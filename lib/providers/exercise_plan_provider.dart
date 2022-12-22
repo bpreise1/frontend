@@ -42,6 +42,10 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         dayToExercisesMap: state.dayToExercisesMap);
   }
 
+  void resetPlan() {
+    state = const ExercisePlanState();
+  }
+
   void addExercise(Exercise exercise) {
     if (state.currentDay == '') {
       throw Exception('Add a day before adding exercises');
@@ -155,13 +159,15 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 
   void removeDay(String day) {
-    String newDay = state.dayToExercisesMap.length == 1
-        ? ''
-        : state.dayToExercisesMap.keys.last;
+    if (state.dayToExercisesMap.length == 1) {
+      throw Exception('There must be at least one day in a plan');
+    }
 
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
     newDayToExercisesMap.remove(day);
+
+    String newDay = newDayToExercisesMap.keys.last;
 
     state = ExercisePlanState(
         planName: state.planName,

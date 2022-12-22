@@ -13,7 +13,7 @@ class DraggableExerciseListItem extends StatelessWidget {
     return Draggable(
         data: exercise,
         feedback: ExerciseCard(exercise: exercise),
-        childWhenDragging: ExerciseListItem(exercise: exercise),
-        child: ExerciseListItem(exercise: exercise));
+        childWhenDragging: ExerciseCard(exercise: exercise),
+        child: ExerciseCard(exercise: exercise));
   }
 }

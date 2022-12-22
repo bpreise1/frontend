@@ -45,14 +45,6 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
 
       return Row(
         children: [
-          if (widget.editingEnabled)
-            IconButton(
-                onPressed: () {
-                  ref
-                      .read(exercisePlanProvider.notifier)
-                      .addDay('Day ${allDays.length + 1}');
-                },
-                icon: const Icon(Icons.add_circle)),
           Expanded(
               child: DropdownButton<String>(
                   isExpanded: true,
@@ -87,14 +79,50 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                               .selectDay(value!);
                         }))),
           if (widget.editingEnabled)
-            IconButton(
-                onPressed: () {
-                  print(allDays);
-                  setState(() {
-                    _isEditing = true;
-                  });
-                },
-                icon: const Icon(Icons.edit))
+            Row(children: [
+              IconButton(
+                  onPressed: () {
+                    ref
+                        .read(exercisePlanProvider.notifier)
+                        .addDay('Day ${allDays.length + 1}');
+                  },
+                  icon: const Icon(Icons.add_circle)),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isEditing = true;
+                    });
+                  },
+                  icon: const Icon(Icons.edit)),
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: ((context) {
+                          return AlertDialog(
+                              title: Text(
+                                  'Are you sure you want to delete $currentDay?'),
+                              content: Row(
+                                children: [
+                                  OutlinedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('No')),
+                                  OutlinedButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(exercisePlanProvider.notifier)
+                                            .removeDay(currentDay);
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Yes'))
+                                ],
+                              ));
+                        }));
+                  },
+                  icon: const Icon(Icons.delete))
+            ]),
         ],
       );
     }));

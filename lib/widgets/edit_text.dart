@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class EditText extends StatefulWidget {
-  const EditText({this.initialText = '', required this.onSubmitted, super.key});
+  const EditText({this.text = '', required this.onSubmitted, super.key});
 
-  final String initialText;
+  final String text;
   final void Function(String text) onSubmitted;
 
   @override
@@ -14,12 +14,10 @@ class _EditTextState extends State<EditText> {
   final _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isEditing = false;
-  String _text = '';
 
   @override
   void initState() {
     super.initState();
-    _text = widget.initialText;
     _focusNode.addListener(_handleFocusChange);
   }
 
@@ -33,7 +31,6 @@ class _EditTextState extends State<EditText> {
 
   @override
   void dispose() {
-    _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
     _textController.dispose();
     super.dispose();
@@ -41,24 +38,24 @@ class _EditTextState extends State<EditText> {
 
   @override
   Widget build(BuildContext context) {
+    String text = widget.text;
     return Row(children: [
       Expanded(
           child: _isEditing
               ? TextField(
                   textAlign: TextAlign.center,
-                  controller: _textController,
+                  controller: _textController..text = text,
                   autofocus: true,
                   focusNode: _focusNode,
                   onSubmitted: (text) {
                     setState(() {
-                      _text = text;
                       _isEditing = false;
-                      widget.onSubmitted(_text);
+                      widget.onSubmitted(text);
                     });
                   },
                 )
               : Text(
-                  _text,
+                  text,
                   textAlign: TextAlign.center,
                 )),
       IconButton(
