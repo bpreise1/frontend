@@ -5,14 +5,14 @@ class Exercise {
   const Exercise(
       {required this.name,
       required this.description,
-      this.image,
+      required this.image,
       this.sets,
       this.reps,
       this.rest});
 
   final String name;
   final String description;
-  final ImageProvider? image;
+  final ImageProvider image;
   final int? sets;
   final int? reps;
   final String? rest;
@@ -21,15 +21,15 @@ class Exercise {
 class ExercisePlanState {
   const ExercisePlanState(
       {this.planName = 'My Plan',
-      this.day = 'Day 1',
+      this.currentDay = 'Day 1',
       this.dayToExercisesMap = const {'Day 1': []}});
 
   final String planName;
-  final String day;
+  final String currentDay;
   final Map<String, List<Exercise>> dayToExercisesMap;
 
   List<String> get days => dayToExercisesMap.keys.toList();
-  List<Exercise>? get exercises => dayToExercisesMap[day];
+  List<Exercise>? get exercises => dayToExercisesMap[currentDay];
 }
 
 class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
@@ -38,18 +38,18 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   void changePlanName(String name) {
     state = ExercisePlanState(
         planName: name,
-        day: state.day,
+        currentDay: state.currentDay,
         dayToExercisesMap: state.dayToExercisesMap);
   }
 
   void addExercise(Exercise exercise) {
-    if (state.day == '') {
+    if (state.currentDay == '') {
       throw Exception('Add a day before adding exercises');
     }
 
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     state.dayToExercisesMap.forEach((key, value) {
-      if (key == state.day) {
+      if (key == state.currentDay) {
         List<Exercise> newExerciseList = List.from(value);
         newExerciseList.add(exercise);
         newDayToExercisesMap[key] = newExerciseList;
@@ -60,14 +60,14 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: state.day,
+        currentDay: state.currentDay,
         dayToExercisesMap: newDayToExercisesMap);
   }
 
   void removeExercise(Exercise exercise) {
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     state.dayToExercisesMap.forEach((key, value) {
-      if (key == state.day) {
+      if (key == state.currentDay) {
         List<Exercise> newExerciseList = List.from(value);
         newExerciseList.remove(exercise);
         newDayToExercisesMap[key] = newExerciseList;
@@ -78,7 +78,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: state.day,
+        currentDay: state.currentDay,
         dayToExercisesMap: newDayToExercisesMap);
   }
 
@@ -90,7 +90,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     newExerciseList.insert(newIndex, newExerciseList.removeAt(oldIndex));
 
     state.dayToExercisesMap.forEach((key, value) {
-      if (key == state.day) {
+      if (key == state.currentDay) {
         newDayToExercisesMap[key] = newExerciseList;
       } else {
         newDayToExercisesMap[key] = value;
@@ -99,7 +99,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: state.day,
+        currentDay: state.currentDay,
         dayToExercisesMap: newDayToExercisesMap);
   }
 
@@ -109,7 +109,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     }
 
     if (state.dayToExercisesMap.containsKey(day)) {
-      throw Exception('Each day must have a unique name');
+      throw Exception('Name "$day" can only be used once');
     }
 
     final newDayToExercisesMap =
@@ -118,7 +118,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: day,
+        currentDay: day,
         dayToExercisesMap: newDayToExercisesMap);
   }
 
@@ -127,13 +127,13 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
       throw Exception('Day must not be empty');
     }
 
-    if (state.dayToExercisesMap.containsKey(name)) {
-      throw Exception('Each day must have a unique name');
+    if (state.currentDay != name && state.dayToExercisesMap.containsKey(name)) {
+      throw Exception('Name "$name" can only be used once');
     }
 
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     state.dayToExercisesMap.forEach((key, value) {
-      if (key == state.day) {
+      if (key == state.currentDay) {
         List<Exercise> newExerciseList = value;
         newDayToExercisesMap[name] = newExerciseList;
       } else {
@@ -143,14 +143,14 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: name,
+        currentDay: name,
         dayToExercisesMap: newDayToExercisesMap);
   }
 
   void selectDay(String day) {
     state = ExercisePlanState(
         planName: state.planName,
-        day: day,
+        currentDay: day,
         dayToExercisesMap: state.dayToExercisesMap);
   }
 
@@ -165,7 +165,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     state = ExercisePlanState(
         planName: state.planName,
-        day: newDay,
+        currentDay: newDay,
         dayToExercisesMap: newDayToExercisesMap);
   }
 }

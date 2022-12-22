@@ -16,7 +16,7 @@ class ExerciseCard extends StatelessWidget {
     return Card(
         child: Row(
       children: [
-        ImageIcon(exercise.image),
+        Image(image: exercise.image, width: 50, height: 50),
         Text(exercise.name),
         if (isInsertedInCreatePlanList)
           Consumer(builder: ((context, ref, child) {

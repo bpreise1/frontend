@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/widgets/exercise_card.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 
 class DraggableExerciseListItem extends StatelessWidget {
@@ -11,9 +12,7 @@ class DraggableExerciseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Draggable(
         data: exercise,
-        feedback: Card(
-            child: Row(
-                children: [ImageIcon(exercise.image), Text(exercise.name)])),
+        feedback: ExerciseCard(exercise: exercise),
         childWhenDragging: ExerciseListItem(exercise: exercise),
         child: ExerciseListItem(exercise: exercise));
   }
