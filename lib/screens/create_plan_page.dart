@@ -4,7 +4,8 @@ import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
 import 'package:frontend/widgets/edit_text.dart';
-import 'package:frontend/widgets/exercise_card.dart';
+import 'package:frontend/widgets/exercise_list_item.dart';
+import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 
 class CreatePlanPage extends StatelessWidget {
   const CreatePlanPage({super.key});
@@ -12,86 +13,132 @@ class CreatePlanPage extends StatelessWidget {
   //TODO: Make multiple consumer widgets so everything doesn't rerender anytime something changes
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(child: DraggableExerciseList()),
-        Consumer(builder: ((context, ref, child) {
-          String planName = ref.watch(exercisePlanProvider).planName;
-          List<Exercise>? exercises = ref.watch(exercisePlanProvider).exercises;
+    return Scaffold(
+        body: Row(
+          children: [
+            const Expanded(child: DraggableExerciseList()),
+            Consumer(builder: ((context, ref, child) {
+              String currentDay = ref.watch(exercisePlanProvider).currentDay;
+              String planName = ref.watch(exercisePlanProvider).planName;
+              List<Exercise>? exercises =
+                  ref.watch(exercisePlanProvider).exercises;
 
-          return Expanded(
-              flex: 2,
-              child: Column(
-                children: [
-                  Row(children: [
-                    Expanded(
-                        child: EditText(
-                            text: planName,
-                            onSubmitted: (text) {
+              return Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Row(children: [
+                        Expanded(
+                            child: EditText(
+                                text: planName,
+                                onSubmitted: (text) {
+                                  ref
+                                      .read(exercisePlanProvider.notifier)
+                                      .changePlanName(text);
+                                })),
+                        IconButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: ((context) {
+                                    return AlertDialog(
+                                        title: Text(
+                                            'Are you sure you want to reset $planName?'),
+                                        content: Row(
+                                          children: [
+                                            OutlinedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('No')),
+                                            OutlinedButton(
+                                                onPressed: () {
+                                                  ref
+                                                      .read(exercisePlanProvider
+                                                          .notifier)
+                                                      .resetPlan();
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Yes'))
+                                          ],
+                                        ));
+                                  }));
+                            },
+                            icon: const Icon(Icons.restore)),
+                      ]),
+                      const DaySelectDropdown(editingEnabled: true),
+                      Expanded(
+                          child: DragTarget<Exercise>(onAccept: (exercise) {
+                        ref
+                            .read(exercisePlanProvider.notifier)
+                            .addExercise(exercise);
+                      }, builder: ((context, candidateData, rejectedData) {
+                        return ReorderableListView(
+                            onReorder: (oldIndex, newIndex) {
                               ref
                                   .read(exercisePlanProvider.notifier)
-                                  .changePlanName(text);
-                            })),
-                    IconButton(
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: ((context) {
-                                return AlertDialog(
-                                    title: Text(
-                                        'Are you sure you want to reset $planName?'),
-                                    content: Row(
-                                      children: [
-                                        OutlinedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('No')),
-                                        OutlinedButton(
-                                            onPressed: () {
+                                  .moveExercise(oldIndex, newIndex);
+                            },
+                            children: [
+                              for (int index = 0;
+                                  exercises != null && index < exercises.length;
+                                  index++)
+                                ExerciseListItem(
+                                  key: Key('$index'),
+                                  exercise: exercises[index],
+                                  children: [
+                                    Expanded(
+                                        child: ExerciseListItemTextfield(
+                                            text: exercises[index].sets,
+                                            onSubmitted: ((text) {
                                               ref
                                                   .read(exercisePlanProvider
                                                       .notifier)
-                                                  .resetPlan();
-                                              Navigator.pop(context);
+                                                  .updateSets(
+                                                      currentDay, index, text);
+                                            }),
+                                            helperText: 'Sets')),
+                                    Expanded(
+                                        child: ExerciseListItemTextfield(
+                                            text: exercises[index].reps,
+                                            onSubmitted: (text) {
+                                              ref
+                                                  .read(exercisePlanProvider
+                                                      .notifier)
+                                                  .updateReps(
+                                                      currentDay, index, text);
                                             },
-                                            child: const Text('Yes'))
-                                      ],
-                                    ));
-                              }));
-                        },
-                        icon: const Icon(Icons.restore)),
-                  ]),
-                  const DaySelectDropdown(editingEnabled: true),
-                  Expanded(
-                      child: DragTarget<Exercise>(onAccept: (exercise) {
-                    ref
-                        .read(exercisePlanProvider.notifier)
-                        .addExercise(exercise);
-                  }, builder: ((context, candidateData, rejectedData) {
-                    return ReorderableListView(
-                        onReorder: (oldIndex, newIndex) {
-                          ref
-                              .read(exercisePlanProvider.notifier)
-                              .moveExercise(oldIndex, newIndex);
-                        },
-                        children: [
-                          for (int i = 0;
-                              exercises != null && i < exercises.length;
-                              i++)
-                            ExerciseCard(
-                              key: Key('$i'),
-                              exercise: exercises[i],
-                              isInsertedInCreatePlanList: true,
-                            ),
-                        ]);
-                  }))),
-                  FloatingActionButton(
-                      onPressed: () {}, child: const Icon(Icons.add)),
-                ],
-              ));
-        }))
-      ],
-    );
+                                            helperText: 'Reps')),
+                                    IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () {
+                                          ref
+                                              .read(
+                                                  exercisePlanProvider.notifier)
+                                              .removeExerciseAt(index);
+                                        })
+                                  ],
+                                ),
+                            ]);
+                      }))),
+                    ],
+                  ));
+            }))
+          ],
+        ),
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniStartFloat,
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Save and Publish'),
+                      content: Container(),
+                    );
+                  });
+            },
+            child: const Icon(Icons.add)));
   }
 }

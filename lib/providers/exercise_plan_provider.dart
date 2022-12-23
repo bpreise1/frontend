@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Exercise {
-  const Exercise(
-      {required this.name,
-      required this.description,
-      required this.image,
-      this.sets,
-      this.reps,
-      this.rest});
+  const Exercise({
+    required this.name,
+    required this.description,
+    required this.image,
+    this.sets = '',
+    this.reps = '',
+  });
 
   final String name;
   final String description;
   final ImageProvider image;
-  final int? sets;
-  final int? reps;
-  final String? rest;
+  final String sets;
+  final String reps;
 }
 
 class ExercisePlanState {
@@ -68,12 +67,12 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         dayToExercisesMap: newDayToExercisesMap);
   }
 
-  void removeExercise(Exercise exercise) {
+  void removeExerciseAt(int index) {
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     state.dayToExercisesMap.forEach((key, value) {
       if (key == state.currentDay) {
         List<Exercise> newExerciseList = List.from(value);
-        newExerciseList.remove(exercise);
+        newExerciseList.removeAt(index);
         newDayToExercisesMap[key] = newExerciseList;
       } else {
         newDayToExercisesMap[key] = value;
@@ -107,14 +106,13 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         dayToExercisesMap: newDayToExercisesMap);
   }
 
-  void addDay(String day) {
-    if (day == '') {
-      throw Exception('Day must not be empty');
+  void addDay() {
+    int numDayToAdd = state.days.length + 1;
+    while (state.dayToExercisesMap.containsKey('Day $numDayToAdd')) {
+      numDayToAdd++;
     }
 
-    if (state.dayToExercisesMap.containsKey(day)) {
-      throw Exception('Name "$day" can only be used once');
-    }
+    String day = 'Day $numDayToAdd';
 
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
@@ -165,13 +163,55 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
 
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
+    int indexToRemove = newDayToExercisesMap.keys.toList().indexOf(day);
     newDayToExercisesMap.remove(day);
 
-    String newDay = newDayToExercisesMap.keys.last;
+    String newDay;
+    if (indexToRemove == 0) {
+      newDay = newDayToExercisesMap.keys.first;
+    } else {
+      newDay = newDayToExercisesMap.keys.toList()[indexToRemove - 1];
+    }
 
     state = ExercisePlanState(
         planName: state.planName,
         currentDay: newDay,
+        dayToExercisesMap: newDayToExercisesMap);
+  }
+
+  void updateSets(String day, int index, String sets) {
+    final newDayToExercisesMap =
+        Map<String, List<Exercise>>.from(state.dayToExercisesMap);
+
+    Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
+    newDayToExercisesMap[day]![index] = Exercise(
+        name: exerciseToReplace.name,
+        description: exerciseToReplace.description,
+        image: exerciseToReplace.image,
+        sets: sets,
+        reps: exerciseToReplace.reps);
+
+    state = ExercisePlanState(
+        planName: state.planName,
+        currentDay: state.currentDay,
+        dayToExercisesMap: newDayToExercisesMap);
+  }
+
+  void updateReps(String day, int index, String reps) {
+    final newDayToExercisesMap =
+        Map<String, List<Exercise>>.from(state.dayToExercisesMap);
+
+    Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
+    newDayToExercisesMap[day]![index] = Exercise(
+        name: exerciseToReplace.name,
+        description: exerciseToReplace.description,
+        image: exerciseToReplace.image,
+        sets: exerciseToReplace.sets,
+        reps: reps);
+
+    state = ExercisePlanState(
+        planName: state.planName,
+        currentDay: state.currentDay,
         dayToExercisesMap: newDayToExercisesMap);
   }
 }
