@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -41,13 +40,19 @@ class CompletedExercisePlanRepository
       return CompletedExercisePlan.fromJson(jsonDecode(contents));
     }).toList());
 
+    completedExercisePlans.sort((plan1, plan2) {
+      return -plan1.lastUsed.compareTo(plan2.lastUsed);
+    });
     return completedExercisePlans;
   }
 
   @override
   Future<void> removeCompletedExercisePlanFromDevice(
       CompletedExercisePlan exercisePlan) async {
-    // TODO: implement removeCompletedExercisePlanFromDevice
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final File file = File(
+        '${appDocDir.path}/completed_exercise_plan_${exercisePlan.id}.txt');
+    await file.delete();
   }
 }
 

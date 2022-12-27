@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:frontend/models/exercise.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,11 +12,14 @@ class InProgressExercisePlan {
 
 class CompletedExercisePlan {
   CompletedExercisePlan(
-      {required this.planName, required this.dayToExercisesMap});
+      {required this.planName,
+      required this.dayToExercisesMap,
+      required this.lastUsed});
 
   String id = const Uuid().v4();
   final String planName;
   Map<String, List<Exercise>> dayToExercisesMap;
+  final DateTime lastUsed;
 
   factory CompletedExercisePlan.fromJson(Map<String, dynamic> json) {
     jsonToExerciseList(List exerciseList) =>
@@ -29,7 +30,9 @@ class CompletedExercisePlan {
         (day, exerciseList) => MapEntry(day, jsonToExerciseList(exerciseList)));
 
     CompletedExercisePlan completedExercisePlan = CompletedExercisePlan(
-        planName: json['planName'], dayToExercisesMap: parsedDayToExercisesMap);
+        planName: json['planName'],
+        dayToExercisesMap: parsedDayToExercisesMap,
+        lastUsed: DateTime.parse(json['lastUsed']));
     completedExercisePlan.id = json['id'];
     return completedExercisePlan;
   }
@@ -40,6 +43,7 @@ class CompletedExercisePlan {
     return {
       'id': id,
       'planName': planName,
+      'lastUsed': lastUsed.toString(),
       'plan': dayToExercisesMap.map<String, List<Map<String, String>>>(
           (day, exerciseList) =>
               MapEntry(day, exerciseListToJson(exerciseList))),

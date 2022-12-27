@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/screens/create_plan_page.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerWidget {
   const Home({super.key});
 
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
   final List<Widget> _screens = const [
     HomePage(),
     SearchPage(),
@@ -23,14 +19,16 @@ class _HomeState extends State<Home> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    int selectedIndex = ref.watch(bottomNavigationBarProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fitkick'),
       ),
-      body: _screens[_selectedIndex],
+      body: _screens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
@@ -43,11 +41,11 @@ class _HomeState extends State<Home> {
           BottomNavigationBarItem(
               icon: Icon(Icons.import_contacts), label: 'encyclopedia'),
         ],
-        onTap: ((index) => {
-              setState(() {
-                _selectedIndex = index;
-              })
-            }),
+        onTap: ((index) {
+          ref
+              .read(bottomNavigationBarProvider.notifier)
+              .update((state) => index);
+        }),
       ),
     );
   }

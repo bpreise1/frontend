@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/repository/completed_exercise_plan_repository.dart';
 
@@ -50,7 +51,8 @@ class SubmitPlanDialog extends StatelessWidget {
                       CompletedExercisePlan(
                           planName: inProgressExerciseplan.planName,
                           dayToExercisesMap:
-                              inProgressExerciseplan.dayToExercisesMap);
+                              inProgressExerciseplan.dayToExercisesMap,
+                          lastUsed: DateTime.now());
 
                   return OutlinedButton(
                       onPressed: () async {
@@ -67,6 +69,12 @@ class SubmitPlanDialog extends StatelessWidget {
                         }
 
                         if (publishIsChecked) {}
+
+                        Navigator.pop(context);
+                        ref.read(exercisePlanProvider.notifier).resetPlan();
+                        ref
+                            .read(bottomNavigationBarProvider.notifier)
+                            .update((state) => 3);
                       },
                       child: const Text('Submit'));
                 }))
