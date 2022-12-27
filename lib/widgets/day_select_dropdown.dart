@@ -100,7 +100,7 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                               builder: ((context) {
                                 return AlertDialog(
                                     title: Text(
-                                        'Are you sure you want to delete $currentDay?'),
+                                        'Are you sure you want to delete "$currentDay"?'),
                                     content: Row(
                                       children: [
                                         OutlinedButton(

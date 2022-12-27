@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/models/exercise.dart';
 
 class ExerciseListItem extends StatelessWidget {
   const ExerciseListItem(
@@ -31,7 +31,10 @@ class ExerciseListItem extends StatelessWidget {
       child: Card(
         child: Row(
           children: [
-            Image(image: exercise.image, width: 50, height: 50),
+            Image.asset(
+                'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
+                width: 50,
+                height: 50),
             Text(exercise.name),
             ...children
           ],

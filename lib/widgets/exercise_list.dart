@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/models/exercise.dart';
 import 'package:frontend/statics/all_exercises.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 

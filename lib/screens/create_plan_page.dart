@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/exercise.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
 import 'package:frontend/widgets/edit_text.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
+import 'package:frontend/widgets/submit_plan_dialog.dart';
 
 class CreatePlanPage extends StatelessWidget {
   const CreatePlanPage({super.key});
@@ -133,10 +135,7 @@ class CreatePlanPage extends StatelessWidget {
               showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      title: const Text('Save and Publish'),
-                      content: Container(),
-                    );
+                    return const SubmitPlanDialog();
                   });
             },
             child: const Icon(Icons.add)));
