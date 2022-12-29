@@ -4,6 +4,7 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/repository/completed_exercise_plan_repository.dart';
+import 'package:frontend/screens/create_plan_page.dart';
 import 'package:frontend/widgets/plan_list_item.dart';
 
 class PlanList extends StatelessWidget {
@@ -56,7 +57,7 @@ class PlanList extends StatelessWidget {
                                         onPressed: () {
                                           void editPlanAndNavigate() {
                                             ref
-                                                .read(exercisePlanProvider
+                                                .read(createExercisePlanProvider
                                                     .notifier)
                                                 .editPlan(plan);
                                             ref
@@ -67,8 +68,8 @@ class PlanList extends StatelessWidget {
                                           }
 
                                           if (ref
-                                              .read(
-                                                  exercisePlanProvider.notifier)
+                                              .read(createExercisePlanProvider
+                                                  .notifier)
                                               .isEditing()) {
                                             showDialog(
                                                 context: context,

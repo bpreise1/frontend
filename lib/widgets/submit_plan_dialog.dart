@@ -4,6 +4,7 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/repository/completed_exercise_plan_repository.dart';
+import 'package:frontend/screens/saved_plans_page.dart';
 
 class SubmitPlanDialog extends StatelessWidget {
   const SubmitPlanDialog({super.key});
@@ -37,7 +38,7 @@ class SubmitPlanDialog extends StatelessWidget {
                     })),
                 Consumer(builder: ((context, ref, child) {
                   InProgressExercisePlan inProgressExerciseplan =
-                      ref.watch(exercisePlanProvider).exercisePlan;
+                      ref.watch(createExercisePlanProvider).exercisePlan;
 
                   void validatePlan() {
                     inProgressExerciseplan.dayToExercisesMap
@@ -71,7 +72,9 @@ class SubmitPlanDialog extends StatelessWidget {
                         if (publishIsChecked) {}
 
                         Navigator.pop(context);
-                        ref.read(exercisePlanProvider.notifier).resetPlan();
+                        ref
+                            .read(createExercisePlanProvider.notifier)
+                            .resetPlan();
                         ref
                             .read(bottomNavigationBarProvider.notifier)
                             .update((state) => 3);

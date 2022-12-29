@@ -5,11 +5,13 @@ class ExerciseListItemTextfield extends StatefulWidget {
       {required this.text,
       required this.helperText,
       required this.onSubmitted,
+      this.hintText,
       super.key});
 
   final String text;
   final String helperText;
   final void Function(String text) onSubmitted;
+  final String? hintText;
 
   @override
   State<ExerciseListItemTextfield> createState() =>
@@ -54,6 +56,7 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   helperText: widget.helperText,
+                  hintText: widget.hintText ?? '',
                 ),
                 keyboardType: TextInputType.number)));
   }

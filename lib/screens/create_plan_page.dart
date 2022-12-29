@@ -20,10 +20,11 @@ class CreatePlanPage extends StatelessWidget {
           children: [
             const Expanded(child: DraggableExerciseList()),
             Consumer(builder: ((context, ref, child) {
-              String currentDay = ref.watch(exercisePlanProvider).currentDay;
-              String planName = ref.watch(exercisePlanProvider).planName;
+              String currentDay =
+                  ref.watch(createExercisePlanProvider).currentDay;
+              String planName = ref.watch(createExercisePlanProvider).planName;
               List<Exercise>? exercises =
-                  ref.watch(exercisePlanProvider).exercises;
+                  ref.watch(createExercisePlanProvider).exercises;
 
               return Expanded(
                   flex: 2,
@@ -35,7 +36,7 @@ class CreatePlanPage extends StatelessWidget {
                                 text: planName,
                                 onSubmitted: (text) {
                                   ref
-                                      .read(exercisePlanProvider.notifier)
+                                      .read(createExercisePlanProvider.notifier)
                                       .changePlanName(text);
                                 })),
                         IconButton(
@@ -56,8 +57,9 @@ class CreatePlanPage extends StatelessWidget {
                                             OutlinedButton(
                                                 onPressed: () {
                                                   ref
-                                                      .read(exercisePlanProvider
-                                                          .notifier)
+                                                      .read(
+                                                          createExercisePlanProvider
+                                                              .notifier)
                                                       .resetPlan();
                                                   Navigator.pop(context);
                                                 },
@@ -68,17 +70,19 @@ class CreatePlanPage extends StatelessWidget {
                             },
                             icon: const Icon(Icons.restore)),
                       ]),
-                      const DaySelectDropdown(editingEnabled: true),
+                      DaySelectDropdown(
+                          provider: createExercisePlanProvider,
+                          editingEnabled: true),
                       Expanded(
                           child: DragTarget<Exercise>(onAccept: (exercise) {
                         ref
-                            .read(exercisePlanProvider.notifier)
+                            .read(createExercisePlanProvider.notifier)
                             .addExercise(exercise);
                       }, builder: ((context, candidateData, rejectedData) {
                         return ReorderableListView(
                             onReorder: (oldIndex, newIndex) {
                               ref
-                                  .read(exercisePlanProvider.notifier)
+                                  .read(createExercisePlanProvider.notifier)
                                   .moveExercise(oldIndex, newIndex);
                             },
                             children: [
@@ -94,8 +98,9 @@ class CreatePlanPage extends StatelessWidget {
                                             text: exercises[index].sets,
                                             onSubmitted: ((text) {
                                               ref
-                                                  .read(exercisePlanProvider
-                                                      .notifier)
+                                                  .read(
+                                                      createExercisePlanProvider
+                                                          .notifier)
                                                   .updateSets(
                                                       currentDay, index, text);
                                             }),
@@ -105,8 +110,9 @@ class CreatePlanPage extends StatelessWidget {
                                             text: exercises[index].reps,
                                             onSubmitted: (text) {
                                               ref
-                                                  .read(exercisePlanProvider
-                                                      .notifier)
+                                                  .read(
+                                                      createExercisePlanProvider
+                                                          .notifier)
                                                   .updateReps(
                                                       currentDay, index, text);
                                             },
@@ -115,8 +121,8 @@ class CreatePlanPage extends StatelessWidget {
                                         icon: const Icon(Icons.delete),
                                         onPressed: () {
                                           ref
-                                              .read(
-                                                  exercisePlanProvider.notifier)
+                                              .read(createExercisePlanProvider
+                                                  .notifier)
                                               .removeExerciseAt(index);
                                         })
                                   ],

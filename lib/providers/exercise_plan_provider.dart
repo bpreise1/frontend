@@ -201,6 +201,15 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         currentDay: exercisePlan.dayToExercisesMap.keys.first);
   }
 
+  void setPlan(CompletedExercisePlan exercisePlan) {
+    //TODO: change currentDay logic
+    state = ExercisePlanState(
+        exercisePlan: InProgressExercisePlan(
+            planName: exercisePlan.planName,
+            dayToExercisesMap: exercisePlan.dayToExercisesMap),
+        currentDay: exercisePlan.dayToExercisesMap.keys.first);
+  }
+
   bool isEditing() {
     if (state.days.length == 1 &&
         state.currentDay == 'Day 1' &&
@@ -211,6 +220,10 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 }
 
-final exercisePlanProvider =
+final createExercisePlanProvider =
+    StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState>(
+        ((ref) => ExercisePlanNotifier()));
+
+final savedExercisePlanProvider =
     StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState>(
         ((ref) => ExercisePlanNotifier()));

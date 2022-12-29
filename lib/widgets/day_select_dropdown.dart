@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 
 class DaySelectDropdown extends StatefulWidget {
-  const DaySelectDropdown({this.editingEnabled = false, super.key});
+  const DaySelectDropdown(
+      {required this.provider, this.editingEnabled = false, super.key});
 
   final bool editingEnabled;
+  final StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState> provider;
 
   @override
   State<DaySelectDropdown> createState() => _DaySelectDropdownState();
@@ -40,8 +42,8 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: ((context, ref, child) {
-      String currentDay = ref.watch(exercisePlanProvider).currentDay;
-      List<String> allDays = ref.watch(exercisePlanProvider).days;
+      String currentDay = ref.watch(widget.provider).currentDay;
+      List<String> allDays = ref.watch(widget.provider).days;
 
       return Row(
         children: [
@@ -62,7 +64,7 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                                       focusNode: _focusNode,
                                       onSubmitted: (text) {
                                         ref
-                                            .read(exercisePlanProvider.notifier)
+                                            .read(widget.provider.notifier)
                                             .updateDayName(text);
                                         setState(() {
                                           _isEditing = false;
@@ -74,15 +76,13 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                   onChanged: _isEditing
                       ? null
                       : ((value) {
-                          ref
-                              .read(exercisePlanProvider.notifier)
-                              .selectDay(value!);
+                          ref.read(widget.provider.notifier).selectDay(value!);
                         }))),
           if (widget.editingEnabled)
             Row(children: [
               IconButton(
                   onPressed: () {
-                    ref.read(exercisePlanProvider.notifier).addDay();
+                    ref.read(widget.provider.notifier).addDay();
                   },
                   icon: const Icon(Icons.add_circle)),
               IconButton(
@@ -111,8 +111,8 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                                         OutlinedButton(
                                             onPressed: () {
                                               ref
-                                                  .read(exercisePlanProvider
-                                                      .notifier)
+                                                  .read(
+                                                      widget.provider.notifier)
                                                   .removeDay(currentDay);
                                               Navigator.pop(context);
                                             },
