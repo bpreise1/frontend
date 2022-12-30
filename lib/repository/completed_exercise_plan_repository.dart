@@ -5,17 +5,23 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class ICompletedExercisePlanRepository {
-  Future<void> saveCompletedExercisePlansToDevice(
+  Future<void> saveCompletedExercisePlanToDevice(
       CompletedExercisePlan exercisePlan);
   Future<void> removeCompletedExercisePlanFromDevice(
       CompletedExercisePlan exercisePlan);
   Future<List<CompletedExercisePlan>> getCompletedExercisePlansFromDevice();
+  Future<CompletedExercisePlan> getCompletedExercisePlanFromDeviceById(
+      String exercisePlanId);
+  Future<void> beginCompletedExercisePlanById(String exercisePlanId);
+  Future<void> updateCompletedExercisePlanProgressById(
+      String exercisePlanId, InProgressExercisePlan inProgressExercisePlan);
+  Future<void> endCompletedExercisePlanById(String exercisePlanId);
 }
 
 class CompletedExercisePlanRepository
     implements ICompletedExercisePlanRepository {
   @override
-  Future<void> saveCompletedExercisePlansToDevice(
+  Future<void> saveCompletedExercisePlanToDevice(
       CompletedExercisePlan exercisePlan) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final File file = File(
@@ -47,12 +53,55 @@ class CompletedExercisePlanRepository
   }
 
   @override
+  Future<CompletedExercisePlan> getCompletedExercisePlanFromDeviceById(
+      String exercisePlanId) async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final File file =
+        File('${appDocDir.path}/completed_exercise_plan_$exercisePlanId.txt');
+    final contents = await file.readAsString();
+    return CompletedExercisePlan.fromJson(jsonDecode(contents));
+  }
+
+  @override
   Future<void> removeCompletedExercisePlanFromDevice(
       CompletedExercisePlan exercisePlan) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final File file = File(
         '${appDocDir.path}/completed_exercise_plan_${exercisePlan.id}.txt');
     await file.delete();
+  }
+
+  @override
+  Future<void> beginCompletedExercisePlanById(String exercisePlanId) async {
+    final completedExercisePlan =
+        await getCompletedExercisePlanFromDeviceById(exercisePlanId);
+
+    completedExercisePlan.isInProgress = true;
+
+    await saveCompletedExercisePlanToDevice(completedExercisePlan);
+  }
+
+  @override
+  Future<void> updateCompletedExercisePlanProgressById(String exercisePlanId,
+      InProgressExercisePlan inProgressExercisePlan) async {
+    final completedExercisePlan =
+        await getCompletedExercisePlanFromDeviceById(exercisePlanId);
+
+    completedExercisePlan.dayToExercisesMap =
+        inProgressExercisePlan.dayToExercisesMap;
+    completedExercisePlan.lastUsed = DateTime.now();
+
+    await saveCompletedExercisePlanToDevice(completedExercisePlan);
+  }
+
+  @override
+  Future<void> endCompletedExercisePlanById(String exercisePlanId) async {
+    final completedExercisePlan =
+        await getCompletedExercisePlanFromDeviceById(exercisePlanId);
+
+    completedExercisePlan.isInProgress = false;
+
+    await saveCompletedExercisePlanToDevice(completedExercisePlan);
   }
 }
 

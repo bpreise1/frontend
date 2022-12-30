@@ -107,13 +107,13 @@ class CreatePlanPage extends StatelessWidget {
                                             helperText: 'Sets')),
                                     Expanded(
                                         child: ExerciseListItemTextfield(
-                                            text: exercises[index].reps,
+                                            text: exercises[index].reps[0],
                                             onSubmitted: (text) {
                                               ref
                                                   .read(
                                                       createExercisePlanProvider
                                                           .notifier)
-                                                  .updateReps(
+                                                  .updateGoalReps(
                                                       currentDay, index, text);
                                             },
                                             helperText: 'Reps')),

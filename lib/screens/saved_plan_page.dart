@@ -1,66 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/providers/completed_exercise_plan_repository_provider.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 
-class SavedPlanPage extends ConsumerWidget {
+class SavedPlanPage extends StatefulWidget {
   const SavedPlanPage({required this.exercisePlan, super.key});
 
   final CompletedExercisePlan exercisePlan;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentDay = ref.watch(savedExercisePlanProvider).currentDay;
-    final currentExercises = ref.watch(savedExercisePlanProvider).exercises!;
+  State<SavedPlanPage> createState() => _SavedPlanPageState();
+}
 
-    final planName = exercisePlan.planName;
-    final planExercises = exercisePlan.dayToExercisesMap[currentDay]!;
+class _SavedPlanPageState extends State<SavedPlanPage> {
+  bool _isInProgress = false;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(planName)),
-      body: Column(children: [
-        DaySelectDropdown(provider: savedExercisePlanProvider),
-        Expanded(
-            child: ListView(children: [
-          for (int index = 0; index < planExercises.length; index++)
-            ExpansionTile(
-                key: PageStorageKey<String>('${currentDay}_$index'),
-                initiallyExpanded: true,
-                title: ExerciseListItem(
-                  exercise: planExercises[index],
-                ),
-                children: [
-                  for (int set = 1;
-                      set < int.parse(planExercises[index].sets) + 1;
-                      set++)
-                    ListTile(
-                        key: PageStorageKey<String>(
-                            '${currentDay}_{$index}_$set'),
-                        title: Row(children: [
-                          Text('Set $set'),
-                          Expanded(
-                              child: ExerciseListItemTextfield(
-                                  text: currentExercises[index].reps,
-                                  helperText: 'Reps',
-                                  hintText: planExercises[index].reps,
-                                  onSubmitted: (text) {
-                                    ref
-                                        .read(
-                                            savedExercisePlanProvider.notifier)
-                                        .updateReps(currentDay, index, text);
-                                  }))
-                        ]))
-                ])
-        ]))
-      ]),
-      floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.done),
-          onPressed: () {
-            print('DONE');
-          }),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _isInProgress = widget.exercisePlan.isInProgress;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: ((context, ref, child) {
+      final currentDay = ref.watch(savedExercisePlanProvider).currentDay;
+      final inProgressPlan = ref.watch(savedExercisePlanProvider).exercisePlan;
+      final planName = ref.watch(savedExercisePlanProvider).planName;
+      final planExercises = ref.watch(savedExercisePlanProvider).exercises!;
+
+      return Scaffold(
+        appBar: AppBar(title: Text(planName)),
+        body: Column(children: [
+          DaySelectDropdown(provider: savedExercisePlanProvider),
+          Expanded(
+              child: ListView(children: [
+            for (int index = 0; index < planExercises.length; index++)
+              ExpansionTile(
+                  key: PageStorageKey<String>('${currentDay}_$index'),
+                  initiallyExpanded: true,
+                  title: ExerciseListItem(
+                    exercise: planExercises[index],
+                  ),
+                  children: [
+                    for (int set = 1;
+                        set < int.parse(planExercises[index].sets) + 1;
+                        set++)
+                      ListTile(
+                          key: PageStorageKey<String>(
+                              '${currentDay}_{$index}_$set'),
+                          title: Row(children: [
+                            Text('Set $set'),
+                            Expanded(
+                                child: ExerciseListItemTextfield(
+                                    text: planExercises[index].reps[set],
+                                    helperText: 'Reps',
+                                    hintText: planExercises[index].reps[0],
+                                    disabled: !_isInProgress,
+                                    onSubmitted: (text) async {
+                                      ref
+                                          .read(savedExercisePlanProvider
+                                              .notifier)
+                                          .updateRepsForSet(
+                                              currentDay, index, set, text);
+                                      await ref
+                                          .read(completedExercisePlansProvider
+                                              .notifier)
+                                          .updateCompletedExercisePlanProgressById(
+                                              widget.exercisePlan.id,
+                                              inProgressPlan);
+                                    }))
+                          ]))
+                  ])
+          ]))
+        ]),
+        floatingActionButton: FloatingActionButton(
+            child: _isInProgress
+                ? const Icon(Icons.done)
+                : const Icon(Icons.play_arrow_rounded),
+            onPressed: () async {
+              if (_isInProgress) {
+                setState(() {
+                  _isInProgress = false;
+                });
+                await ref
+                    .read(completedExercisePlansProvider.notifier)
+                    .endCompletedExercisePlanById(widget.exercisePlan.id);
+              } else {
+                setState(() {
+                  _isInProgress = true;
+                });
+                await ref
+                    .read(completedExercisePlansProvider.notifier)
+                    .beginCompletedExercisePlanById(widget.exercisePlan.id);
+              }
+            }),
+      );
+    }));
   }
 }

@@ -17,21 +17,21 @@ class PlanListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('REBUILD');
     return Material(
         child: InkWell(
       onTap: onTapEnabled
-          ? () {
+          ? () async {
               ref
                   .read(savedExercisePlanProvider.notifier)
                   .setPlan(exercisePlan);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: ((context) =>
-                          SavedPlanPage(exercisePlan: exercisePlan))));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: ((context) =>
+                      SavedPlanPage(exercisePlan: exercisePlan))));
             }
           : null,
       child: Card(
+        color: exercisePlan.isInProgress ? Colors.blue : Colors.white,
         child: Row(
           children: [Text(exercisePlan.planName), ...children],
         ),

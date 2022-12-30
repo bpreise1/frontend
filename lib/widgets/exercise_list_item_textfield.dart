@@ -6,12 +6,14 @@ class ExerciseListItemTextfield extends StatefulWidget {
       required this.helperText,
       required this.onSubmitted,
       this.hintText,
+      this.disabled = false,
       super.key});
 
   final String text;
   final String helperText;
   final void Function(String text) onSubmitted;
   final String? hintText;
+  final bool disabled;
 
   @override
   State<ExerciseListItemTextfield> createState() =>
@@ -52,6 +54,7 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
             child: TextField(
                 controller: _textController..text = widget.text,
                 focusNode: _focusNode,
+                readOnly: widget.disabled,
                 onSubmitted: widget.onSubmitted,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(

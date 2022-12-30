@@ -19,7 +19,8 @@ class CompletedExercisePlan {
   String id = const Uuid().v4();
   final String planName;
   Map<String, List<Exercise>> dayToExercisesMap;
-  final DateTime lastUsed;
+  bool isInProgress = false;
+  DateTime lastUsed;
 
   factory CompletedExercisePlan.fromJson(Map<String, dynamic> json) {
     jsonToExerciseList(List exerciseList) =>
@@ -34,6 +35,7 @@ class CompletedExercisePlan {
         dayToExercisesMap: parsedDayToExercisesMap,
         lastUsed: DateTime.parse(json['lastUsed']));
     completedExercisePlan.id = json['id'];
+    completedExercisePlan.isInProgress = json['isInProgress'];
     return completedExercisePlan;
   }
 
@@ -44,7 +46,8 @@ class CompletedExercisePlan {
       'id': id,
       'planName': planName,
       'lastUsed': lastUsed.toString(),
-      'plan': dayToExercisesMap.map<String, List<Map<String, String>>>(
+      'isInProgress': isInProgress,
+      'plan': dayToExercisesMap.map<String, List<Map<String, dynamic>>>(
           (day, exerciseList) =>
               MapEntry(day, exerciseListToJson(exerciseList))),
     };

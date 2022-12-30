@@ -162,12 +162,15 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
 
+    final newReps = List.filled(int.parse(sets) + 1, '');
+    newReps[0] = state.exercises![index].reps[0];
+
     Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
     newDayToExercisesMap[day]![index] = Exercise(
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: sets,
-        reps: exerciseToReplace.reps);
+        reps: newReps);
 
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
@@ -175,22 +178,47 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         currentDay: state.currentDay);
   }
 
-  void updateReps(String day, int index, String reps) {
+  void updateGoalReps(String day, int index, String reps) {
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
 
     Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
+
+    final newReps = [...exerciseToReplace.reps];
+    newReps[0] = reps;
+
     newDayToExercisesMap[day]![index] = Exercise(
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: exerciseToReplace.sets,
-        reps: reps);
+        reps: newReps);
 
     state = ExercisePlanState(
       exercisePlan: InProgressExercisePlan(
           planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
       currentDay: state.currentDay,
     );
+  }
+
+  void updateRepsForSet(String day, int index, int set, String reps) {
+    final newDayToExercisesMap =
+        Map<String, List<Exercise>>.from(state.dayToExercisesMap);
+
+    Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
+
+    final newReps = [...exerciseToReplace.reps];
+    newReps[set] = reps;
+
+    newDayToExercisesMap[day]![index] = Exercise(
+        name: exerciseToReplace.name,
+        description: exerciseToReplace.description,
+        sets: exerciseToReplace.sets,
+        reps: newReps);
+
+    state = ExercisePlanState(
+        exercisePlan: InProgressExercisePlan(
+            planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
+        currentDay: state.currentDay);
   }
 
   void editPlan(CompletedExercisePlan exercisePlan) {

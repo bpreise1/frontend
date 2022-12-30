@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
+import 'package:frontend/providers/completed_exercise_plan_repository_provider.dart';
 import 'package:frontend/providers/exercise_plan_provider.dart';
-import 'package:frontend/repository/completed_exercise_plan_repository.dart';
-import 'package:frontend/screens/saved_plans_page.dart';
 
 class SubmitPlanDialog extends StatelessWidget {
   const SubmitPlanDialog({super.key});
@@ -63,10 +62,10 @@ class SubmitPlanDialog extends StatelessWidget {
                         validatePlan();
 
                         if (saveIsChecked) {
-                          await completedExercisePlanRepository
-                              .saveCompletedExercisePlansToDevice(
+                          await ref
+                              .read(completedExercisePlansProvider.notifier)
+                              .saveCompletedExercisePlanToDevice(
                                   completedExercisePlan);
-                          print('DONE');
                         }
 
                         if (publishIsChecked) {}
@@ -77,7 +76,7 @@ class SubmitPlanDialog extends StatelessWidget {
                             .resetPlan();
                         ref
                             .read(bottomNavigationBarProvider.notifier)
-                            .update((state) => 3);
+                            .setNavigationBarIndex(3);
                       },
                       child: const Text('Submit'));
                 }))

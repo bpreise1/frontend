@@ -44,7 +44,7 @@ class Home extends ConsumerWidget {
         onTap: ((index) {
           ref
               .read(bottomNavigationBarProvider.notifier)
-              .update((state) => index);
+              .setNavigationBarIndex(index);
         }),
       ),
     );

@@ -22,7 +22,7 @@ class Workout {
       'dateCompleted': dateCompleted.toString(),
       'day': day,
       'exercises': exercises
-          .map<Map<String, String>>((exercise) => exercise.toJson())
+          .map<Map<String, dynamic>>((exercise) => exercise.toJson())
           .toList()
     };
   }
