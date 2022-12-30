@@ -222,10 +222,24 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 
   void editPlan(CompletedExercisePlan exercisePlan) {
+    final Map<String, List<Exercise>> newDayToExercisesMap = {};
+    exercisePlan.dayToExercisesMap.forEach((day, exercises) {
+      final newExerciseList = exercises.map((exercise) {
+        final newReps = List.filled(int.parse(exercise.sets) + 1, '');
+        newReps[0] = exercise.reps[0];
+        return Exercise(
+            name: exercise.name,
+            description: exercise.description,
+            sets: exercise.sets,
+            reps: newReps);
+      }).toList();
+      newDayToExercisesMap[day] = newExerciseList;
+    });
+
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: '${exercisePlan.planName} (Copy)',
-            dayToExercisesMap: exercisePlan.dayToExercisesMap),
+            dayToExercisesMap: newDayToExercisesMap),
         currentDay: exercisePlan.dayToExercisesMap.keys.first);
   }
 
