@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
-import 'package:frontend/providers/completed_exercise_plan_repository_provider.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/providers/completed_exercise_plan_provider.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 
 class SubmitPlanDialog extends StatelessWidget {
   const SubmitPlanDialog({super.key});

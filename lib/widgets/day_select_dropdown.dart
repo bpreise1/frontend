@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 
 class DaySelectDropdown extends StatefulWidget {
   const DaySelectDropdown(

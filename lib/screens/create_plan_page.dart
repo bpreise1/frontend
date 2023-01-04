@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
 import 'package:frontend/widgets/edit_text.dart';

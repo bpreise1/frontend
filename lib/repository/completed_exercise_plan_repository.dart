@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/workout.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class ICompletedExercisePlanRepository {
@@ -24,10 +25,14 @@ class CompletedExercisePlanRepository
   Future<void> saveCompletedExercisePlanToDevice(
       CompletedExercisePlan exercisePlan) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final File file = File(
-        '${appDocDir.path}/completed_exercise_plan_${exercisePlan.id}.txt');
 
-    file.writeAsString(jsonEncode(exercisePlan.toJson()));
+    final Directory directory =
+        await Directory('${appDocDir.path}/${exercisePlan.id}_info').create();
+
+    final File file = File(
+        '${directory.path}/completed_exercise_plan_${exercisePlan.id}.txt');
+
+    await file.writeAsString(jsonEncode(exercisePlan.toJson()));
   }
 
   @override
@@ -35,7 +40,7 @@ class CompletedExercisePlanRepository
       getCompletedExercisePlansFromDevice() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final completedExercisePlanFiles = appDocDir
-        .listSync()
+        .listSync(recursive: true)
         .whereType<File>()
         .where((file) =>
             file.path.split('/').last.startsWith('completed_exercise_plan_'));
@@ -56,8 +61,8 @@ class CompletedExercisePlanRepository
   Future<CompletedExercisePlan> getCompletedExercisePlanFromDeviceById(
       String exercisePlanId) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final File file =
-        File('${appDocDir.path}/completed_exercise_plan_$exercisePlanId.txt');
+    final File file = File(
+        '${appDocDir.path}/${exercisePlanId}_info/completed_exercise_plan_$exercisePlanId.txt');
     final contents = await file.readAsString();
     return CompletedExercisePlan.fromJson(jsonDecode(contents));
   }
@@ -66,9 +71,8 @@ class CompletedExercisePlanRepository
   Future<void> removeCompletedExercisePlanFromDevice(
       CompletedExercisePlan exercisePlan) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final File file = File(
-        '${appDocDir.path}/completed_exercise_plan_${exercisePlan.id}.txt');
-    await file.delete();
+    final File file = File('${appDocDir.path}/${exercisePlan.id}_info');
+    await file.delete(recursive: true);
   }
 
   @override

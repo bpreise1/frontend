@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/completed_exercise_plan_repository_provider.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/models/workout.dart';
+import 'package:frontend/providers/completed_exercise_plan_provider.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/repository/completed_exercise_plan_repository.dart';
+import 'package:frontend/repository/workout_repository.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
@@ -73,6 +76,24 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                           .updateCompletedExercisePlanProgressById(
                                               widget.exercisePlan.id,
                                               inProgressPlan);
+                                    })),
+                            Expanded(
+                                child: ExerciseListItemTextfield(
+                                    text: planExercises[index].weights[set],
+                                    helperText: 'Weight',
+                                    disabled: !_isInProgress,
+                                    onSubmitted: (text) async {
+                                      ref
+                                          .read(savedExercisePlanProvider
+                                              .notifier)
+                                          .updateWeightForSet(
+                                              currentDay, index, set, text);
+                                      await ref
+                                          .read(completedExercisePlansProvider
+                                              .notifier)
+                                          .updateCompletedExercisePlanProgressById(
+                                              widget.exercisePlan.id,
+                                              inProgressPlan);
                                     }))
                           ]))
                   ])
@@ -90,6 +111,9 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                 await ref
                     .read(completedExercisePlansProvider.notifier)
                     .endCompletedExercisePlanById(widget.exercisePlan.id);
+                await workoutRepository.saveWorkoutForExercisePlanById(
+                    Workout(day: currentDay, exercises: planExercises),
+                    widget.exercisePlan.id);
               } else {
                 setState(() {
                   _isInProgress = true;

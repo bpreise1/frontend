@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/screens/saved_plan_page.dart';
 
 class PlanListItem extends ConsumerWidget {
@@ -21,7 +21,7 @@ class PlanListItem extends ConsumerWidget {
     return Material(
         child: InkWell(
       onTap: onTapEnabled
-          ? () async {
+          ? () {
               ref
                   .read(savedExercisePlanProvider.notifier)
                   .setPlan(exercisePlan);
