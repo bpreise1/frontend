@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/exercise.dart';
+import 'package:frontend/models/date_time_exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/workout.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
@@ -13,15 +13,15 @@ class PlanMetricsPage extends StatelessWidget {
 
   final CompletedExercisePlan exercisePlan;
 
-  Map<String, List<Exercise>> _splitWorkoutListIntoExercises(
+  Map<String, List<DateTimeExercise>> _splitWorkoutListIntoDateTimeExercises(
       List<Workout> workoutList) {
-    Map<String, List<Exercise>> splitExercises = {};
+    Map<String, List<DateTimeExercise>> splitExercises = {};
 
     for (final workout in workoutList) {
       for (final exercise in workout.exercises) {
         splitExercises[exercise.name] = [
           ...?splitExercises[exercise.name],
-          exercise
+          DateTimeExercise(dateTime: workout.dateCompleted, exercise: exercise)
         ];
       }
     }
@@ -46,7 +46,8 @@ class PlanMetricsPage extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (!snapshot.hasError) {
                     return Column(
-                        children: _splitWorkoutListIntoExercises(snapshot.data!)
+                        children: _splitWorkoutListIntoDateTimeExercises(
+                                snapshot.data!)
                             .entries
                             .map((entry) =>
                                 ExerciseLineGraph(exercises: entry.value))

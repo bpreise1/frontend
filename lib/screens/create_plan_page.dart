@@ -9,67 +9,40 @@ import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 import 'package:frontend/widgets/submit_plan_dialog.dart';
 
-class CreatePlanPage extends StatelessWidget {
+class CreatePlanPage extends StatefulWidget {
   const CreatePlanPage({super.key});
+
+  @override
+  State<CreatePlanPage> createState() => _CreatePlanPageState();
+}
+
+class _CreatePlanPageState extends State<CreatePlanPage> {
+  bool _showExerciseList = true;
 
   //TODO: Make multiple consumer widgets so everything doesn't rerender anytime something changes
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Row(
-          children: [
-            const Expanded(child: DraggableExerciseList()),
-            Consumer(builder: ((context, ref, child) {
-              String currentDay =
-                  ref.watch(createExercisePlanProvider).currentDay;
-              String planName = ref.watch(createExercisePlanProvider).planName;
-              List<Exercise>? exercises =
-                  ref.watch(createExercisePlanProvider).exercises;
-
-              return Expanded(
+    return Consumer(builder: ((context, ref, child) {
+      String currentDay = ref.watch(createExercisePlanProvider).currentDay;
+      String planName = ref.watch(createExercisePlanProvider).planName;
+      List<Exercise>? exercises =
+          ref.watch(createExercisePlanProvider).exercises;
+      return Scaffold(
+          body: Row(
+            children: [
+              if (_showExerciseList)
+                const Expanded(child: DraggableExerciseList()),
+              Expanded(
                   flex: 2,
                   child: Column(
                     children: [
-                      Row(children: [
-                        Expanded(
-                            child: EditText(
-                                text: planName,
-                                onSubmitted: (text) {
-                                  ref
-                                      .read(createExercisePlanProvider.notifier)
-                                      .changePlanName(text);
-                                })),
-                        IconButton(
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: ((context) {
-                                    return AlertDialog(
-                                        title: Text(
-                                            'Are you sure you want to reset $planName?'),
-                                        content: Row(
-                                          children: [
-                                            OutlinedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('No')),
-                                            OutlinedButton(
-                                                onPressed: () {
-                                                  ref
-                                                      .read(
-                                                          createExercisePlanProvider
-                                                              .notifier)
-                                                      .resetPlan();
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('Yes'))
-                                          ],
-                                        ));
-                                  }));
-                            },
-                            icon: const Icon(Icons.restore)),
-                      ]),
+                      EditText(
+                          text: planName,
+                          onSubmitted: (text) {
+                            ref
+                                .read(createExercisePlanProvider.notifier)
+                                .changePlanName(text);
+                          }),
                       DaySelectDropdown(
                           provider: createExercisePlanProvider,
                           editingEnabled: true),
@@ -93,30 +66,32 @@ class CreatePlanPage extends StatelessWidget {
                                   key: Key('$index'),
                                   exercise: exercises[index],
                                   children: [
-                                    Expanded(
-                                        child: ExerciseListItemTextfield(
-                                            text: exercises[index].sets,
-                                            onSubmitted: ((text) {
-                                              ref
-                                                  .read(
-                                                      createExercisePlanProvider
-                                                          .notifier)
-                                                  .updateSets(
-                                                      currentDay, index, text);
-                                            }),
-                                            helperText: 'Sets')),
-                                    Expanded(
-                                        child: ExerciseListItemTextfield(
-                                            text: exercises[index].reps[0],
-                                            onSubmitted: (text) {
-                                              ref
-                                                  .read(
-                                                      createExercisePlanProvider
-                                                          .notifier)
-                                                  .updateGoalReps(
-                                                      currentDay, index, text);
-                                            },
-                                            helperText: 'Reps')),
+                                    if (!_showExerciseList)
+                                      Expanded(
+                                          child: ExerciseListItemTextfield(
+                                              text: exercises[index].sets,
+                                              onSubmitted: ((text) {
+                                                ref
+                                                    .read(
+                                                        createExercisePlanProvider
+                                                            .notifier)
+                                                    .updateSets(currentDay,
+                                                        index, text);
+                                              }),
+                                              helperText: 'Sets')),
+                                    if (!_showExerciseList)
+                                      Expanded(
+                                          child: ExerciseListItemTextfield(
+                                              text: exercises[index].reps[0],
+                                              onSubmitted: (text) {
+                                                ref
+                                                    .read(
+                                                        createExercisePlanProvider
+                                                            .notifier)
+                                                    .updateGoalReps(currentDay,
+                                                        index, text);
+                                              },
+                                              helperText: 'Reps')),
                                     IconButton(
                                         icon: const Icon(Icons.delete),
                                         onPressed: () {
@@ -130,20 +105,66 @@ class CreatePlanPage extends StatelessWidget {
                             ]);
                       }))),
                     ],
-                  ));
-            }))
-          ],
-        ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniStartFloat,
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const SubmitPlanDialog();
-                  });
-            },
-            child: const Icon(Icons.add)));
+                  ))
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.miniStartFloat,
+          floatingActionButton: Row(
+            children: [
+              TextButton(
+                  onPressed: () {
+                    _showExerciseList
+                        ? setState(() {
+                            _showExerciseList = false;
+                          })
+                        : setState(() {
+                            _showExerciseList = true;
+                          });
+                  },
+                  child: _showExerciseList
+                      ? const Text('Hide Exercise List')
+                      : const Text('Show Exercise List')),
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const SubmitPlanDialog();
+                        });
+                  },
+                  icon: const Icon(Icons.add)),
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: ((context) {
+                          return AlertDialog(
+                              title: Text(
+                                  'Are you sure you want to reset $planName?'),
+                              content: Row(
+                                children: [
+                                  OutlinedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('No')),
+                                  OutlinedButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(createExercisePlanProvider
+                                                .notifier)
+                                            .resetPlan();
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Yes'))
+                                ],
+                              ));
+                        }));
+                  },
+                  icon: const Icon(Icons.restore))
+            ],
+          ));
+    }));
   }
 }
