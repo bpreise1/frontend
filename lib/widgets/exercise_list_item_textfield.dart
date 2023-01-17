@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ExerciseListItemTextfield extends StatefulWidget {
   const ExerciseListItemTextfield(
@@ -52,15 +53,19 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
         child: Container(
             alignment: Alignment.center,
             child: TextField(
-                controller: _textController..text = widget.text,
-                focusNode: _focusNode,
-                readOnly: widget.disabled,
-                onSubmitted: widget.onSubmitted,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  helperText: widget.helperText,
-                  hintText: widget.hintText ?? '',
-                ),
-                keyboardType: TextInputType.number)));
+              controller: _textController..text = widget.text,
+              focusNode: _focusNode,
+              readOnly: widget.disabled,
+              onSubmitted: widget.onSubmitted,
+              textAlign: TextAlign.center,
+              decoration: InputDecoration(
+                helperText: widget.helperText,
+                hintText: widget.hintText ?? '',
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+              ],
+            )));
   }
 }

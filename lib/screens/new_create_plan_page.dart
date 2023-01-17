@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
+import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/providers/create_plan_stepper_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
-import 'package:frontend/widgets/edit_text.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 import 'package:frontend/widgets/submit_plan_dialog.dart';
@@ -20,6 +21,8 @@ class NewCreatePlanPage extends ConsumerWidget {
     String currentDay = ref.watch(createExercisePlanProvider).currentDay;
     String planName = ref.watch(createExercisePlanProvider).planName;
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
+    InProgressExercisePlan plan =
+        ref.watch(createExercisePlanProvider).exercisePlan;
 
     return Scaffold(
         body: Column(children: [
@@ -87,6 +90,7 @@ class NewCreatePlanPage extends ConsumerWidget {
                                         Expanded(
                                             child: ExerciseListItemTextfield(
                                                 text: exercises[index].sets,
+                                                disabled: true,
                                                 onSubmitted: ((text) {
                                                   ref
                                                       .read(
@@ -100,6 +104,7 @@ class NewCreatePlanPage extends ConsumerWidget {
                                         Expanded(
                                             child: ExerciseListItemTextfield(
                                                 text: exercises[index].reps[0],
+                                                disabled: true,
                                                 onSubmitted: (text) {
                                                   ref
                                                       .read(
@@ -111,6 +116,12 @@ class NewCreatePlanPage extends ConsumerWidget {
                                                           text);
                                                 },
                                                 helperText: 'Reps')),
+                                      if (selectedStepperIndex == 1)
+                                        IconButton(
+                                            onPressed: () {
+                                              Scaffold.of(context).openDrawer();
+                                            },
+                                            icon: const Icon(Icons.edit)),
                                       if (selectedStepperIndex == 0)
                                         IconButton(
                                             icon: const Icon(Icons.delete),
@@ -193,11 +204,37 @@ class NewCreatePlanPage extends ConsumerWidget {
         floatingActionButton: selectedStepperIndex == 1
             ? FloatingActionButton(
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const SubmitPlanDialog();
-                      });
+                  UserException? exception;
+
+                  outerloop:
+                  for (var entry in plan.dayToExercisesMap.entries) {
+                    if (entry.value.isEmpty) {
+                      exception = UserException(
+                          message: 'Day "${entry.key}" must not be empty');
+                      break outerloop;
+                    }
+
+                    for (Exercise exercise in entry.value) {
+                      if (exercise.sets == '') {
+                        exception = UserException(
+                            message:
+                                'Sets of "${exercise.name}" must not be empty');
+                        break outerloop;
+                      }
+
+                      //TODO: rep validation
+                    }
+                  }
+
+                  if (exception != null) {
+                    exception.displayException(context);
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const SubmitPlanDialog();
+                        });
+                  }
                 },
                 child: const Icon(Icons.done),
               )

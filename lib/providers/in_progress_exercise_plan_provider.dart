@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/user_exception.dart';
 
 class ExercisePlanState {
   const ExercisePlanState({
@@ -112,11 +113,13 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 
   void updateDayName(String name) {
-    assert(name != '', 'Day must not be empty');
+    if (name == '') {
+      throw const UserException(message: 'Day must not be empty');
+    }
 
-    assert(
-        state.currentDay == name || !state.dayToExercisesMap.containsKey(name),
-        'Name "$name" can only be used once');
+    if (state.currentDay != name && state.dayToExercisesMap.containsKey(name)) {
+      throw UserException(message: 'Name "$name" can only be used once');
+    }
 
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     state.dayToExercisesMap.forEach((key, value) {

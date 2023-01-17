@@ -10,8 +10,8 @@ class SubmitPlanDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool saveIsChecked = true;
-    bool publishIsChecked = true;
+    bool saveIsChecked = false;
+    bool publishIsChecked = false;
 
     return AlertDialog(
         title: const Text('Save and Publish'),
@@ -39,14 +39,6 @@ class SubmitPlanDialog extends StatelessWidget {
                   InProgressExercisePlan inProgressExerciseplan =
                       ref.watch(createExercisePlanProvider).exercisePlan;
 
-                  void validatePlan() {
-                    inProgressExerciseplan.dayToExercisesMap
-                        .forEach((day, exercises) {
-                      assert(
-                          exercises.isNotEmpty, 'Day "$day" must not be empty');
-                    });
-                  }
-
                   final CompletedExercisePlan completedExercisePlan =
                       CompletedExercisePlan(
                           planName: inProgressExerciseplan.planName,
@@ -55,29 +47,30 @@ class SubmitPlanDialog extends StatelessWidget {
                           lastUsed: DateTime.now());
 
                   return OutlinedButton(
-                      onPressed: () async {
-                        assert(saveIsChecked || publishIsChecked,
-                            'Either save or publish must be selected');
+                      onPressed: saveIsChecked || publishIsChecked
+                          ? () async {
+                              assert(saveIsChecked || publishIsChecked,
+                                  'Either save or publish must be selected');
 
-                        validatePlan();
+                              if (saveIsChecked) {
+                                await ref
+                                    .read(
+                                        completedExercisePlansProvider.notifier)
+                                    .saveCompletedExercisePlanToDevice(
+                                        completedExercisePlan);
+                              }
 
-                        if (saveIsChecked) {
-                          await ref
-                              .read(completedExercisePlansProvider.notifier)
-                              .saveCompletedExercisePlanToDevice(
-                                  completedExercisePlan);
-                        }
+                              if (publishIsChecked) {}
 
-                        if (publishIsChecked) {}
-
-                        Navigator.pop(context);
-                        ref
-                            .read(createExercisePlanProvider.notifier)
-                            .resetPlan();
-                        ref
-                            .read(bottomNavigationBarProvider.notifier)
-                            .setNavigationBarIndex(3);
-                      },
+                              Navigator.pop(context);
+                              ref
+                                  .read(createExercisePlanProvider.notifier)
+                                  .resetPlan();
+                              ref
+                                  .read(bottomNavigationBarProvider.notifier)
+                                  .setNavigationBarIndex(3);
+                            }
+                          : null,
                       child: const Text('Submit'));
                 }))
               ],

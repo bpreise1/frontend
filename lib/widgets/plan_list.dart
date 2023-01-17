@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/providers/completed_exercise_plan_provider.dart';
+import 'package:frontend/providers/create_plan_stepper_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/screens/plan_metrics_page.dart';
 import 'package:frontend/widgets/plan_list_item.dart';
@@ -62,6 +63,9 @@ class PlanList extends ConsumerWidget {
                             ref
                                 .read(createExercisePlanProvider.notifier)
                                 .editPlan(plan);
+                            ref
+                                .read(createPlanStepperProvider.notifier)
+                                .setCreatePlanStepperIndex(0);
                             ref
                                 .read(bottomNavigationBarProvider.notifier)
                                 .setNavigationBarIndex(2);

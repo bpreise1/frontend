@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 
 class DaySelectDropdown extends StatefulWidget {
@@ -63,9 +64,13 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                                       autofocus: true,
                                       focusNode: _focusNode,
                                       onSubmitted: (text) {
-                                        ref
-                                            .read(widget.provider.notifier)
-                                            .updateDayName(text);
+                                        try {
+                                          ref
+                                              .read(widget.provider.notifier)
+                                              .updateDayName(text);
+                                        } on UserException catch (exception) {
+                                          exception.displayException(context);
+                                        }
                                         setState(() {
                                           _isEditing = false;
                                         });

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/widgets/snack_bar_error.dart';
+import 'package:frontend/widgets/snack_bar_exception.dart';
 
 class UserException implements Exception {
   const UserException({required this.message});
@@ -8,9 +8,10 @@ class UserException implements Exception {
 
   void displayException(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: SnackBarError(errorMessage: message),
+        content: SnackBarException(errorMessage: message),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
-        elevation: 0));
+        dismissDirection: DismissDirection.none,
+        elevation: 100));
   }
 }
