@@ -46,9 +46,6 @@ class WorkoutRepository implements IWorkoutRepository {
 
     if (file.existsSync()) {
       final String contents = await file.readAsString();
-
-      print(contents);
-
       List jsonWorkouts = jsonDecode(contents);
       List<Workout> workouts =
           jsonWorkouts.map((workout) => Workout.fromJson(workout)).toList();
