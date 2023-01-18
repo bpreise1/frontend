@@ -138,8 +138,10 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 
   void selectDay(String day) {
-    state =
-        ExercisePlanState(exercisePlan: state.exercisePlan, currentDay: day);
+    if (day != state.currentDay) {
+      state =
+          ExercisePlanState(exercisePlan: state.exercisePlan, currentDay: day);
+    }
   }
 
   void removeDay(String day) {
