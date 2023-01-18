@@ -17,7 +17,6 @@ class PlanListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('REBUILD');
     return Material(
         child: InkWell(
       onTap: onTapEnabled

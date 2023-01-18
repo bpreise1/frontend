@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/user_preferences.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
+import 'package:frontend/providers/user_preferences_provider.dart';
 import 'package:frontend/screens/create_plan_page.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
@@ -9,6 +11,7 @@ import 'package:frontend/screens/new_create_plan_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
 import 'package:frontend/widgets/user_profile_scaffold_button.dart';
+import 'package:frontend/widgets/weight_mode_toggle.dart';
 
 class Home extends ConsumerWidget {
   const Home({super.key});
@@ -36,7 +39,8 @@ class Home extends ConsumerWidget {
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
               },
-              child: const Text('Sign Out'))
+              child: const Text('Sign Out')),
+          const Center(child: WeightModeToggle())
         ]),
       ),
       body: _screens[selectedIndex],
