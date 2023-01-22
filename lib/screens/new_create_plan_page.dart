@@ -8,7 +8,7 @@ import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
-import 'package:frontend/widgets/exercise_list_item_textfield.dart';
+import 'package:frontend/widgets/sets_and_reps_editor.dart';
 import 'package:frontend/widgets/submit_plan_dialog.dart';
 
 class NewCreatePlanPage extends ConsumerWidget {
@@ -24,6 +24,8 @@ class NewCreatePlanPage extends ConsumerWidget {
     InProgressExercisePlan plan =
         ref.watch(createExercisePlanProvider).exercisePlan;
 
+    bool isEditingSetsAndReps = false;
+    int editingSetsAndRepsExerciseIndex = -1;
     return Scaffold(
         body: Column(children: [
           Expanded(
@@ -54,75 +56,36 @@ class NewCreatePlanPage extends ConsumerWidget {
           Expanded(
               flex: 8,
               child: Stack(children: [
-                Row(children: [
-                  if (selectedStepperIndex == 0)
+                if (selectedStepperIndex == 0) //Exercises
+                  Row(children: [
                     const Expanded(child: DraggableExerciseList()),
-                  Expanded(
-                      flex: 2,
-                      child: Column(children: [
-                        DaySelectDropdown(
-                            provider: createExercisePlanProvider,
-                            editingEnabled: selectedStepperIndex == 0),
-                        Expanded(
-                            child: DragTarget<Exercise>(onAccept: (exercise) {
-                          ref
-                              .read(createExercisePlanProvider.notifier)
-                              .addExercise(exercise);
-                        }, builder: ((context, candidateData, rejectedData) {
-                          return ReorderableListView(
-                              buildDefaultDragHandles:
-                                  selectedStepperIndex == 0,
-                              onReorder: (oldIndex, newIndex) {
-                                ref
-                                    .read(createExercisePlanProvider.notifier)
-                                    .moveExercise(oldIndex, newIndex);
-                              },
-                              children: [
-                                for (int index = 0;
-                                    exercises != null &&
-                                        index < exercises.length;
-                                    index++)
-                                  ExerciseListItem(
-                                    key: Key('$index'),
-                                    exercise: exercises[index],
-                                    children: [
-                                      if (selectedStepperIndex == 1)
-                                        Expanded(
-                                            child: ExerciseListItemTextfield(
-                                                text: exercises[index].sets,
-                                                disabled: true,
-                                                onSubmitted: ((text) {
-                                                  ref
-                                                      .read(
-                                                          createExercisePlanProvider
-                                                              .notifier)
-                                                      .updateSets(currentDay,
-                                                          index, text);
-                                                }),
-                                                helperText: 'Sets')),
-                                      if (selectedStepperIndex == 1)
-                                        Expanded(
-                                            child: ExerciseListItemTextfield(
-                                                text: exercises[index].reps[0],
-                                                disabled: true,
-                                                onSubmitted: (text) {
-                                                  ref
-                                                      .read(
-                                                          createExercisePlanProvider
-                                                              .notifier)
-                                                      .updateGoalReps(
-                                                          currentDay,
-                                                          index,
-                                                          text);
-                                                },
-                                                helperText: 'Reps')),
-                                      if (selectedStepperIndex == 1)
-                                        IconButton(
-                                            onPressed: () {
-                                              Scaffold.of(context).openDrawer();
-                                            },
-                                            icon: const Icon(Icons.edit)),
-                                      if (selectedStepperIndex == 0)
+                    Expanded(
+                        flex: 2,
+                        child: Column(children: [
+                          DaySelectDropdown(
+                              provider: createExercisePlanProvider,
+                              editingEnabled: true),
+                          Expanded(
+                              child: DragTarget<Exercise>(onAccept: (exercise) {
+                            ref
+                                .read(createExercisePlanProvider.notifier)
+                                .addExercise(exercise);
+                          }, builder: ((context, candidateData, rejectedData) {
+                            return ReorderableListView(
+                                onReorder: (oldIndex, newIndex) {
+                                  ref
+                                      .read(createExercisePlanProvider.notifier)
+                                      .moveExercise(oldIndex, newIndex);
+                                },
+                                children: [
+                                  for (int index = 0;
+                                      exercises != null &&
+                                          index < exercises.length;
+                                      index++)
+                                    ExerciseListItem(
+                                      key: Key('$index'),
+                                      exercise: exercises[index],
+                                      children: [
                                         IconButton(
                                             icon: const Icon(Icons.delete),
                                             onPressed: () {
@@ -132,12 +95,26 @@ class NewCreatePlanPage extends ConsumerWidget {
                                                           .notifier)
                                                   .removeExerciseAt(index);
                                             })
-                                    ],
-                                  ),
-                              ]);
-                        })))
-                      ]))
-                ]),
+                                      ],
+                                    ),
+                                ]);
+                          })))
+                        ])),
+                  ]),
+                if (selectedStepperIndex == 1) //Sets and Reps
+                  StatefulBuilder(
+                    builder: ((context, setState) {
+                      return Column(
+                        children: [
+                          DaySelectDropdown(
+                              provider: createExercisePlanProvider,
+                              editingEnabled: false,
+                              disabled: isEditingSetsAndReps),
+                          const Expanded(child: SetsAndRepsEditor()),
+                        ],
+                      );
+                    }),
+                  ),
                 Positioned(
                     bottom: 0,
                     left: 0,

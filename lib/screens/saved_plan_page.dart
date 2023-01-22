@@ -41,7 +41,8 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
       return Scaffold(
         appBar: AppBar(title: Text(planName)),
         body: Column(children: [
-          DaySelectDropdown(provider: savedExercisePlanProvider),
+          DaySelectDropdown(
+              provider: savedExercisePlanProvider, disabled: _isInProgress),
           Expanded(
               child: ListView(children: [
             for (int index = 0; index < planExercises.length; index++)
@@ -64,7 +65,8 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                 child: ExerciseListItemTextfield(
                                     text: planExercises[index].reps[set],
                                     helperText: 'Reps',
-                                    hintText: planExercises[index].reps[0],
+                                    hintText:
+                                        'Goal: ${planExercises[index].reps[0]}',
                                     disabled: !_isInProgress,
                                     onSubmitted: (text) async {
                                       ref

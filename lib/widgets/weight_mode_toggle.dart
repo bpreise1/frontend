@@ -26,7 +26,7 @@ class WeightModeToggle extends ConsumerWidget {
           selectedBorderColor: Colors.red,
           children: const [Text('Pounds'), Text('Kilograms')]);
     }), error: ((error, stackTrace) {
-      return const SizedBox.shrink();
+      return Center(child: Text(error.toString()));
     }), loading: (() {
       return ToggleButtons(
         isSelected: const [false, false],

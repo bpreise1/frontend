@@ -5,9 +5,13 @@ import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 
 class DaySelectDropdown extends StatefulWidget {
   const DaySelectDropdown(
-      {required this.provider, this.editingEnabled = false, super.key});
+      {required this.provider,
+      this.editingEnabled = false,
+      this.disabled = false,
+      super.key});
 
   final bool editingEnabled;
+  final bool disabled;
   final StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState> provider;
 
   @override
@@ -78,7 +82,7 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                                     )
                                   : Text(day, textAlign: TextAlign.center))))
                       .toList(),
-                  onChanged: _isEditing
+                  onChanged: widget.disabled || _isEditing
                       ? null
                       : ((value) {
                           ref.read(widget.provider.notifier).selectDay(value!);

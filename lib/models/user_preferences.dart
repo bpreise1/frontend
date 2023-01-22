@@ -6,10 +6,10 @@ class UserPreferences {
   final WeightMode weightMode;
 
   UserPreferences.fromJson(Map<String, dynamic> json)
-      : weightMode = WeightMode.values
-            .firstWhere((element) => element.toString() == json['weightMode']);
+      : weightMode = WeightMode.values.firstWhere(
+            (element) => element.name.toString() == json['weightMode']);
 
   Map<String, dynamic> toJson() {
-    return {'weightMode': weightMode.toString()};
+    return {'weightMode': weightMode.name.toString()};
   }
 }

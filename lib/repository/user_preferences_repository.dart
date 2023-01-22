@@ -23,6 +23,7 @@ class UserPreferencesRepository implements IUserPreferencesRepository {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final File file = File('${appDocDir.path}/user_preferences');
     final String contents = await file.readAsString();
+    print(contents);
     return UserPreferences.fromJson(jsonDecode(contents));
   }
 }
