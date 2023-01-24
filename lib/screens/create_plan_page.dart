@@ -83,14 +83,14 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                                       Expanded(
                                           child: ExerciseListItemTextfield(
                                               text: exercises[index].reps[0],
-                                              onSubmitted: (text) {
-                                                ref
-                                                    .read(
-                                                        createExercisePlanProvider
-                                                            .notifier)
-                                                    .updateGoalReps(currentDay,
-                                                        index, text);
-                                              },
+                                              onSubmitted: (text) {}, //(text) {
+                                              //   ref
+                                              //       .read(
+                                              //           createExercisePlanProvider
+                                              //               .notifier)
+                                              //       .updateGoalReps(currentDay,
+                                              //           index, text);
+                                              // },
                                               helperText: 'Reps')),
                                     IconButton(
                                         icon: const Icon(Icons.delete),

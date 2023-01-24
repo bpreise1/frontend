@@ -18,14 +18,12 @@ class NewCreatePlanPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int selectedStepperIndex = ref.watch(createPlanStepperProvider);
 
-    String currentDay = ref.watch(createExercisePlanProvider).currentDay;
     String planName = ref.watch(createExercisePlanProvider).planName;
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
     InProgressExercisePlan plan =
         ref.watch(createExercisePlanProvider).exercisePlan;
 
     bool isEditingSetsAndReps = false;
-    int editingSetsAndRepsExerciseIndex = -1;
     return Scaffold(
         body: Column(children: [
           Expanded(
@@ -199,7 +197,14 @@ class NewCreatePlanPage extends ConsumerWidget {
                         break outerloop;
                       }
 
-                      //TODO: rep validation
+                      for (String rep in exercise.goalReps) {
+                        if (rep == '') {
+                          exception = UserException(
+                              message:
+                                  'Reps of "${exercise.name}" must not be empty');
+                          break outerloop;
+                        }
+                      }
                     }
                   }
 

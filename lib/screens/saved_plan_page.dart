@@ -53,20 +53,20 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                     exercise: planExercises[index],
                   ),
                   children: [
-                    for (int set = 1;
-                        set < int.parse(planExercises[index].sets) + 1;
+                    for (int set = 0;
+                        set < int.parse(planExercises[index].sets);
                         set++)
                       ListTile(
                           key: PageStorageKey<String>(
                               '${currentDay}_{$index}_$set'),
                           title: Row(children: [
-                            Text('Set $set'),
+                            Text('Set ${set + 1}'),
                             Expanded(
                                 child: ExerciseListItemTextfield(
                                     text: planExercises[index].reps[set],
                                     helperText: 'Reps',
                                     hintText:
-                                        'Goal: ${planExercises[index].reps[0]}',
+                                        'Goal: ${planExercises[index].goalReps[set]}',
                                     disabled: !_isInProgress,
                                     onSubmitted: (text) async {
                                       ref

@@ -92,10 +92,9 @@ class ExerciseLineGraph extends ConsumerWidget {
               if (index != null) {
                 DateTimeExercise exercise = exercises[index];
                 String newText = 'Volume: ${exercise.getVolume()}\n';
-                for (int set = 1; set < int.parse(exercise.sets) + 1; set++) {
-                  String setInfo = '';
+                for (int set = 0; set < int.parse(exercise.sets); set++) {
                   if (exercise.reps[set] == '' || exercise.weights[set] == '') {
-                    newText += "\nSet $set: _";
+                    newText += "\nSet ${set + 1}: _";
                   } else {
                     newText +=
                         "\nSet $set: ${exercise.reps[set]} x ${preferences.weightMode == WeightMode.pounds ? exercise.weights[set] : convertWeightToKilograms(double.parse(exercise.weights[set])).toStringAsFixed(2)}";

@@ -164,19 +164,29 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   }
 
   void updateSets(String day, int index, String sets) {
+    int numSets = sets == '' ? 0 : int.parse(sets);
+
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
 
-    final newReps = List.filled(int.parse(sets) + 1, '');
-    newReps[0] = state.exercises![index].reps[0];
+    final newReps = List.filled(numSets, '');
 
-    final newWeights = List.filled(int.parse(sets) + 1, '');
+    final newWeights = List.filled(numSets, '');
 
     Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
+
+    final newGoalReps = List.filled(numSets, '');
+    for (int i = 0; i < numSets; i++) {
+      if (i < exerciseToReplace.goalReps.length) {
+        newGoalReps[i] = exerciseToReplace.goalReps[i];
+      }
+    }
+
     newDayToExercisesMap[day]![index] = Exercise(
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: sets,
+        goalReps: newGoalReps,
         reps: newReps,
         weights: newWeights);
 
@@ -186,20 +196,21 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         currentDay: state.currentDay);
   }
 
-  void updateGoalReps(String day, int index, String reps) {
+  void updateGoalReps(String day, int index, int set, String goalReps) {
     final newDayToExercisesMap =
         Map<String, List<Exercise>>.from(state.dayToExercisesMap);
 
     Exercise exerciseToReplace = newDayToExercisesMap[day]![index];
 
-    final newReps = [...exerciseToReplace.reps];
-    newReps[0] = reps;
+    final newGoalReps = [...exerciseToReplace.goalReps];
+    newGoalReps[set] = goalReps;
 
     newDayToExercisesMap[day]![index] = Exercise(
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: exerciseToReplace.sets,
-        reps: newReps,
+        goalReps: newGoalReps,
+        reps: exerciseToReplace.reps,
         weights: exerciseToReplace.weights);
 
     state = ExercisePlanState(
@@ -222,6 +233,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: exerciseToReplace.sets,
+        goalReps: exerciseToReplace.goalReps,
         reps: newReps,
         weights: exerciseToReplace.weights);
 
@@ -244,6 +256,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         name: exerciseToReplace.name,
         description: exerciseToReplace.description,
         sets: exerciseToReplace.sets,
+        goalReps: exerciseToReplace.goalReps,
         reps: exerciseToReplace.reps,
         weights: newWeights);
 
@@ -257,15 +270,15 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     exercisePlan.dayToExercisesMap.forEach((day, exercises) {
       final newExerciseList = exercises.map((exercise) {
-        final newReps = List.filled(int.parse(exercise.sets) + 1, '');
-        newReps[0] = exercise.reps[0];
+        final newReps = List.filled(int.parse(exercise.sets), '');
 
-        final newWeights = List.filled(int.parse(exercise.sets) + 1, '');
+        final newWeights = List.filled(int.parse(exercise.sets), '');
 
         return Exercise(
           name: exercise.name,
           description: exercise.description,
           sets: exercise.sets,
+          goalReps: exercise.goalReps,
           reps: newReps,
           weights: newWeights,
         );

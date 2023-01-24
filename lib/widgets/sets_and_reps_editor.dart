@@ -28,10 +28,12 @@ class SetsAndRepsEditing extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String currentDay = ref.watch(createExercisePlanProvider).currentDay;
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
 
-    return ListView(children: [
-      Hero(
+    return ListView(
+      children: [
+        Hero(
           tag: 'list_item_$exerciseIndex',
           child: ExerciseListItem(
             exercise: exercises![exerciseIndex],
@@ -41,10 +43,53 @@ class SetsAndRepsEditing extends ConsumerWidget {
                   onPressed: (() {
                     Navigator.pop(context);
                   }),
-                  icon: const Icon(Icons.done))
+                  icon: const Icon(Icons.done)),
             ],
-          )),
-    ]);
+          ),
+        ),
+        ListTile(
+          title: Row(
+            children: [
+              const Text('Sets '),
+              Expanded(
+                child: ExerciseListItemTextfield(
+                  text: exercises[exerciseIndex].sets,
+                  onSubmitted: ((text) {
+                    ref
+                        .read(createExercisePlanProvider.notifier)
+                        .updateSets(currentDay, exerciseIndex, text);
+                  }),
+                  hintText: 'Enter Sets',
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (exercises[exerciseIndex].sets != '')
+          for (int set = 0;
+              set < int.parse(exercises[exerciseIndex].sets);
+              set++)
+            ListTile(
+              title: Row(
+                children: [
+                  Text('Set ${set + 1}'),
+                  Expanded(
+                    child: ExerciseListItemTextfield(
+                      text: exercises[exerciseIndex].goalReps[set],
+                      onSubmitted: ((text) {
+                        ref
+                            .read(createExercisePlanProvider.notifier)
+                            .updateGoalReps(
+                                currentDay, exerciseIndex, set, text);
+                      }),
+                      hintText: 'Enter Reps',
+                    ),
+                  ),
+                ],
+              ),
+            )
+      ],
+    );
   }
 }
 
@@ -78,13 +123,12 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                         helperText: 'Sets')),
                 Expanded(
                     child: ExerciseListItemTextfield(
-                        text: exercises[index].reps[0],
+                        text: exercises[index]
+                            .goalReps
+                            .map((rep) => rep == '' ? '_' : rep)
+                            .join(' , '),
                         disabled: true,
-                        onSubmitted: (text) {
-                          ref
-                              .read(createExercisePlanProvider.notifier)
-                              .updateGoalReps(currentDay, index, text);
-                        },
+                        onSubmitted: (text) {},
                         helperText: 'Reps')),
                 IconButton(
                     onPressed: (() {

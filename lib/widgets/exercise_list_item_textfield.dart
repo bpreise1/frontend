@@ -4,14 +4,14 @@ import 'package:flutter/services.dart';
 class ExerciseListItemTextfield extends StatefulWidget {
   const ExerciseListItemTextfield(
       {required this.text,
-      required this.helperText,
       required this.onSubmitted,
+      this.helperText,
       this.hintText,
       this.disabled = false,
       super.key});
 
   final String text;
-  final String helperText;
+  final String? helperText;
   final void Function(String text) onSubmitted;
   final String? hintText;
   final bool disabled;

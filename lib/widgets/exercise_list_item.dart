@@ -15,31 +15,32 @@ class ExerciseListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: InkWell(
-      onTap: onTapEnabled
-          ? () {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: Text(exercise.name),
-                        content: Column(
-                          children: [Text(exercise.description)],
-                        ),
-                      ));
-            }
-          : null,
-      child: Card(
-        child: Row(
-          children: [
-            Image.asset(
-                'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
-                width: 50,
-                height: 50),
-            Text(exercise.name),
-            ...children
-          ],
+      child: InkWell(
+        onTap: onTapEnabled
+            ? () {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: Text(exercise.name),
+                          content: Column(
+                            children: [Text(exercise.description)],
+                          ),
+                        ));
+              }
+            : null,
+        child: Card(
+          child: Row(
+            children: [
+              Image.asset(
+                  'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
+                  width: 50,
+                  height: 50),
+              Text(exercise.name),
+              ...children
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }
