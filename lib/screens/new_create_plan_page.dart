@@ -7,8 +7,8 @@ import 'package:frontend/providers/create_plan_stepper_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
-import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/sets_and_reps_editor.dart';
+import 'package:frontend/widgets/slidable_card.dart';
 import 'package:frontend/widgets/submit_plan_dialog.dart';
 
 class NewCreatePlanPage extends ConsumerWidget {
@@ -35,7 +35,7 @@ class NewCreatePlanPage extends ConsumerWidget {
                   },
                   type: StepperType.horizontal,
                   controlsBuilder: (context, details) {
-                    return const SizedBox();
+                    return const SizedBox.shrink();
                   },
                   steps: [
                 Step(
@@ -52,11 +52,13 @@ class NewCreatePlanPage extends ConsumerWidget {
                     content: const SizedBox.shrink()),
               ])),
           Expanded(
-              flex: 8,
-              child: Stack(children: [
+            flex: 8,
+            child: Stack(
+              children: [
                 if (selectedStepperIndex == 0) //Exercises
                   Row(children: [
                     const Expanded(child: DraggableExerciseList()),
+                    const VerticalDivider(),
                     Expanded(
                         flex: 2,
                         child: Column(children: [
@@ -64,39 +66,58 @@ class NewCreatePlanPage extends ConsumerWidget {
                               provider: createExercisePlanProvider,
                               editingEnabled: true),
                           Expanded(
-                              child: DragTarget<Exercise>(onAccept: (exercise) {
-                            ref
-                                .read(createExercisePlanProvider.notifier)
-                                .addExercise(exercise);
-                          }, builder: ((context, candidateData, rejectedData) {
-                            return ReorderableListView(
-                                onReorder: (oldIndex, newIndex) {
-                                  ref
-                                      .read(createExercisePlanProvider.notifier)
-                                      .moveExercise(oldIndex, newIndex);
-                                },
-                                children: [
-                                  for (int index = 0;
-                                      exercises != null &&
-                                          index < exercises.length;
-                                      index++)
-                                    ExerciseListItem(
-                                      key: Key('$index'),
-                                      exercise: exercises[index],
-                                      children: [
-                                        IconButton(
-                                            icon: const Icon(Icons.delete),
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                      createExercisePlanProvider
-                                                          .notifier)
-                                                  .removeExerciseAt(index);
-                                            })
-                                      ],
-                                    ),
-                                ]);
-                          })))
+                            child: DragTarget<Exercise>(
+                              onAccept: (exercise) {
+                                ref
+                                    .read(createExercisePlanProvider.notifier)
+                                    .addExercise(exercise);
+                              },
+                              builder: ((context, candidateData, rejectedData) {
+                                return ReorderableListView(
+                                  buildDefaultDragHandles: false,
+                                  onReorder: (oldIndex, newIndex) {
+                                    ref
+                                        .read(
+                                            createExercisePlanProvider.notifier)
+                                        .moveExercise(oldIndex, newIndex);
+                                  },
+                                  children: [
+                                    for (int index = 0;
+                                        exercises != null &&
+                                            index < exercises.length;
+                                        index++)
+                                      SlidableCard(
+                                        key: Key(index.toString()),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                                'assets/${exercises[index].name.toLowerCase().replaceAll(' ', '_')}.png',
+                                                width: 50,
+                                                height: 50),
+                                            Text(exercises[index].name),
+                                            const Spacer(),
+                                            ReorderableDragStartListener(
+                                              index: index,
+                                              child: const Icon(Icons.menu),
+                                            ),
+                                            const Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 8),
+                                            ),
+                                          ],
+                                        ),
+                                        onDismiss: () {
+                                          ref
+                                              .read(createExercisePlanProvider
+                                                  .notifier)
+                                              .removeExerciseAt(index);
+                                        },
+                                      ),
+                                  ],
+                                );
+                              }),
+                            ),
+                          )
                         ])),
                   ]),
                 if (selectedStepperIndex == 1) //Sets and Reps
@@ -114,9 +135,10 @@ class NewCreatePlanPage extends ConsumerWidget {
                     }),
                   ),
                 Positioned(
-                    bottom: 0,
-                    left: 0,
-                    child: Row(children: [
+                  bottom: 0,
+                  left: 0,
+                  child: Row(
+                    children: [
                       IconButton(
                           onPressed: selectedStepperIndex == 0
                               ? null
@@ -173,8 +195,12 @@ class NewCreatePlanPage extends ConsumerWidget {
                                 }));
                           },
                           icon: const Icon(Icons.refresh))
-                    ]))
-              ]))
+                    ],
+                  ),
+                )
+              ],
+            ),
+          )
         ]),
         floatingActionButton: selectedStepperIndex == 1
             ? FloatingActionButton(

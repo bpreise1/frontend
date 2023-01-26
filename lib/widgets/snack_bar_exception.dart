@@ -11,7 +11,7 @@ class SnackBarException extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       height: 70,
       decoration: const BoxDecoration(
-          color: Colors.red,
+          color: Color(0xFFB00020),
           borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Stack(children: [
         Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -30,7 +30,9 @@ class SnackBarException extends StatelessWidget {
             const Padding(padding: EdgeInsets.symmetric(horizontal: 3)),
             Text(errorMessage,
                 style: const TextStyle(
-                    fontSize: 12, overflow: TextOverflow.ellipsis)),
+                    fontSize: 12,
+                    overflow: TextOverflow.ellipsis,
+                    color: Colors.white)),
           ],
         ))
       ]),

@@ -35,11 +35,20 @@ class PlanList extends ConsumerWidget {
 
         return Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4),
+            ),
             TextField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
               onChanged: searchExercise,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4),
             ),
             Expanded(
                 child: ListView(

@@ -31,10 +31,16 @@ class _ExerciseListState extends State<ExerciseList> {
     return Column(
       children: [
         TextField(
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.search),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
           ),
           onChanged: _searchExercise,
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 4),
         ),
         Expanded(
             child: ListView(

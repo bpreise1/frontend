@@ -30,10 +30,14 @@ class PlanListItem extends ConsumerWidget {
             }
           : null,
       child: Card(
-        color: exercisePlan.isInProgress ? Colors.blue : Colors.white,
+        color: exercisePlan.isInProgress
+            ? Theme.of(context).colorScheme.secondary
+            : Theme.of(context).cardColor,
         child: Row(
           children: [
-            Flexible(fit: FlexFit.tight, child: Text(exercisePlan.planName)),
+            Text(
+              exercisePlan.planName,
+            ),
             const Spacer(),
             ...children
           ],

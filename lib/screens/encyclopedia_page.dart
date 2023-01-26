@@ -6,6 +6,15 @@ class EncyclopediaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ExerciseList();
+    return Column(
+      children: const [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 4),
+        ),
+        Expanded(
+          child: ExerciseList(),
+        ),
+      ],
+    );
   }
 }
