@@ -19,111 +19,139 @@ class PlanList extends ConsumerWidget {
       final List<CompletedExercisePlan> allPlans = data.exercisePlans;
       List<CompletedExercisePlan> plans = data.exercisePlans;
 
-      return StatefulBuilder(builder: (context, setFilterState) {
-        void searchExercise(String query) {
-          final suggestions = allPlans.where((plan) {
-            final String exerciseName = plan.planName.toLowerCase();
-            final String input = query.toLowerCase();
-
-            return exerciseName.contains(input);
-          }).toList();
-
-          setFilterState(() {
-            plans = suggestions;
-          });
-        }
-
-        return Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+      return plans.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Create a plan to being tracking workouts',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 16)),
+                  FloatingActionButton(
+                    onPressed: () {
+                      ref
+                          .read(createPlanStepperProvider.notifier)
+                          .setCreatePlanStepperIndex(0);
+                      ref
+                          .read(bottomNavigationBarProvider.notifier)
+                          .setNavigationBarIndex(2);
+                    },
+                    child: const Icon(Icons.add),
+                  )
+                ],
               ),
-              onChanged: searchExercise,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4),
-            ),
-            Expanded(
-                child: ListView(
-              children: plans.map((plan) {
-                return PlanListItem(
-                  exercisePlan: plan,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          ref
-                              .read(savedExercisePlanProvider.notifier)
-                              .setPlan(plan);
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: ((context) =>
-                                  PlanMetricsPage(exercisePlan: plan))));
-                        },
-                        icon: const Icon(Icons.bar_chart)),
-                    IconButton(
-                        onPressed: () {
-                          void editPlanAndNavigate() {
-                            ref
-                                .read(createExercisePlanProvider.notifier)
-                                .editPlan(plan);
-                            ref
-                                .read(createPlanStepperProvider.notifier)
-                                .setCreatePlanStepperIndex(0);
-                            ref
-                                .read(bottomNavigationBarProvider.notifier)
-                                .setNavigationBarIndex(2);
-                          }
+            )
+          : StatefulBuilder(builder: (context, setFilterState) {
+              void searchExercise(String query) {
+                final suggestions = allPlans.where((plan) {
+                  final String exerciseName = plan.planName.toLowerCase();
+                  final String input = query.toLowerCase();
 
-                          if (ref
-                              .read(createExercisePlanProvider.notifier)
-                              .isEditing()) {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                      title: Text(
-                                          'You are currently editing another plan in the Plan Creator. If you choose to edit "${plan.planName}," that progress will be overwritten. Are you sure you want to continue?'),
-                                      content: Row(
-                                        children: [
-                                          OutlinedButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('No')),
-                                          OutlinedButton(
-                                              onPressed: () {
-                                                editPlanAndNavigate();
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Yes'))
-                                        ],
-                                      ));
-                                });
-                          } else {
-                            editPlanAndNavigate();
-                          }
-                        },
-                        icon: const Icon(Icons.edit)),
-                    IconButton(
-                        onPressed: () async {
-                          await ref
-                              .read(completedExercisePlansProvider.notifier)
-                              .removeCompletedExercisePlanFromDevice(plan);
-                        },
-                        icon: const Icon(Icons.delete))
-                  ],
-                );
-              }).toList(),
-            ))
-          ],
-        );
-      });
+                  return exerciseName.contains(input);
+                }).toList();
+
+                setFilterState(() {
+                  plans = suggestions;
+                });
+              }
+
+              return Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onChanged: searchExercise,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                  ),
+                  Expanded(
+                      child: ListView(
+                    children: plans.map((plan) {
+                      return PlanListItem(
+                        exercisePlan: plan,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                ref
+                                    .read(savedExercisePlanProvider.notifier)
+                                    .setPlan(plan);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: ((context) =>
+                                        PlanMetricsPage(exercisePlan: plan))));
+                              },
+                              icon: const Icon(Icons.bar_chart)),
+                          IconButton(
+                              onPressed: () {
+                                void editPlanAndNavigate() {
+                                  ref
+                                      .read(createExercisePlanProvider.notifier)
+                                      .editPlan(plan);
+                                  ref
+                                      .read(createPlanStepperProvider.notifier)
+                                      .setCreatePlanStepperIndex(0);
+                                  ref
+                                      .read(
+                                          bottomNavigationBarProvider.notifier)
+                                      .setNavigationBarIndex(2);
+                                }
+
+                                if (ref
+                                    .read(createExercisePlanProvider.notifier)
+                                    .isEditing()) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                            title: Text(
+                                                'You are currently editing another plan in the Plan Creator. If you choose to edit "${plan.planName}," that progress will be overwritten. Are you sure you want to continue?'),
+                                            content: Row(
+                                              children: [
+                                                OutlinedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('No')),
+                                                OutlinedButton(
+                                                    onPressed: () {
+                                                      editPlanAndNavigate();
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('Yes'))
+                                              ],
+                                            ));
+                                      });
+                                } else {
+                                  editPlanAndNavigate();
+                                }
+                              },
+                              icon: const Icon(Icons.edit)),
+                          IconButton(
+                              onPressed: () async {
+                                await ref
+                                    .read(
+                                        completedExercisePlansProvider.notifier)
+                                    .removeCompletedExercisePlanFromDevice(
+                                        plan);
+                              },
+                              icon: const Icon(Icons.delete))
+                        ],
+                      );
+                    }).toList(),
+                  ))
+                ],
+              );
+            });
     }, loading: () {
       return Container();
     }, error: (error, stackTrace) {

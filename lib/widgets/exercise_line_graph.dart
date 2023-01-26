@@ -22,6 +22,7 @@ class ExerciseLineGraph extends ConsumerWidget {
             primaryXAxis: DateTimeAxis(
                 labelIntersectAction: AxisLabelIntersectAction.hide,
                 tickPosition: TickPosition.inside,
+                visibleMinimum: exercises[0].dateTime,
                 axisLabelFormatter: (axisLabelRenderArgs) {
                   DateTime date = DateTime.fromMillisecondsSinceEpoch(
                       axisLabelRenderArgs.value.toInt());

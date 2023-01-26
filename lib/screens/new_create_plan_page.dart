@@ -129,7 +129,27 @@ class NewCreatePlanPage extends ConsumerWidget {
                               provider: createExercisePlanProvider,
                               editingEnabled: false,
                               disabled: isEditingSetsAndReps),
-                          const Expanded(child: SetsAndRepsEditor()),
+                          exercises!.isEmpty
+                              ? const Flexible(
+                                  child: Center(
+                                    child: Text(
+                                      'Add exercises to edit sets and reps',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                )
+                              : Expanded(
+                                  child: SetsAndRepsEditor(
+                                    setEditingState: (isEditing) {
+                                      setState(
+                                        () {
+                                          isEditingSetsAndReps = isEditing;
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
                         ],
                       );
                     }),

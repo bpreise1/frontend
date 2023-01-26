@@ -13,40 +13,39 @@ class SlidableCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      child: ClipRect(
-        child: Slidable(
-          key: UniqueKey(),
-          endActionPane: ActionPane(
-            extentRatio: .4,
-            dismissible: DismissiblePane(
-                resizeDuration: _resizeDuration,
-                onDismissed: () {
-                  onDismiss();
-                }),
-            motion: const StretchMotion(),
-            children: [
-              SlidableAction(
-                autoClose: false,
-                backgroundColor: const Color(0xFFB00020),
-                label: 'Delete',
-                icon: Icons.delete,
-                onPressed: ((context) async {
-                  final SlidableController slidableController =
-                      Slidable.of(context)!;
-                  await slidableController.dismiss(
-                    ResizeRequest(
-                      _resizeDuration,
-                      (() {
-                        onDismiss();
-                      }),
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-          child: child,
+      clipBehavior: Clip.hardEdge,
+      child: Slidable(
+        key: UniqueKey(),
+        endActionPane: ActionPane(
+          extentRatio: .4,
+          dismissible: DismissiblePane(
+              resizeDuration: _resizeDuration,
+              onDismissed: () {
+                onDismiss();
+              }),
+          motion: const StretchMotion(),
+          children: [
+            SlidableAction(
+              autoClose: false,
+              backgroundColor: const Color(0xFFB00020),
+              label: 'Delete',
+              icon: Icons.delete,
+              onPressed: ((context) async {
+                final SlidableController slidableController =
+                    Slidable.of(context)!;
+                await slidableController.dismiss(
+                  ResizeRequest(
+                    _resizeDuration,
+                    (() {
+                      onDismiss();
+                    }),
+                  ),
+                );
+              }),
+            ),
+          ],
         ),
+        child: child,
       ),
     );
   }

@@ -45,13 +45,23 @@ class PlanMetricsPage extends StatelessWidget {
               builder: ((context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (!snapshot.hasError) {
-                    return Column(
-                        children: _splitWorkoutListIntoDateTimeExercises(
-                                snapshot.data!)
-                            .entries
-                            .map((entry) =>
-                                ExerciseLineGraph(exercises: entry.value))
-                            .toList());
+                    return snapshot.data!.isEmpty
+                        ? const Flexible(
+                            child: Center(
+                              child: Text(
+                                'Complete a workout to being tracking metrics',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          )
+                        : Column(
+                            children: _splitWorkoutListIntoDateTimeExercises(
+                                    snapshot.data!)
+                                .entries
+                                .map((entry) =>
+                                    ExerciseLineGraph(exercises: entry.value))
+                                .toList());
                   }
                   return Center(child: Text(snapshot.error.toString()));
                 }

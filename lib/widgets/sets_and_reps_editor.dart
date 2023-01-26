@@ -7,14 +7,20 @@ import 'exercise_list_item.dart';
 import 'exercise_list_item_textfield.dart';
 
 class SetsAndRepsEditor extends StatelessWidget {
-  const SetsAndRepsEditor({super.key});
+  const SetsAndRepsEditor({required this.setEditingState, super.key});
+
+  final void Function(bool isEditing) setEditingState;
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
       observers: [HeroController()],
-      pages: const [
-        MaterialPage(child: SetsAndRepsNotEditing()),
+      pages: [
+        MaterialPage(
+          child: SetsAndRepsNotEditing(
+            setEditingState: setEditingState,
+          ),
+        ),
       ],
       onPopPage: (route, result) => route.didPop(result),
     );
@@ -22,9 +28,11 @@ class SetsAndRepsEditor extends StatelessWidget {
 }
 
 class SetsAndRepsEditing extends ConsumerWidget {
-  const SetsAndRepsEditing({required this.exerciseIndex, super.key});
+  const SetsAndRepsEditing(
+      {required this.exerciseIndex, required this.setEditingState, super.key});
 
   final int exerciseIndex;
+  final void Function(bool isEditing) setEditingState;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,7 +102,9 @@ class SetsAndRepsEditing extends ConsumerWidget {
 }
 
 class SetsAndRepsNotEditing extends ConsumerWidget {
-  const SetsAndRepsNotEditing({super.key});
+  const SetsAndRepsNotEditing({required this.setEditingState, super.key});
+
+  final void Function(bool isEditing) setEditingState;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -108,6 +118,19 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
             index++)
           Hero(
             tag: 'list_item_$index',
+            flightShuttleBuilder: (flightContext, animation, flightDirection,
+                fromHeroContext, toHeroContext) {
+              animation.addStatusListener(
+                (status) {
+                  if (status == AnimationStatus.completed) {
+                    setEditingState(true);
+                  } else if (status == AnimationStatus.dismissed) {
+                    setEditingState(false);
+                  }
+                },
+              );
+              return toHeroContext.widget;
+            },
             child: ExerciseListItem(
               exercise: exercises[index],
               children: [
@@ -142,9 +165,11 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                       }, pageBuilder:
                               ((context, animation, secondaryAnimation) {
                         return Material(
-                            child: SetsAndRepsEditing(
-                          exerciseIndex: index,
-                        ));
+                          child: SetsAndRepsEditing(
+                            exerciseIndex: index,
+                            setEditingState: setEditingState,
+                          ),
+                        );
                       })));
                     }),
                     icon: const Icon(Icons.edit)),

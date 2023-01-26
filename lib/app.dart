@@ -8,7 +8,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: darkTheme,
+      theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       home: const AuthGate(),
