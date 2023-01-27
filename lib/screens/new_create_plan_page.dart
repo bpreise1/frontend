@@ -239,15 +239,15 @@ class NewCreatePlanPage extends ConsumerWidget {
                       if (exercise.sets == '') {
                         exception = UserException(
                             message:
-                                'Sets of "${exercise.name}" must not be empty');
+                                'Sets of "${exercise.name}" must not be empty for "${entry.key}"');
                         break outerloop;
                       }
 
-                      for (String rep in exercise.goalReps) {
-                        if (rep == '') {
+                      for (int i = 0; i < int.parse(exercise.sets); i++) {
+                        if (exercise.goalReps[i] == '') {
                           exception = UserException(
                               message:
-                                  'Reps of "${exercise.name}" must not be empty');
+                                  'Reps of "${exercise.name}" for "Set ${i + 1}" must not be empty for "${entry.key}"');
                           break outerloop;
                         }
                       }
