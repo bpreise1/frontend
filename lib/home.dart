@@ -32,12 +32,21 @@ class Home extends ConsumerWidget {
       ),
       endDrawer: Drawer(
         child: ListView(children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+          ),
+          const Center(
+            child: WeightModeToggle(),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+          ),
           TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-              },
-              child: const Text('Sign Out')),
-          const Center(child: WeightModeToggle())
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+            child: const Text('Sign Out'),
+          ),
         ]),
       ),
       body: _screens[selectedIndex],

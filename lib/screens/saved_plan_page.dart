@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/models/user_preferences.dart';
 import 'package:frontend/models/workout.dart';
 import 'package:frontend/providers/completed_exercise_plan_provider.dart';
@@ -28,6 +30,34 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
   void initState() {
     super.initState();
     _isInProgress = widget.exercisePlan.isInProgress;
+  }
+
+  void showSnackBar(BuildContext context, String text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        dismissDirection: DismissDirection.none,
+        elevation: 100,
+        content: Container(
+          padding: const EdgeInsets.all(16),
+          height: 90,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(20),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -91,19 +121,25 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                         text: data.weightMode ==
                                                 WeightMode.pounds
                                             ? planExercises[index].weights[set]
-                                            : convertWeightToKilograms(
-                                                    double.parse(
-                                                        planExercises[index]
-                                                            .weights[set]))
-                                                .toStringAsFixed(2),
+                                            : planExercises[index]
+                                                        .weights[set] ==
+                                                    ''
+                                                ? ''
+                                                : convertWeightToKilograms(
+                                                        double.parse(
+                                                            planExercises[index]
+                                                                .weights[set]))
+                                                    .toStringAsFixed(2),
                                         helperText:
                                             'Weight ${data.weightMode == WeightMode.pounds ? '(Pounds)' : '(Kilograms)'}',
                                         disabled: !_isInProgress,
                                         onSubmitted: (text) async {
-                                          String submittedWeight =
-                                              data.weightMode ==
-                                                      WeightMode.pounds
-                                                  ? text
+                                          String submittedWeight = data
+                                                      .weightMode ==
+                                                  WeightMode.pounds
+                                              ? text
+                                              : text == ''
+                                                  ? ''
                                                   : convertWeightToPounds(
                                                           double.parse(text))
                                                       .toStringAsFixed(2);
@@ -155,19 +191,59 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                 : const Icon(Icons.play_arrow_rounded),
             onPressed: () async {
               if (_isInProgress) {
-                setState(() {
-                  _isInProgress = false;
-                });
-                await ref
-                    .read(completedExercisePlansProvider.notifier)
-                    .endCompletedExercisePlanById(widget.exercisePlan.id);
-                await workoutRepository.saveWorkoutForExercisePlanById(
-                    Workout(day: currentDay, exercises: planExercises),
-                    widget.exercisePlan.id);
+                UserException? exception;
+
+                outerloop:
+                for (var entry
+                    in widget.exercisePlan.dayToExercisesMap.entries) {
+                  if (entry.value.isEmpty) {
+                    exception = UserException(
+                        message: 'Day "${entry.key}" must not be empty');
+                    break outerloop;
+                  }
+
+                  for (Exercise exercise in entry.value) {
+                    for (int i = 0; i < int.parse(exercise.sets); i++) {
+                      if (exercise.reps[i] == '' && exercise.weights[i] != '') {
+                        exception = UserException(
+                            message:
+                                'Set ${i + 1} of "${exercise.name} has empty reps but non-empty weight');
+                        break outerloop;
+                      } else if (exercise.reps[i] != '' &&
+                          exercise.weights[i] == '') {
+                        exception = UserException(
+                            message:
+                                'Set ${i + 1} of "${exercise.name} has empty weight but non-empty reps');
+                        break outerloop;
+                      }
+                    }
+                  }
+                }
+
+                if (exception != null) {
+                  exception.displayException(context);
+                } else {
+                  setState(() {
+                    _isInProgress = false;
+                  });
+
+                  showSnackBar(
+                      context, 'Congratulations on completing your workout!');
+
+                  await ref
+                      .read(completedExercisePlansProvider.notifier)
+                      .endCompletedExercisePlanById(widget.exercisePlan.id);
+                  await workoutRepository.saveWorkoutForExercisePlanById(
+                      Workout(day: currentDay, exercises: planExercises),
+                      widget.exercisePlan.id);
+                }
               } else {
                 setState(() {
                   _isInProgress = true;
                 });
+
+                showSnackBar(context, 'Enjoy your workout!');
+
                 await ref
                     .read(completedExercisePlansProvider.notifier)
                     .beginCompletedExercisePlanById(widget.exercisePlan.id);

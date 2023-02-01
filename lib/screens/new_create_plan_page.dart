@@ -5,6 +5,7 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/providers/create_plan_stepper_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/sets_and_reps_editor_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
 import 'package:frontend/widgets/sets_and_reps_editor.dart';
@@ -18,17 +19,23 @@ class NewCreatePlanPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int selectedStepperIndex = ref.watch(createPlanStepperProvider);
 
-    String planName = ref.watch(createExercisePlanProvider).planName;
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
     InProgressExercisePlan plan =
         ref.watch(createExercisePlanProvider).exercisePlan;
 
-    bool isEditingSetsAndReps = false;
+    bool isEditingSetsAndReps = ref.watch(setsAndRepsEditorProvider);
     return Scaffold(
         body: Column(children: [
-          Expanded(
+          SizedBox(
+              height: 80,
+              width: MediaQuery.of(context).size.width,
               child: Stepper(
                   onStepTapped: (value) {
+                    if (value != 1) {
+                      ref
+                          .read(setsAndRepsEditorProvider.notifier)
+                          .setEditing(false);
+                    }
                     ref
                         .read(createPlanStepperProvider.notifier)
                         .setCreatePlanStepperIndex(value);
@@ -38,21 +45,20 @@ class NewCreatePlanPage extends ConsumerWidget {
                     return const SizedBox.shrink();
                   },
                   steps: [
-                Step(
-                    title: const Text('Exercises'),
-                    state: selectedStepperIndex == 0
-                        ? StepState.editing
-                        : StepState.indexed,
-                    content: const SizedBox.shrink()),
-                Step(
-                    title: const Text('Sets and Reps'),
-                    state: selectedStepperIndex == 1
-                        ? StepState.editing
-                        : StepState.indexed,
-                    content: const SizedBox.shrink()),
-              ])),
+                    Step(
+                        title: const Text('Exercises'),
+                        state: selectedStepperIndex == 0
+                            ? StepState.editing
+                            : StepState.indexed,
+                        content: const SizedBox.shrink()),
+                    Step(
+                        title: const Text('Sets and Reps'),
+                        state: selectedStepperIndex == 1
+                            ? StepState.editing
+                            : StepState.indexed,
+                        content: const SizedBox.shrink()),
+                  ])),
           Expanded(
-            flex: 8,
             child: Stack(
               children: [
                 if (selectedStepperIndex == 0) //Exercises
@@ -94,7 +100,11 @@ class NewCreatePlanPage extends ConsumerWidget {
                                                 'assets/${exercises[index].name.toLowerCase().replaceAll(' ', '_')}.png',
                                                 width: 50,
                                                 height: 50),
-                                            Text(exercises[index].name),
+                                            Flexible(
+                                              fit: FlexFit.tight,
+                                              child:
+                                                  Text(exercises[index].name),
+                                            ),
                                             const Spacer(),
                                             ReorderableDragStartListener(
                                               index: index,
@@ -121,38 +131,26 @@ class NewCreatePlanPage extends ConsumerWidget {
                         ])),
                   ]),
                 if (selectedStepperIndex == 1) //Sets and Reps
-                  StatefulBuilder(
-                    builder: ((context, setState) {
-                      return Column(
-                        children: [
-                          DaySelectDropdown(
-                              provider: createExercisePlanProvider,
-                              editingEnabled: false,
-                              disabled: isEditingSetsAndReps),
-                          exercises!.isEmpty
-                              ? const Flexible(
-                                  child: Center(
-                                    child: Text(
-                                      'Add exercises to edit sets and reps',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                )
-                              : Expanded(
-                                  child: SetsAndRepsEditor(
-                                    setEditingState: (isEditing) {
-                                      setState(
-                                        () {
-                                          isEditingSetsAndReps = isEditing;
-                                        },
-                                      );
-                                    },
-                                  ),
+                  Column(
+                    children: [
+                      DaySelectDropdown(
+                          provider: createExercisePlanProvider,
+                          editingEnabled: false,
+                          disabled: isEditingSetsAndReps),
+                      exercises!.isEmpty
+                          ? const Flexible(
+                              child: Center(
+                                child: Text(
+                                  'Add exercises to edit sets and reps',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20),
                                 ),
-                        ],
-                      );
-                    }),
+                              ),
+                            )
+                          : const Expanded(
+                              child: SetsAndRepsEditor(),
+                            ),
+                    ],
                   ),
                 Positioned(
                   bottom: 0,
@@ -185,8 +183,8 @@ class NewCreatePlanPage extends ConsumerWidget {
                                 context: context,
                                 builder: ((context) {
                                   return AlertDialog(
-                                      title: Text(
-                                          'Are you sure you want to reset $planName?'),
+                                      title: const Text(
+                                          'Are you sure you want to reset this plan?'),
                                       content: Row(
                                         children: [
                                           OutlinedButton(

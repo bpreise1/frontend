@@ -25,7 +25,7 @@ class PlanList extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Create a plan to being tracking workouts',
+                    'Create a plan to begin tracking workouts',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20),
                   ),

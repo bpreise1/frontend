@@ -23,13 +23,26 @@ class WeightModeToggle extends ConsumerWidget {
             data.weightMode == WeightMode.pounds,
             data.weightMode == WeightMode.kilograms
           ],
-          selectedBorderColor: Colors.red,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(8),
+          ),
+          fillColor: Theme.of(context).colorScheme.secondary,
+          selectedColor: Theme.of(context).colorScheme.onSecondary,
+          selectedBorderColor: Theme.of(context).colorScheme.secondary,
+          constraints: const BoxConstraints(minHeight: 40, minWidth: 80),
           children: const [Text('Pounds'), Text('Kilograms')]);
     }), error: ((error, stackTrace) {
       return Center(child: Text(error.toString()));
     }), loading: (() {
       return ToggleButtons(
         isSelected: const [false, false],
+        borderRadius: const BorderRadius.all(
+          Radius.circular(8),
+        ),
+        fillColor: Theme.of(context).colorScheme.secondary,
+        selectedColor: Theme.of(context).colorScheme.onSecondary,
+        selectedBorderColor: Theme.of(context).colorScheme.secondary,
+        constraints: const BoxConstraints(minHeight: 40, minWidth: 80),
         children: const [Text('Pounds'), Text('Kilograms')],
       );
     }));

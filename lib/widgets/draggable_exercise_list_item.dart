@@ -11,7 +11,10 @@ class DraggableExerciseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Draggable(
         data: exercise,
-        feedback: ExerciseListItem(exercise: exercise),
+        feedback: ExerciseListItem(
+          exercise: exercise,
+          flexible: false,
+        ),
         childWhenDragging: ExerciseListItem(exercise: exercise),
         child: ExerciseListItem(exercise: exercise));
   }

@@ -26,6 +26,7 @@ class PlanMetricsPage extends StatelessWidget {
       }
     }
 
+    print(splitExercises);
     return splitExercises;
   }
 
@@ -49,7 +50,7 @@ class PlanMetricsPage extends StatelessWidget {
                         ? const Flexible(
                             child: Center(
                               child: Text(
-                                'Complete a workout to being tracking metrics',
+                                'Complete a workout to begin tracking metrics',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontSize: 20),
                               ),

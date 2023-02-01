@@ -2,24 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/sets_and_reps_editor_provider.dart';
 
 import 'exercise_list_item.dart';
 import 'exercise_list_item_textfield.dart';
 
 class SetsAndRepsEditor extends StatelessWidget {
-  const SetsAndRepsEditor({required this.setEditingState, super.key});
-
-  final void Function(bool isEditing) setEditingState;
+  const SetsAndRepsEditor({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
       observers: [HeroController()],
-      pages: [
+      pages: const [
         MaterialPage(
-          child: SetsAndRepsNotEditing(
-            setEditingState: setEditingState,
-          ),
+          child: SetsAndRepsNotEditing(),
         ),
       ],
       onPopPage: (route, result) => route.didPop(result),
@@ -28,12 +25,9 @@ class SetsAndRepsEditor extends StatelessWidget {
 }
 
 class SetsAndRepsEditing extends ConsumerWidget {
-  const SetsAndRepsEditing(
-      {required this.exerciseIndex, required this.setEditingState, super.key});
+  const SetsAndRepsEditing({required this.exerciseIndex, super.key});
 
   final int exerciseIndex;
-  final void Function(bool isEditing) setEditingState;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String currentDay = ref.watch(createExercisePlanProvider).currentDay;
@@ -102,9 +96,7 @@ class SetsAndRepsEditing extends ConsumerWidget {
 }
 
 class SetsAndRepsNotEditing extends ConsumerWidget {
-  const SetsAndRepsNotEditing({required this.setEditingState, super.key});
-
-  final void Function(bool isEditing) setEditingState;
+  const SetsAndRepsNotEditing({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -122,10 +114,15 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                 fromHeroContext, toHeroContext) {
               animation.addStatusListener(
                 (status) {
+                  print(status);
                   if (status == AnimationStatus.completed) {
-                    setEditingState(true);
+                    ref
+                        .read(setsAndRepsEditorProvider.notifier)
+                        .setEditing(true);
                   } else if (status == AnimationStatus.dismissed) {
-                    setEditingState(false);
+                    ref
+                        .read(setsAndRepsEditorProvider.notifier)
+                        .setEditing(false);
                   }
                 },
               );
@@ -135,6 +132,7 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
               exercise: exercises[index],
               children: [
                 Expanded(
+                    flex: 2,
                     child: ExerciseListItemTextfield(
                         text: exercises[index].sets,
                         disabled: true,
@@ -145,14 +143,20 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                         }),
                         helperText: 'Sets')),
                 Expanded(
+                    flex: 2,
                     child: ExerciseListItemTextfield(
-                        text: exercises[index]
-                            .goalReps
-                            .map((rep) => rep == '' ? '_' : rep)
-                            .join(' , '),
+                        text: exercises[index].sets == ''
+                            ? ''
+                            : exercises[index]
+                                .goalReps
+                                .map((rep) => rep == '' ? '_' : rep)
+                                .join(' , '),
                         disabled: true,
                         onSubmitted: (text) {},
                         helperText: 'Reps')),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                ),
                 IconButton(
                     onPressed: (() {
                       Navigator.of(context).push(PageRouteBuilder(
@@ -167,7 +171,6 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                         return Material(
                           child: SetsAndRepsEditing(
                             exerciseIndex: index,
-                            setEditingState: setEditingState,
                           ),
                         );
                       })));

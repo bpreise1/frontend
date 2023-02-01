@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class EditText extends StatefulWidget {
-  const EditText({this.text = '', required this.onSubmitted, super.key});
+  const EditText(
+      {this.text = '', required this.onSubmitted, this.hintText, super.key});
 
   final String text;
+  final String? hintText;
   final void Function(String text) onSubmitted;
 
   @override
