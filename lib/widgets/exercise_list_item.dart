@@ -31,20 +31,23 @@ class ExerciseListItem extends StatelessWidget {
               }
             : null,
         child: Card(
-          child: Row(
-            children: [
-              Image.asset(
-                  'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
-                  width: 50,
-                  height: 50),
-              flexible
-                  ? Flexible(
-                      fit: FlexFit.tight,
-                      child: Text(exercise.name),
-                    )
-                  : Text(exercise.name),
-              ...children
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [
+                Image.asset(
+                    'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
+                    width: 50,
+                    height: 50),
+                flexible
+                    ? Flexible(
+                        fit: FlexFit.tight,
+                        child: Text(exercise.name),
+                      )
+                    : Text(exercise.name),
+                ...children
+              ],
+            ),
           ),
         ),
       ),

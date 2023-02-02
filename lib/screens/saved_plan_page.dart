@@ -32,34 +32,6 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
     _isInProgress = widget.exercisePlan.isInProgress;
   }
 
-  void showSnackBar(BuildContext context, String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        dismissDirection: DismissDirection.none,
-        elevation: 100,
-        content: Container(
-          padding: const EdgeInsets.all(16),
-          height: 90,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(20),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onSecondary),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: ((context, ref, child) {
@@ -69,7 +41,13 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
       final planExercises = ref.watch(savedExercisePlanProvider).exercises!;
 
       return Scaffold(
-        appBar: AppBar(title: Text(planName)),
+        appBar: AppBar(
+            title: Text(
+              planName,
+            ),
+            backgroundColor: _isInProgress
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).appBarTheme.backgroundColor),
         body: Column(children: [
           DaySelectDropdown(
               provider: savedExercisePlanProvider, disabled: _isInProgress),
@@ -227,9 +205,6 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                     _isInProgress = false;
                   });
 
-                  showSnackBar(
-                      context, 'Congratulations on completing your workout!');
-
                   await ref
                       .read(completedExercisePlansProvider.notifier)
                       .endCompletedExercisePlanById(widget.exercisePlan.id);
@@ -241,8 +216,6 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                 setState(() {
                   _isInProgress = true;
                 });
-
-                showSnackBar(context, 'Enjoy your workout!');
 
                 await ref
                     .read(completedExercisePlansProvider.notifier)

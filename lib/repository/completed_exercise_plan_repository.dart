@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/models/workout.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class ICompletedExercisePlanRepository {
@@ -81,6 +80,7 @@ class CompletedExercisePlanRepository
         await getCompletedExercisePlanFromDeviceById(exercisePlanId);
 
     completedExercisePlan.isInProgress = true;
+    completedExercisePlan.lastUsed = DateTime.now();
 
     await saveCompletedExercisePlanToDevice(completedExercisePlan);
   }
@@ -104,6 +104,7 @@ class CompletedExercisePlanRepository
         await getCompletedExercisePlanFromDeviceById(exercisePlanId);
 
     completedExercisePlan.isInProgress = false;
+    completedExercisePlan.lastUsed = DateTime.now();
 
     await saveCompletedExercisePlanToDevice(completedExercisePlan);
   }

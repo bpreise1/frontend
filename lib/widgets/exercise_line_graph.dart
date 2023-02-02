@@ -18,11 +18,13 @@ class ExerciseLineGraph extends ConsumerWidget {
 
     return userPreferences.when(
         data: ((preferences) => SfCartesianChart(
-            title: ChartTitle(text: exercises[0].name),
+            margin:
+                const EdgeInsets.only(left: 10, top: 30, right: 30, bottom: 30),
             primaryXAxis: DateTimeAxis(
+              majorGridLines: const MajorGridLines(width: 0),
+              minorGridLines: const MinorGridLines(width: 0),
               labelIntersectAction: AxisLabelIntersectAction.hide,
               tickPosition: TickPosition.inside,
-              visibleMinimum: exercises[0].dateTime,
               axisLabelFormatter: (axisLabelRenderArgs) {
                 DateTime date = DateTime.fromMillisecondsSinceEpoch(
                     axisLabelRenderArgs.value.toInt());
@@ -63,7 +65,6 @@ class ExerciseLineGraph extends ConsumerWidget {
 
                 return ChartAxisLabel(formattedDate, const TextStyle());
               },
-              minorTicksPerInterval: 1,
               intervalType: DateTimeIntervalType.auto,
               edgeLabelPlacement: EdgeLabelPlacement.shift,
             ),

@@ -33,14 +33,17 @@ class PlanListItem extends ConsumerWidget {
         color: exercisePlan.isInProgress
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).cardColor,
-        child: Row(
-          children: [
-            Text(
-              exercisePlan.planName,
-            ),
-            const Spacer(),
-            ...children
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            children: [
+              Text(
+                exercisePlan.planName,
+              ),
+              const Spacer(),
+              ...children
+            ],
+          ),
         ),
       ),
     ));

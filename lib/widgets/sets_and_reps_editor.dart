@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/sets_and_reps_editor_provider.dart';
+import 'package:frontend/utils/reps_input_formatter.dart';
 
 import 'exercise_list_item.dart';
 import 'exercise_list_item_textfield.dart';
@@ -52,44 +54,72 @@ class SetsAndRepsEditing extends ConsumerWidget {
         ListTile(
           title: Row(
             children: [
-              const Text('Sets '),
+              const Text('Sets'),
               Expanded(
                 child: ExerciseListItemTextfield(
                   text: exercises[exerciseIndex].sets,
                   onSubmitted: ((text) {
+                    String sets = text == '0' ? '' : text;
+
                     ref
                         .read(createExercisePlanProvider.notifier)
-                        .updateSets(currentDay, exerciseIndex, text);
+                        .updateSets(currentDay, exerciseIndex, sets);
                   }),
                   hintText: 'Enter Sets',
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'\d'),
+                    )
+                  ],
                 ),
               ),
             ],
           ),
         ),
         if (exercises[exerciseIndex].sets != '')
-          for (int set = 0;
-              set < int.parse(exercises[exerciseIndex].sets);
-              set++)
-            ListTile(
-              title: Row(
-                children: [
-                  Text('Set ${set + 1}'),
-                  Expanded(
-                    child: ExerciseListItemTextfield(
-                      text: exercises[exerciseIndex].goalReps[set],
-                      onSubmitted: ((text) {
-                        ref
-                            .read(createExercisePlanProvider.notifier)
-                            .updateGoalReps(
-                                currentDay, exerciseIndex, set, text);
-                      }),
-                      hintText: 'Enter Reps',
-                    ),
-                  ),
-                ],
+          Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: Divider(),
               ),
-            )
+              for (int set = 0;
+                  set < int.parse(exercises[exerciseIndex].sets);
+                  set++)
+                ListTile(
+                  title: Row(
+                    children: [
+                      Text('Set ${set + 1}'),
+                      Expanded(
+                        child: ExerciseListItemTextfield(
+                          text: exercises[exerciseIndex].goalReps[set],
+                          onSubmitted: ((text) {
+                            String reps = text;
+                            if (reps == '0') {
+                              reps = '';
+                            } else if (reps.isNotEmpty &&
+                                reps[reps.length - 1] == '-') {
+                              reps = reps.substring(0, reps.length - 1);
+                            }
+
+                            ref
+                                .read(createExercisePlanProvider.notifier)
+                                .updateGoalReps(
+                                    currentDay, exerciseIndex, set, reps);
+                          }),
+                          inputFormatters: [
+                            RepsInputFormatter(),
+                          ],
+                          hintText: set == 0
+                              ? 'Enter Reps (e.g. 10, 8-12)'
+                              : 'Enter Reps',
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+            ],
+          )
       ],
     );
   }
@@ -114,7 +144,6 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
                 fromHeroContext, toHeroContext) {
               animation.addStatusListener(
                 (status) {
-                  print(status);
                   if (status == AnimationStatus.completed) {
                     ref
                         .read(setsAndRepsEditorProvider.notifier)

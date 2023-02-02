@@ -7,6 +7,7 @@ import 'package:frontend/providers/create_plan_stepper_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/screens/plan_metrics_page.dart';
 import 'package:frontend/widgets/plan_list_item.dart';
+import 'package:frontend/widgets/yes_no_dialog.dart';
 
 class PlanList extends ConsumerWidget {
   const PlanList({super.key});
@@ -112,24 +113,19 @@ class PlanList extends ConsumerWidget {
                                   showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return AlertDialog(
-                                            title: Text(
-                                                'You are currently editing another plan in the Plan Creator. If you choose to edit "${plan.planName}," that progress will be overwritten. Are you sure you want to continue?'),
-                                            content: Row(
-                                              children: [
-                                                OutlinedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text('No')),
-                                                OutlinedButton(
-                                                    onPressed: () {
-                                                      editPlanAndNavigate();
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text('Yes'))
-                                              ],
-                                            ));
+                                        return YesNoDialog(
+                                          title: Text(
+                                            'You are currently editing another plan in the Plan Creator.\n\n If you choose to edit "${plan.planName}," that progress will be overwritten. Are you sure you want to continue?',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          onNoPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          onYesPressed: () {
+                                            editPlanAndNavigate();
+                                            Navigator.pop(context);
+                                          },
+                                        );
                                       });
                                 } else {
                                   editPlanAndNavigate();

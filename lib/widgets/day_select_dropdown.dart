@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/widgets/yes_no_dialog.dart';
 
 class DaySelectDropdown extends StatefulWidget {
   const DaySelectDropdown(
@@ -107,27 +108,21 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                           showDialog(
                               context: context,
                               builder: ((context) {
-                                return AlertDialog(
-                                    title: Text(
-                                        'Are you sure you want to delete "$currentDay"?'),
-                                    content: Row(
-                                      children: [
-                                        OutlinedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('No')),
-                                        OutlinedButton(
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                      widget.provider.notifier)
-                                                  .removeDay(currentDay);
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Yes'))
-                                      ],
-                                    ));
+                                return YesNoDialog(
+                                  title: Text(
+                                    'Are you sure you want to delete "$currentDay"?',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  onNoPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  onYesPressed: () {
+                                    ref
+                                        .read(widget.provider.notifier)
+                                        .removeDay(currentDay);
+                                    Navigator.pop(context);
+                                  },
+                                );
                               }));
                         }
                       : null,

@@ -8,6 +8,7 @@ class ExerciseListItemTextfield extends StatefulWidget {
       this.helperText,
       this.hintText,
       this.disabled = false,
+      this.inputFormatters,
       super.key});
 
   final String text;
@@ -15,6 +16,7 @@ class ExerciseListItemTextfield extends StatefulWidget {
   final void Function(String text) onSubmitted;
   final String? hintText;
   final bool disabled;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<ExerciseListItemTextfield> createState() =>
@@ -63,9 +65,7 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
                 hintText: widget.hintText ?? '',
               ),
               keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-              ],
+              inputFormatters: widget.inputFormatters,
             )));
   }
 }

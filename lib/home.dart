@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
-import 'package:frontend/screens/new_create_plan_page.dart';
+import 'package:frontend/screens/create_plan_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
 import 'package:frontend/widgets/user_profile_scaffold_button.dart';
@@ -16,7 +16,7 @@ class Home extends ConsumerWidget {
   final List<Widget> _screens = const [
     HomePage(),
     SearchPage(),
-    NewCreatePlanPage(),
+    CreatePlanPage(),
     SavedPlansPage(),
     EncyclopediaPage(),
   ];

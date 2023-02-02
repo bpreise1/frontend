@@ -20,7 +20,7 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
   }
 
   Future<void> setUserPreferences(UserPreferences userPreferences) async {
-    userPreferencesRepository.setUserPreferences(userPreferences);
+    await userPreferencesRepository.setUserPreferences(userPreferences);
     _updateUserPreferences();
   }
 

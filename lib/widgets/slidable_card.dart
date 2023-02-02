@@ -45,7 +45,7 @@ class SlidableCard extends ConsumerWidget {
             ),
           ],
         ),
-        child: child,
+        child: Padding(padding: const EdgeInsets.all(4), child: child),
       ),
     );
   }

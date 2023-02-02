@@ -7,26 +7,28 @@ import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/repository/workout_repository.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_line_graph.dart';
+import 'package:frontend/widgets/exercise_list_item.dart';
 
 class PlanMetricsPage extends StatelessWidget {
   const PlanMetricsPage({required this.exercisePlan, super.key});
 
   final CompletedExercisePlan exercisePlan;
 
-  Map<String, List<DateTimeExercise>> _splitWorkoutListIntoDateTimeExercises(
+  List<List<DateTimeExercise>> _splitWorkoutListIntoDateTimeExercises(
       List<Workout> workoutList) {
-    Map<String, List<DateTimeExercise>> splitExercises = {};
+    List<List<DateTimeExercise>> splitExercises =
+        List.filled(workoutList[0].exercises.length, []);
 
     for (final workout in workoutList) {
-      for (final exercise in workout.exercises) {
-        splitExercises[exercise.name] = [
-          ...?splitExercises[exercise.name],
-          DateTimeExercise(dateTime: workout.dateCompleted, exercise: exercise)
+      for (int i = 0; i < workout.exercises.length; i++) {
+        splitExercises[i] = [
+          ...splitExercises[i],
+          DateTimeExercise(
+              dateTime: workout.dateCompleted, exercise: workout.exercises[i]),
         ];
       }
     }
 
-    print(splitExercises);
     return splitExercises;
   }
 
@@ -56,13 +58,25 @@ class PlanMetricsPage extends StatelessWidget {
                               ),
                             ),
                           )
-                        : Column(
-                            children: _splitWorkoutListIntoDateTimeExercises(
-                                    snapshot.data!)
-                                .entries
-                                .map((entry) =>
-                                    ExerciseLineGraph(exercises: entry.value))
-                                .toList());
+                        : Expanded(
+                            child: ListView(
+                                children:
+                                    _splitWorkoutListIntoDateTimeExercises(
+                                            snapshot.data!)
+                                        .map(
+                                          (exercises) => ExpansionTile(
+                                            initiallyExpanded: true,
+                                            title: ExerciseListItem(
+                                                exercise:
+                                                    exercises.first.exercise),
+                                            children: [
+                                              ExerciseLineGraph(
+                                                  exercises: exercises)
+                                            ],
+                                          ),
+                                        )
+                                        .toList()),
+                          );
                   }
                   return Center(child: Text(snapshot.error.toString()));
                 }

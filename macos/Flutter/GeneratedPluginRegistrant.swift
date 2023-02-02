@@ -8,7 +8,7 @@ import Foundation
 import desktop_webview_auth
 import firebase_auth
 import firebase_core
-import path_provider_macos
+import path_provider_foundation
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   DesktopWebviewAuthPlugin.register(with: registry.registrar(forPlugin: "DesktopWebviewAuthPlugin"))
