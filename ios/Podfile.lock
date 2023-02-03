@@ -15,14 +15,14 @@ PODS:
   - Firebase/DynamicLinks (10.3.0):
     - Firebase/CoreOnly
     - FirebaseDynamicLinks (~> 10.3.0)
-  - firebase_auth (4.2.0):
+  - firebase_auth (4.2.5):
     - Firebase/Auth (= 10.3.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.4.0):
+  - firebase_core (2.4.1):
     - Firebase/CoreOnly (= 10.3.0)
     - Flutter
-  - firebase_dynamic_links (5.0.8):
+  - firebase_dynamic_links (5.0.11):
     - Firebase/DynamicLinks (= 10.3.0)
     - firebase_core
     - Flutter
@@ -66,8 +66,9 @@ PODS:
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 3.0, >= 1.5)
   - GTMSessionFetcher/Core (2.3.0)
-  - path_provider_ios (0.0.1):
+  - path_provider_foundation (0.0.1):
     - Flutter
+    - FlutterMacOS
   - PromisesObjC (2.1.1)
 
 DEPENDENCIES:
@@ -77,7 +78,7 @@ DEPENDENCIES:
   - firebase_dynamic_links (from `.symlinks/plugins/firebase_dynamic_links/ios`)
   - Flutter (from `Flutter`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/ios`)
-  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
 
 SPEC REPOS:
   trunk:
@@ -106,16 +107,16 @@ EXTERNAL SOURCES:
     :path: Flutter
   google_sign_in_ios:
     :path: ".symlinks/plugins/google_sign_in_ios/ios"
-  path_provider_ios:
-    :path: ".symlinks/plugins/path_provider_ios/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/ios"
 
 SPEC CHECKSUMS:
   AppAuth: 8fca6b5563a5baef2c04bee27538025e4ceb2add
   desktop_webview_auth: d645139460ef203d50bd0cdb33356785dd939cce
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
-  firebase_auth: 579a0dc15451491cc83fccaa5102296635f24938
-  firebase_core: 6f2f753e316765799d88568232ed59e300ff53db
-  firebase_dynamic_links: 5451db596cc101d1fbe526f64d04f592ef84fc06
+  firebase_auth: 3bab991fe1df91c2f948156e9dee976e01a19ab9
+  firebase_core: bf59c32d2e53814f558efa20840c1902fa2fe461
+  firebase_dynamic_links: e5ca49679928f5d46e2db5168656975eae39d379
   FirebaseAuth: 0e415d29d846c1dce2fb641e46f35e9888d9bec6
   FirebaseCore: 988754646ab3bd4bdcb740f1bfe26b9f6c0d5f2a
   FirebaseCoreInternal: 29b76f784d607df8b2a1259d73c3f04f1210137b
@@ -126,7 +127,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: bad72cb363809015b1f7f19beb1f1cd23c589f95
   GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
   GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
-  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  path_provider_foundation: 37748e03f12783f9de2cb2c4eadfaa25fe6d4852
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3

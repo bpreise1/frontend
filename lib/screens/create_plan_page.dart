@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/user_exception.dart';
@@ -64,10 +65,10 @@ class CreatePlanPage extends ConsumerWidget {
               children: [
                 if (selectedStepperIndex == 0) //Exercises
                   Row(children: [
-                    const Expanded(child: DraggableExerciseList()),
+                    const Expanded(flex: 3, child: DraggableExerciseList()),
                     const VerticalDivider(),
                     Expanded(
-                        flex: 2,
+                        flex: 5,
                         child: Column(children: [
                           DaySelectDropdown(
                               provider: createExercisePlanProvider,
@@ -97,8 +98,8 @@ class CreatePlanPage extends ConsumerWidget {
                                         key: Key(index.toString()),
                                         child: Row(
                                           children: [
-                                            Image.asset('assets/temp.png',
-                                                width: 64, height: 64),
+                                            SvgPicture.asset('assets/temp.svg',
+                                                width: 38, height: 38),
                                             const Padding(
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: 4),
@@ -143,10 +144,13 @@ class CreatePlanPage extends ConsumerWidget {
                       exercises!.isEmpty
                           ? const Flexible(
                               child: Center(
-                                child: Text(
-                                  'Add exercises to edit sets and reps',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 20),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: Text(
+                                    'Add exercises to edit sets and reps',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 20),
+                                  ),
                                 ),
                               ),
                             )
@@ -172,6 +176,10 @@ class CreatePlanPage extends ConsumerWidget {
                             onPressed: selectedStepperIndex == 0
                                 ? null
                                 : () {
+                                    ref
+                                        .read(
+                                            setsAndRepsEditorProvider.notifier)
+                                        .setEditing(false);
                                     ref
                                         .read(
                                             createPlanStepperProvider.notifier)
@@ -209,6 +217,10 @@ class CreatePlanPage extends ConsumerWidget {
                                                 .notifier)
                                             .resetPlan();
                                         ref
+                                            .read(setsAndRepsEditorProvider
+                                                .notifier)
+                                            .setEditing(false);
+                                        ref
                                             .read(createPlanStepperProvider
                                                 .notifier)
                                             .setCreatePlanStepperIndex(0);
@@ -226,7 +238,7 @@ class CreatePlanPage extends ConsumerWidget {
             ),
           )
         ]),
-        floatingActionButton: selectedStepperIndex == 1
+        floatingActionButton: selectedStepperIndex == 1 && !isEditingSetsAndReps
             ? Container(
                 padding: const EdgeInsets.only(right: 20),
                 child: FloatingActionButton(

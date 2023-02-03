@@ -64,7 +64,7 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
                 helperText: widget.helperText,
                 hintText: widget.hintText ?? '',
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(signed: true),
               inputFormatters: widget.inputFormatters,
             )));
   }

@@ -25,10 +25,13 @@ class PlanList extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Create a plan to begin tracking workouts',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'Create a plan to begin tracking workouts',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 16)),
                   FloatingActionButton(

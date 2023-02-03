@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/exercise.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+enum ImageSize { small, large }
 
 class ExerciseListItem extends StatelessWidget {
   const ExerciseListItem(
@@ -7,12 +10,14 @@ class ExerciseListItem extends StatelessWidget {
       this.children = const [],
       this.onTapEnabled = true,
       this.flexible = true,
+      this.imageSize = ImageSize.large,
       super.key});
 
   final Exercise exercise;
   final List<Widget> children;
   final bool onTapEnabled;
   final bool flexible;
+  final ImageSize imageSize;
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +36,29 @@ class ExerciseListItem extends StatelessWidget {
               }
             : null,
         child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Row(
-              children: [
-                Image.asset('assets/temp.png', width: 64, height: 64),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                ),
-                flexible
-                    ? Flexible(
-                        fit: FlexFit.tight,
-                        child: Text(exercise.name),
-                      )
-                    : Text(exercise.name),
-                ...children
-              ],
+          child: SizedBox(
+            height: 90,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  imageSize == ImageSize.large
+                      ? SvgPicture.asset('assets/temp.svg',
+                          width: 48, height: 48)
+                      : SvgPicture.asset('assets/temp.svg',
+                          width: 24, height: 24),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                  flexible
+                      ? Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(exercise.name),
+                        )
+                      : Text(exercise.name),
+                  ...children
+                ],
+              ),
             ),
           ),
         ),

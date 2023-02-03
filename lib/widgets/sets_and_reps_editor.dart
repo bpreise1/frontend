@@ -158,10 +158,11 @@ class SetsAndRepsNotEditing extends ConsumerWidget {
               return toHeroContext.widget;
             },
             child: ExerciseListItem(
+              imageSize: ImageSize.small,
               exercise: exercises[index],
               children: [
                 Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: ExerciseListItemTextfield(
                         text: exercises[index].sets,
                         disabled: true,

@@ -9,13 +9,17 @@ class DraggableExerciseListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Draggable(
+    return LongPressDraggable(
+        delay: const Duration(milliseconds: 80),
         data: exercise,
         feedback: ExerciseListItem(
+          imageSize: ImageSize.small,
           exercise: exercise,
           flexible: false,
         ),
-        childWhenDragging: ExerciseListItem(exercise: exercise),
-        child: ExerciseListItem(exercise: exercise));
+        childWhenDragging:
+            ExerciseListItem(imageSize: ImageSize.small, exercise: exercise),
+        child:
+            ExerciseListItem(imageSize: ImageSize.small, exercise: exercise));
   }
 }
