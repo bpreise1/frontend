@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
@@ -76,6 +77,11 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                     hintText:
                                         'Goal: ${planExercises[index].goalReps[set]}',
                                     disabled: !_isInProgress,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                        RegExp(r'\d'),
+                                      )
+                                    ],
                                     onSubmitted: (text) async {
                                       ref
                                           .read(savedExercisePlanProvider
@@ -111,6 +117,11 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                         helperText:
                                             'Weight ${data.weightMode == WeightMode.pounds ? '(Pounds)' : '(Kilograms)'}',
                                         disabled: !_isInProgress,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'\d'),
+                                          )
+                                        ],
                                         onSubmitted: (text) async {
                                           String submittedWeight = data
                                                       .weightMode ==

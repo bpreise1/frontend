@@ -43,13 +43,18 @@ class _ExerciseListState extends State<ExerciseList> {
           padding: EdgeInsets.symmetric(vertical: 4),
         ),
         Expanded(
-            child: ListView(
-          children: _exercises
-              .map((exercise) => ExerciseListItem(
-                    exercise: exercise,
-                  ))
-              .toList(),
-        ))
+          child: ListView.builder(
+            itemCount: _exercises.length,
+            prototypeItem: ExerciseListItem(
+              exercise: allExercises.first,
+            ),
+            itemBuilder: (context, index) {
+              return ExerciseListItem(
+                exercise: _exercises[index],
+              );
+            },
+          ),
+        ),
       ],
     );
   }

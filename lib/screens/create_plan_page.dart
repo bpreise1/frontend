@@ -93,47 +93,39 @@ class CreatePlanPage extends ConsumerWidget {
                                         exercises != null &&
                                             index < exercises.length;
                                         index++)
-                                      Scrollable(
-                                        key: Key(
-                                          index.toString(),
-                                        ),
-                                        viewportBuilder: (context, position) {
-                                          return SlidableCard(
-                                            key: Key(index.toString()),
-                                            child: Row(
-                                              children: [
-                                                Image.asset('assets/temp.png',
-                                                    width: 64, height: 64),
-                                                const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 4),
-                                                ),
-                                                Flexible(
-                                                  fit: FlexFit.tight,
-                                                  child: Text(
-                                                      exercises[index].name),
-                                                ),
-                                                const Spacer(),
-                                                ReorderableDragStartListener(
-                                                  index: index,
-                                                  child: const Icon(Icons.menu),
-                                                ),
-                                                const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(right: 8),
-                                                ),
-                                              ],
+                                      SlidableCard(
+                                        key: Key(index.toString()),
+                                        child: Row(
+                                          children: [
+                                            Image.asset('assets/temp.png',
+                                                width: 64, height: 64),
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 4),
                                             ),
-                                            onDismiss: () {
-                                              ref
-                                                  .read(
-                                                      createExercisePlanProvider
-                                                          .notifier)
-                                                  .removeExerciseAt(index);
-                                            },
-                                          );
+                                            Flexible(
+                                              fit: FlexFit.tight,
+                                              child:
+                                                  Text(exercises[index].name),
+                                            ),
+                                            const Spacer(),
+                                            ReorderableDragStartListener(
+                                              index: index,
+                                              child: const Icon(Icons.menu),
+                                            ),
+                                            const Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 8),
+                                            ),
+                                          ],
+                                        ),
+                                        onDismiss: () {
+                                          ref
+                                              .read(createExercisePlanProvider
+                                                  .notifier)
+                                              .removeExerciseAt(index);
                                         },
-                                      ),
+                                      )
                                   ],
                                 );
                               }),

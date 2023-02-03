@@ -14,38 +14,40 @@ class SlidableCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       clipBehavior: Clip.hardEdge,
-      child: Slidable(
-        key: UniqueKey(),
-        endActionPane: ActionPane(
-          extentRatio: .4,
-          dismissible: DismissiblePane(
-              resizeDuration: _resizeDuration,
-              onDismissed: () {
-                onDismiss();
-              }),
-          motion: const StretchMotion(),
-          children: [
-            SlidableAction(
-              autoClose: false,
-              backgroundColor: const Color(0xFFB00020),
-              label: 'Delete',
-              icon: Icons.delete,
-              onPressed: ((context) async {
-                final SlidableController slidableController =
-                    Slidable.of(context)!;
-                await slidableController.dismiss(
-                  ResizeRequest(
-                    _resizeDuration,
-                    (() {
-                      onDismiss();
-                    }),
-                  ),
-                );
-              }),
-            ),
-          ],
+      child: SingleChildScrollView(
+        child: Slidable(
+          key: UniqueKey(),
+          endActionPane: ActionPane(
+            extentRatio: .4,
+            dismissible: DismissiblePane(
+                resizeDuration: _resizeDuration,
+                onDismissed: () {
+                  onDismiss();
+                }),
+            motion: const StretchMotion(),
+            children: [
+              SlidableAction(
+                autoClose: false,
+                backgroundColor: const Color(0xFFB00020),
+                label: 'Delete',
+                icon: Icons.delete,
+                onPressed: ((context) async {
+                  final SlidableController slidableController =
+                      Slidable.of(context)!;
+                  await slidableController.dismiss(
+                    ResizeRequest(
+                      _resizeDuration,
+                      (() {
+                        onDismiss();
+                      }),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+          child: Padding(padding: const EdgeInsets.all(4), child: child),
         ),
-        child: Padding(padding: const EdgeInsets.all(4), child: child),
       ),
     );
   }

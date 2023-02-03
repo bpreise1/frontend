@@ -43,11 +43,18 @@ class _DraggableExerciseListState extends State<DraggableExerciseList> {
           padding: EdgeInsets.symmetric(vertical: 4),
         ),
         Expanded(
-            child: ListView(
-          children: _exercises
-              .map((exercise) => DraggableExerciseListItem(exercise: exercise))
-              .toList(),
-        ))
+          child: ListView.builder(
+            itemCount: _exercises.length,
+            prototypeItem: DraggableExerciseListItem(
+              exercise: allExercises.first,
+            ),
+            itemBuilder: (context, index) {
+              return DraggableExerciseListItem(
+                exercise: _exercises[index],
+              );
+            },
+          ),
+        )
       ],
     );
   }
