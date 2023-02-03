@@ -35,10 +35,10 @@ class ExerciseListItem extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             child: Row(
               children: [
-                Image.asset(
-                    'assets/${exercise.name.toLowerCase().replaceAll(' ', '_')}.png',
-                    width: 50,
-                    height: 50),
+                Image.asset('assets/temp.png', width: 64, height: 64),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                ),
                 flexible
                     ? Flexible(
                         fit: FlexFit.tight,

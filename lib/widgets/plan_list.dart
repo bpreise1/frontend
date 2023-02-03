@@ -115,7 +115,7 @@ class PlanList extends ConsumerWidget {
                                       builder: (context) {
                                         return YesNoDialog(
                                           title: Text(
-                                            'You are currently editing another plan in the Plan Creator.\n\n If you choose to edit "${plan.planName}," that progress will be overwritten. Are you sure you want to continue?',
+                                            'You are currently editing another plan in the Plan Creator.\n\n If you choose to edit "${plan.planName}," that progress will be overwritten.\n\nAre you sure you want to continue?',
                                             textAlign: TextAlign.center,
                                           ),
                                           onNoPressed: () {
@@ -134,11 +134,28 @@ class PlanList extends ConsumerWidget {
                               icon: const Icon(Icons.edit)),
                           IconButton(
                               onPressed: () async {
-                                await ref
-                                    .read(
-                                        completedExercisePlansProvider.notifier)
-                                    .removeCompletedExercisePlanFromDevice(
-                                        plan);
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return YesNoDialog(
+                                      title: Text(
+                                        'If you delete "${plan.planName}," you will lose all metrics.\n\nAre you sure you want to continue?',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      onNoPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      onYesPressed: () {
+                                        ref
+                                            .read(completedExercisePlansProvider
+                                                .notifier)
+                                            .removeCompletedExercisePlanFromDevice(
+                                                plan);
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  },
+                                );
                               },
                               icon: const Icon(Icons.delete))
                         ],

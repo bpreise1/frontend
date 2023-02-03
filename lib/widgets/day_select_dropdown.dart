@@ -110,7 +110,7 @@ class _DaySelectDropdownState extends State<DaySelectDropdown> {
                               builder: ((context) {
                                 return YesNoDialog(
                                   title: Text(
-                                    'Are you sure you want to delete "$currentDay"?',
+                                    'Are you sure you want to delete "$currentDay?"',
                                     textAlign: TextAlign.center,
                                   ),
                                   onNoPressed: () {

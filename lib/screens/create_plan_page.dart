@@ -102,10 +102,12 @@ class CreatePlanPage extends ConsumerWidget {
                                             key: Key(index.toString()),
                                             child: Row(
                                               children: [
-                                                Image.asset(
-                                                    'assets/${exercises[index].name.toLowerCase().replaceAll(' ', '_')}.png',
-                                                    width: 50,
-                                                    height: 50),
+                                                Image.asset('assets/temp.png',
+                                                    width: 64, height: 64),
+                                                const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 4),
+                                                ),
                                                 Flexible(
                                                   fit: FlexFit.tight,
                                                   child: Text(
