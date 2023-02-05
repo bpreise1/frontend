@@ -38,25 +38,28 @@ class SubmitPlanDialog extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CheckboxListTile(
-                activeColor: Theme.of(context).colorScheme.secondary,
-                checkColor: Theme.of(context).colorScheme.onSecondary,
-                title: const Text('Save'),
-                value: saveIsChecked,
-                onChanged: ((bool? value) {
-                  setState(() {
-                    saveIsChecked = value!;
-                  });
-                })),
+              activeColor: Theme.of(context).colorScheme.secondary,
+              checkColor: Theme.of(context).colorScheme.onSecondary,
+              title: const Text('Save'),
+              value: saveIsChecked,
+              onChanged: ((bool? value) {
+                setState(() {
+                  saveIsChecked = value!;
+                });
+              }),
+            ),
             CheckboxListTile(
                 activeColor: Theme.of(context).colorScheme.secondary,
                 checkColor: Theme.of(context).colorScheme.onSecondary,
                 title: const Text('Publish'),
                 value: publishIsChecked,
-                onChanged: ((bool? value) {
-                  setState(() {
-                    publishIsChecked = value!;
-                  });
-                })),
+                onChanged: null
+                //((bool? value) {
+                //   setState(() {
+                //     publishIsChecked = value!;
+                //   });
+                // }),
+                ),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
             ),
