@@ -12,10 +12,15 @@ class DraggableExerciseListItem extends StatelessWidget {
     return LongPressDraggable(
         delay: const Duration(milliseconds: 80),
         data: exercise,
-        feedback: ExerciseListItem(
-          imageSize: ImageSize.small,
-          exercise: exercise,
-          flexible: false,
+        feedback: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width * .37,
+          ),
+          child: ExerciseListItem(
+            imageSize: ImageSize.small,
+            exercise: exercise,
+            flexible: false,
+          ),
         ),
         childWhenDragging:
             ExerciseListItem(imageSize: ImageSize.small, exercise: exercise),

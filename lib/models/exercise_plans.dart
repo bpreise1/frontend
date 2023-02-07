@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:uuid/uuid.dart';
 
@@ -50,6 +53,64 @@ class CompletedExercisePlan {
       'plan': dayToExercisesMap.map<String, List<Map<String, dynamic>>>(
           (day, exerciseList) =>
               MapEntry(day, exerciseListToJson(exerciseList))),
+    };
+  }
+}
+
+class PublishedExercisePlan {
+  const PublishedExercisePlan({
+    required this.id,
+    required this.planName,
+    required this.dayToExercisesMap,
+    required this.dateCreated,
+    this.likes = 0,
+    this.likedBy = const [],
+    this.comments = const [],
+  });
+
+  final String id;
+  final String planName;
+  final Map<String, List<Exercise>> dayToExercisesMap;
+  final DateTime dateCreated;
+  final int likes;
+  final List<String> likedBy;
+  final List<Comment> comments;
+
+  factory PublishedExercisePlan.fromJson(Map<String, dynamic> json) {
+    jsonToExerciseList(List exerciseList) =>
+        exerciseList.map((exercise) => Exercise.fromJson(exercise)).toList();
+
+    Map plan = json['plan'] as Map;
+    Map<String, List<Exercise>> parsedDayToExercisesMap = plan.map(
+        (day, exerciseList) => MapEntry(day, jsonToExerciseList(exerciseList)));
+
+    List comments = json['comments'];
+    List likedBy = json['likedBy'];
+
+    return PublishedExercisePlan(
+      id: json['id'],
+      planName: json['planName'],
+      dayToExercisesMap: parsedDayToExercisesMap,
+      dateCreated: DateTime.parse(json['dateCreated']),
+      likes: json['likes'],
+      likedBy: likedBy.map((like) => like as String).toList(),
+      comments: comments.map((comment) => Comment.fromJson(comment)).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    exerciseListToJson(List<Exercise> exerciseList) =>
+        exerciseList.map((exercise) => exercise.toJson()).toList();
+    return {
+      'id': id,
+      'planName': planName,
+      'plan': dayToExercisesMap.map<String, List<Map<String, dynamic>>>(
+          (day, exerciseList) =>
+              MapEntry(day, exerciseListToJson(exerciseList))),
+      'dateCreated': dateCreated.toString(),
+      'likes': likes,
+      'likedBy': likedBy,
+      'comments': comments.map((comment) => comment.toJson()).toList(),
     };
   }
 }

@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
+import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
 import 'package:frontend/screens/create_plan_page.dart';
+import 'package:frontend/screens/profile_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
 import 'package:frontend/widgets/user_profile_scaffold_button.dart';
@@ -35,11 +38,35 @@ class Home extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
           ),
+          InkWell(
+            child: const CircleAvatar(
+              radius: 50,
+            ),
+            onTap: () {
+              final currentUser = ref.watch(currentUserProvider);
+              currentUser.when(
+                data: (data) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return ProfilePage(
+                        user: data,
+                      );
+                    },
+                  ));
+                },
+                error: (error, stackTrace) {},
+                loading: () {},
+              );
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+          ),
           const Center(
             child: WeightModeToggle(),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
+            padding: EdgeInsets.symmetric(vertical: 10),
           ),
           TextButton(
             onPressed: () async {
