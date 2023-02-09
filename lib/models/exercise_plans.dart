@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:frontend/models/comment.dart';
+import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise.dart';
 import 'package:uuid/uuid.dart';
 
@@ -62,8 +63,9 @@ class PublishedExercisePlan {
     required this.id,
     required this.planName,
     required this.dayToExercisesMap,
+    required this.description,
+    required this.creatorUserId,
     required this.dateCreated,
-    this.likes = 0,
     this.likedBy = const [],
     this.comments = const [],
   });
@@ -71,8 +73,9 @@ class PublishedExercisePlan {
   final String id;
   final String planName;
   final Map<String, List<Exercise>> dayToExercisesMap;
+  final String description;
+  final String creatorUserId;
   final DateTime dateCreated;
-  final int likes;
   final List<String> likedBy;
   final List<Comment> comments;
 
@@ -91,8 +94,9 @@ class PublishedExercisePlan {
       id: json['id'],
       planName: json['planName'],
       dayToExercisesMap: parsedDayToExercisesMap,
+      description: json['description'],
+      creatorUserId: json['creatorUserId'],
       dateCreated: DateTime.parse(json['dateCreated']),
-      likes: json['likes'],
       likedBy: likedBy.map((like) => like as String).toList(),
       comments: comments.map((comment) => Comment.fromJson(comment)).toList(),
     );
@@ -107,8 +111,9 @@ class PublishedExercisePlan {
       'plan': dayToExercisesMap.map<String, List<Map<String, dynamic>>>(
           (day, exerciseList) =>
               MapEntry(day, exerciseListToJson(exerciseList))),
+      'description': description,
+      'creatorUserId': creatorUserId,
       'dateCreated': dateCreated.toString(),
-      'likes': likes,
       'likedBy': likedBy,
       'comments': comments.map((comment) => comment.toJson()).toList(),
     };

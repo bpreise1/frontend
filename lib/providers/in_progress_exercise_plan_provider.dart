@@ -7,10 +7,12 @@ class ExercisePlanState {
   const ExercisePlanState({
     required exercisePlan,
     this.currentDay = 'Day 1',
+    this.description = '',
   }) : _exercisePlan = exercisePlan;
 
   final InProgressExercisePlan _exercisePlan;
   final String currentDay;
+  final String description;
 
   InProgressExercisePlan get exercisePlan => _exercisePlan;
   Map<String, List<Exercise>> get dayToExercisesMap =>
@@ -28,7 +30,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: name, dayToExercisesMap: state.dayToExercisesMap),
-        currentDay: state.currentDay);
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void resetPlan() {
@@ -51,6 +54,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
       exercisePlan: InProgressExercisePlan(
           planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
       currentDay: state.currentDay,
+      description: state.description,
     );
   }
 
@@ -67,10 +71,10 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-      exercisePlan: InProgressExercisePlan(
-          planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-      currentDay: state.currentDay,
-    );
+        exercisePlan: InProgressExercisePlan(
+            planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void moveExercise(int oldIndex, int newIndex) {
@@ -91,7 +95,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: state.currentDay);
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void addDay() {
@@ -109,7 +114,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: day);
+        currentDay: day,
+        description: state.description);
   }
 
   void updateDayName(String name) {
@@ -134,13 +140,16 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: name);
+        currentDay: name,
+        description: state.description);
   }
 
   void selectDay(String day) {
     if (day != state.currentDay) {
-      state =
-          ExercisePlanState(exercisePlan: state.exercisePlan, currentDay: day);
+      state = ExercisePlanState(
+          exercisePlan: state.exercisePlan,
+          currentDay: day,
+          description: state.description);
     }
   }
 
@@ -160,7 +169,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: newDay);
+        currentDay: newDay,
+        description: state.description);
   }
 
   void updateSets(String day, int index, String sets) {
@@ -193,7 +203,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: state.currentDay);
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void updateGoalReps(String day, int index, int set, String goalReps) {
@@ -217,6 +228,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
       exercisePlan: InProgressExercisePlan(
           planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
       currentDay: state.currentDay,
+      description: state.description,
     );
   }
 
@@ -240,7 +252,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: state.currentDay);
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void updateWeightForSet(String day, int index, int set, String weight) {
@@ -263,7 +276,8 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     state = ExercisePlanState(
         exercisePlan: InProgressExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
-        currentDay: state.currentDay);
+        currentDay: state.currentDay,
+        description: state.description);
   }
 
   void editPlan(CompletedExercisePlan exercisePlan) {
@@ -287,10 +301,11 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
-            planName: '${exercisePlan.planName} (Copy)',
-            dayToExercisesMap: newDayToExercisesMap),
-        currentDay: exercisePlan.dayToExercisesMap.keys.first);
+      exercisePlan: InProgressExercisePlan(
+          planName: '${exercisePlan.planName} (Copy)',
+          dayToExercisesMap: newDayToExercisesMap),
+      currentDay: exercisePlan.dayToExercisesMap.keys.first,
+    );
   }
 
   void setPlan(CompletedExercisePlan exercisePlan) {
@@ -299,7 +314,15 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         exercisePlan: InProgressExercisePlan(
             planName: exercisePlan.planName,
             dayToExercisesMap: exercisePlan.dayToExercisesMap),
-        currentDay: exercisePlan.dayToExercisesMap.keys.first);
+        currentDay: exercisePlan.dayToExercisesMap.keys.first,
+        description: state.description);
+  }
+
+  void setDescription(String description) {
+    state = ExercisePlanState(
+        exercisePlan: state.exercisePlan,
+        currentDay: state.currentDay,
+        description: description);
   }
 
   bool isEditing() {
@@ -319,3 +342,7 @@ final createExercisePlanProvider =
 final savedExercisePlanProvider =
     StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState>(
         ((ref) => ExercisePlanNotifier()));
+
+final publishedExercisePlanProvider =
+    StateNotifierProvider<ExercisePlanNotifier, ExercisePlanState>(
+        (ref) => ExercisePlanNotifier());

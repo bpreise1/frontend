@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/custom_user.dart';
+
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
-import 'package:frontend/providers/current_user_provider.dart';
+import 'package:frontend/providers/profile_page_provider.dart';
+import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
 import 'package:frontend/screens/create_plan_page.dart';
@@ -43,20 +44,15 @@ class Home extends ConsumerWidget {
               radius: 50,
             ),
             onTap: () {
-              final currentUser = ref.watch(currentUserProvider);
-              currentUser.when(
-                data: (data) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return ProfilePage(
-                        user: data,
-                      );
-                    },
-                  ));
+              ref
+                  .read(profilePageProvider.notifier)
+                  .fetchUser(userRepository.getCurrentUserId());
+
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) {
+                  return const ProfilePage();
                 },
-                error: (error, stackTrace) {},
-                loading: () {},
-              );
+              ));
             },
           ),
           const Padding(
