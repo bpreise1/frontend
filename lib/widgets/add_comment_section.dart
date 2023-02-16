@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
-import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/providers/published_plan_page_provider.dart';
@@ -9,9 +8,11 @@ import 'package:frontend/repository/user_repository.dart';
 import 'package:uuid/uuid.dart';
 
 class AddCommentSection extends StatefulWidget {
-  const AddCommentSection({required this.exercisePlan, super.key});
+  const AddCommentSection(
+      {required this.exercisePlanId, this.replyTo, super.key});
 
-  final PublishedExercisePlan exercisePlan;
+  final String exercisePlanId;
+  final Comment? replyTo;
 
   @override
   State<AddCommentSection> createState() => _AddCommentSectionState();
@@ -43,8 +44,10 @@ class _AddCommentSectionState extends State<AddCommentSection> {
           Expanded(
             child: TextField(
               controller: _textController,
-              decoration: const InputDecoration.collapsed(
-                hintText: 'Add a comment...',
+              decoration: InputDecoration.collapsed(
+                hintText: widget.replyTo != null
+                    ? 'Add a reply...'
+                    : 'Add a comment...',
               ),
             ),
           ),
@@ -55,20 +58,36 @@ class _AddCommentSectionState extends State<AddCommentSection> {
                 onPressed: () async {
                   currentUser.when(
                     data: (data) async {
-                      ref
-                          .read(profilePageProvider.notifier)
-                          .addCommentForExercisePlan(
-                            widget.exercisePlan.id,
-                            Comment(
-                                id: const Uuid().v4(),
-                                comment: _textController.text,
-                                creatorUserId:
-                                    userRepository.getCurrentUserId(),
-                                creatorUsername: data.username,
-                                dateCreated: DateTime.now(),
-                                likedBy: [],
-                                replies: []),
-                          );
+                      widget.replyTo != null
+                          ? ref
+                              .read(profilePageProvider.notifier)
+                              .replyToCommentForExercisePlan(
+                                widget.exercisePlanId,
+                                widget.replyTo!.id,
+                                Comment(
+                                    id: const Uuid().v4(),
+                                    comment: _textController.text,
+                                    creatorUserId:
+                                        userRepository.getCurrentUserId(),
+                                    creatorUsername: data.username,
+                                    dateCreated: DateTime.now(),
+                                    likedBy: [],
+                                    replies: []),
+                              )
+                          : ref
+                              .read(profilePageProvider.notifier)
+                              .addCommentForExercisePlan(
+                                widget.exercisePlanId,
+                                Comment(
+                                    id: const Uuid().v4(),
+                                    comment: _textController.text,
+                                    creatorUserId:
+                                        userRepository.getCurrentUserId(),
+                                    creatorUsername: data.username,
+                                    dateCreated: DateTime.now(),
+                                    likedBy: [],
+                                    replies: []),
+                              );
 
                       _textController.text = '';
 

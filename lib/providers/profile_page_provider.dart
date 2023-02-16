@@ -71,9 +71,21 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       final CustomUser user = state.value!;
       final PublishedExercisePlan plan =
           user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);
-      final Comment comment =
-          plan.comments.firstWhere((comment) => comment.id == commentId);
-      comment.likedBy.add(likerId);
+
+      outerloop:
+      for (final comment in plan.comments) {
+        if (comment.id == commentId) {
+          comment.likedBy.add(likerId);
+          break outerloop;
+        }
+
+        for (final reply in comment.replies) {
+          if (reply.id == commentId) {
+            reply.likedBy.add(likerId);
+            break outerloop;
+          }
+        }
+      }
 
       await userRepository.likeCommentForExercisePlan(
           exercisePlanId, likerId, commentId);
@@ -88,14 +100,41 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       final CustomUser user = state.value!;
       final PublishedExercisePlan plan =
           user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);
-      final Comment comment =
-          plan.comments.firstWhere((comment) => comment.id == commentId);
-      comment.likedBy.remove(likerId);
 
-      print(comment.likedBy);
+      outerloop:
+      for (final comment in plan.comments) {
+        if (comment.id == commentId) {
+          comment.likedBy.remove(likerId);
+          break outerloop;
+        }
+
+        for (final reply in comment.replies) {
+          if (reply.id == commentId) {
+            reply.likedBy.remove(likerId);
+            break outerloop;
+          }
+        }
+      }
 
       await userRepository.unlikeCommentForExercisePlan(
           exercisePlanId, likerId, commentId);
+
+      state = AsyncValue.data(user);
+    }
+  }
+
+  Future<void> replyToCommentForExercisePlan(
+      String exercisePlanId, String commentId, Comment reply) async {
+    if (state.hasValue) {
+      final CustomUser user = state.value!;
+      final PublishedExercisePlan plan =
+          user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);
+      final Comment comment =
+          plan.comments.firstWhere((comment) => comment.id == commentId);
+      comment.replies.add(reply);
+
+      await userRepository.replyToCommentForExercisePlan(
+          exercisePlanId, commentId, reply);
 
       state = AsyncValue.data(user);
     }

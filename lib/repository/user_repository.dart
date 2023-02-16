@@ -114,12 +114,28 @@ class UserRepository implements IUserRepository {
 
     Map<String, dynamic> plan = planDoc.data()!;
     List comments = plan['comments'];
-    Map<String, dynamic> comment =
-        comments.firstWhere((comment) => comment['id'] == commentId);
-    List likedBy = comment['likedBy'];
-    likedBy.add(likerId);
-    comment['likedBy'] = likedBy;
-    plan['comment'] = comment;
+
+    Map<String, dynamic> newComment = {};
+    outerloop:
+    for (final Map<String, dynamic> comment in comments) {
+      if (comment['id'] == commentId) {
+        List likedBy = comment['likedBy'];
+        likedBy.add(likerId);
+        newComment['likedBy'] = likedBy;
+        break outerloop;
+      }
+
+      for (final Map<String, dynamic> reply in comment['replies']) {
+        if (reply['id'] == commentId) {
+          List likedBy = reply['likedBy'];
+          likedBy.add(likerId);
+          newComment['likedBy'] = likedBy;
+          break outerloop;
+        }
+      }
+    }
+
+    plan['comment'] = newComment;
 
     await planRef.update(
       {
@@ -137,11 +153,50 @@ class UserRepository implements IUserRepository {
     Map<String, dynamic> plan = planDoc.data()!;
 
     List comments = plan['comments'];
+
+    Map<String, dynamic> newComment = {};
+    outerloop:
+    for (final Map<String, dynamic> comment in comments) {
+      if (comment['id'] == commentId) {
+        List likedBy = comment['likedBy'];
+        likedBy.remove(likerId);
+        newComment['likedBy'] = likedBy;
+        break outerloop;
+      }
+
+      for (final Map<String, dynamic> reply in comment['replies']) {
+        if (reply['id'] == commentId) {
+          List likedBy = reply['likedBy'];
+          likedBy.remove(likerId);
+          newComment['likedBy'] = likedBy;
+          break outerloop;
+        }
+      }
+    }
+
+    plan['comment'] = newComment;
+
+    await planRef.update(
+      {
+        'comments': comments,
+      },
+    );
+  }
+
+  Future<void> replyToCommentForExercisePlan(
+      String exercisePlanId, String commentId, Comment reply) async {
+    final planRef = FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(exercisePlanId);
+    final planDoc = await planRef.get();
+    Map<String, dynamic> plan = planDoc.data()!;
+
+    List comments = plan['comments'];
     Map<String, dynamic> comment =
         comments.firstWhere((comment) => comment['id'] == commentId);
-    List likedBy = comment['likedBy'];
-    likedBy.remove(likerId);
-    comment['likedBy'] = likedBy;
+    List replies = comment['replies'];
+    replies.add(reply.toJson());
+    comment['replies'] = replies;
     plan['comment'] = comment;
 
     await planRef.update(

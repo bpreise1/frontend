@@ -12,6 +12,7 @@ import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 import 'package:frontend/widgets/like_button.dart';
+import 'package:frontend/widgets/reply_tile.dart';
 
 class PublishedPlanPage extends ConsumerWidget {
   const PublishedPlanPage({required this.exercisePlan, super.key});
@@ -155,7 +156,6 @@ class PublishedPlanPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const Divider(),
                 for (int i = 0; i < comments.length; i++)
                   Column(
                     children: [
@@ -163,14 +163,22 @@ class PublishedPlanPage extends ConsumerWidget {
                         comment: comments[i],
                         exercisePlanId: exercisePlan.id,
                       ),
-                      const Divider(),
+                      for (int j = 0; j < comments[i].replies.length; j++)
+                        Column(
+                          children: [
+                            ReplyTile(
+                              comment: comments[i].replies[j],
+                              exercisePlanId: exercisePlan.id,
+                            ),
+                          ],
+                        )
                     ],
-                  )
+                  ),
               ],
             ),
           ),
           AddCommentSection(
-            exercisePlan: exercisePlan,
+            exercisePlanId: exercisePlan.id,
           ),
         ],
       ),
