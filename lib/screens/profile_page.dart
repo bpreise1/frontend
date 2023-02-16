@@ -4,6 +4,8 @@ import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
+import 'package:frontend/providers/published_plan_page_provider.dart';
+import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/published_plan_page.dart';
 import 'package:frontend/widgets/like_button.dart';
 
@@ -29,6 +31,8 @@ class ProfilePage extends ConsumerWidget {
               itemCount: user.publishedPlans.length,
               itemBuilder: (context, index) {
                 PublishedExercisePlan plan = user.publishedPlans[index];
+                int likes = plan.likedBy.length;
+                int numComments = plan.comments.length;
 
                 return ListTile(
                   onTap: () async {
@@ -38,7 +42,7 @@ class ProfilePage extends ConsumerWidget {
                             dayToExercisesMap: plan.dayToExercisesMap,
                             lastUsed: DateTime.now()));
 
-                    await Navigator.of(context).push(
+                    Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
                           return PublishedPlanPage(exercisePlan: plan);
@@ -52,15 +56,65 @@ class ProfilePage extends ConsumerWidget {
                   subtitle: Row(
                     children: [
                       Expanded(
-                        child: LikeButton(exercisePlan: plan),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              LikeButton(
+                                isLiked: plan.likedBy.contains(
+                                  userRepository.getCurrentUserId(),
+                                ),
+                                onLikeClicked: () async {
+                                  await ref
+                                      .read(profilePageProvider.notifier)
+                                      .likeExercisePlan(plan.id);
+
+                                  ref
+                                      .read(publishedPlanPageProvider.notifier)
+                                      .update();
+                                },
+                                onUnlikeClicked: () async {
+                                  await ref
+                                      .read(profilePageProvider.notifier)
+                                      .unlikeExercisePlan(plan.id);
+
+                                  ref
+                                      .read(publishedPlanPageProvider.notifier)
+                                      .update();
+                                },
+                              ),
+                              Text(
+                                likes.toString(),
+                              ),
+                            ]),
                       ),
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                ref
+                                    .read(
+                                        publishedExercisePlanProvider.notifier)
+                                    .setPlan(CompletedExercisePlan(
+                                        planName: plan.planName,
+                                        dayToExercisesMap:
+                                            plan.dayToExercisesMap,
+                                        lastUsed: DateTime.now()));
+
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return PublishedPlanPage(
+                                          exercisePlan: plan);
+                                    },
+                                  ),
+                                );
+                              },
                               icon: const Icon(Icons.comment),
+                            ),
+                            Text(
+                              numComments.toString(),
                             ),
                           ],
                         ),
@@ -88,6 +142,7 @@ class ProfilePage extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
+        print(stackTrace);
         return Text(error.toString());
       },
       loading: () {

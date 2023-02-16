@@ -2,27 +2,34 @@ import 'package:frontend/models/custom_user.dart';
 
 class Comment {
   const Comment({
+    required this.id,
     required this.comment,
-    required this.createdBy,
+    required this.creatorUserId,
+    required this.creatorUsername,
     required this.dateCreated,
-    required this.likes,
+    required this.likedBy,
     required this.replies,
   });
 
+  final String id;
   final String comment;
-  final CustomUser createdBy;
+  final String creatorUserId;
+  final String creatorUsername;
   final DateTime dateCreated;
-  final int likes;
+  final List<String> likedBy;
   final List<Comment> replies;
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     List replies = json['replies'];
+    List likedBy = json['likedBy'];
 
     return Comment(
+      id: json['id'],
       comment: json['comment'],
-      createdBy: CustomUser.fromJson(json['createdBy']),
+      creatorUserId: json['creatorUserId'],
+      creatorUsername: json['creatorUsername'],
       dateCreated: DateTime.parse(json['dateCreated']),
-      likes: json['likes'],
+      likedBy: likedBy.map((like) => like as String).toList(),
       replies: replies.isEmpty
           ? []
           : replies.map((reply) => Comment.fromJson(reply)).toList(),
@@ -31,10 +38,12 @@ class Comment {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'comment': comment,
-      'createdBy': createdBy.toJson(),
+      'creatorUserId': creatorUserId,
+      'creatorUsername': creatorUsername,
       'dateCreated': dateCreated.toString(),
-      'likes': likes,
+      'likedBy': likedBy,
       'replies': replies.isEmpty
           ? []
           : replies.map((reply) => reply.toJson()).toList(),

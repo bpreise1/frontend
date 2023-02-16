@@ -3,7 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/providers/published_plan_page_provider.dart';
+import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/widgets/add_comment_section.dart';
+import 'package:frontend/widgets/comment_tile.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
@@ -29,104 +33,145 @@ class PublishedPlanPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(exercisePlan.planName),
       ),
-      body: ListView(
+      body: Column(
         children: [
-          DaySelectDropdown(provider: publishedExercisePlanProvider),
-          for (int index = 0; index < currentExercises.length; index++)
-            ExpansionTile(
-              title: ExerciseListItem(
-                exercise: currentExercises[index],
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: ExerciseListItemTextfield(
-                          text: currentExercises[index].sets,
-                          disabled: true,
-                          onSubmitted: (text) {},
-                          helperText: 'Sets')),
-                  Expanded(
-                      flex: 2,
-                      child: ExerciseListItemTextfield(
-                          text: currentExercises[index]
-                              .goalReps
-                              .map((rep) => rep == '' ? '_' : rep)
-                              .join(' , '),
-                          disabled: true,
-                          onSubmitted: (text) {},
-                          helperText: 'Reps')),
-                ],
-              ),
+          Expanded(
+            child: ListView(
               children: [
-                for (int set = 0;
-                    set < int.parse(currentExercises[index].sets);
-                    set++)
-                  ListTile(
-                    title: Row(
+                DaySelectDropdown(provider: publishedExercisePlanProvider),
+                for (int index = 0; index < currentExercises.length; index++)
+                  ExpansionTile(
+                    title: ExerciseListItem(
+                      exercise: currentExercises[index],
                       children: [
-                        Text('Set ${set + 1}'),
                         Expanded(
-                          child: ExerciseListItemTextfield(
-                            text: currentExercises[index].goalReps[set],
-                            disabled: true,
-                            onSubmitted: (text) {},
-                            helperText: 'Reps',
-                          ),
-                        ),
+                            flex: 1,
+                            child: ExerciseListItemTextfield(
+                                text: currentExercises[index].sets,
+                                disabled: true,
+                                onSubmitted: (text) {},
+                                helperText: 'Sets')),
+                        Expanded(
+                            flex: 2,
+                            child: ExerciseListItemTextfield(
+                                text: currentExercises[index]
+                                    .goalReps
+                                    .map((rep) => rep == '' ? '_' : rep)
+                                    .join(' , '),
+                                disabled: true,
+                                onSubmitted: (text) {},
+                                helperText: 'Reps')),
                       ],
                     ),
+                    children: [
+                      for (int set = 0;
+                          set < int.parse(currentExercises[index].sets);
+                          set++)
+                        ListTile(
+                          title: Row(
+                            children: [
+                              Text('Set ${set + 1}'),
+                              Expanded(
+                                child: ExerciseListItemTextfield(
+                                  text: currentExercises[index].goalReps[set],
+                                  disabled: true,
+                                  onSubmitted: (text) {},
+                                  helperText: 'Reps',
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                    ],
+                  ),
+                if (exercisePlan.description != '')
+                  Column(
+                    children: [
+                      Text(exercisePlan.description),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                      )
+                    ],
+                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          LikeButton(
+                            isLiked: exercisePlan.likedBy.contains(
+                              userRepository.getCurrentUserId(),
+                            ),
+                            onLikeClicked: () async {
+                              await ref
+                                  .read(profilePageProvider.notifier)
+                                  .likeExercisePlan(exercisePlan.id);
+
+                              ref
+                                  .read(publishedPlanPageProvider.notifier)
+                                  .update();
+                            },
+                            onUnlikeClicked: () async {
+                              await ref
+                                  .read(profilePageProvider.notifier)
+                                  .unlikeExercisePlan(exercisePlan.id);
+
+                              ref
+                                  .read(publishedPlanPageProvider.notifier)
+                                  .update();
+                            },
+                          ),
+                          Text(
+                            likes.toString(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.comment),
+                          ),
+                          Text(
+                            comments.length.toString(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.send),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                for (int i = 0; i < comments.length; i++)
+                  Column(
+                    children: [
+                      CommentTile(
+                        comment: comments[i],
+                        exercisePlanId: exercisePlan.id,
+                      ),
+                      const Divider(),
+                    ],
                   )
               ],
             ),
-          if (exercisePlan.description != '')
-            Column(
-              children: [
-                Text(exercisePlan.description),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                )
-              ],
-            ),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LikeButton(exercisePlan: exercisePlan),
-                    Text(
-                      likes.toString(),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.comment),
-                    ),
-                    Text(
-                      comments.length.toString(),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.send),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
-          const Divider(),
+          AddCommentSection(
+            exercisePlan: exercisePlan,
+          ),
         ],
       ),
     );

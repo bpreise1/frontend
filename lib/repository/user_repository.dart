@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
 
@@ -90,6 +89,66 @@ class UserRepository implements IUserRepository {
         ],
       )
     });
+  }
+
+  Future<void> addCommentForExercisePlan(
+      String exercisePlanId, Comment comment) async {
+    await FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(exercisePlanId)
+        .update({
+      'comments': FieldValue.arrayUnion(
+        [
+          comment.toJson(),
+        ],
+      )
+    });
+  }
+
+  Future<void> likeCommentForExercisePlan(
+      String exercisePlanId, String likerId, String commentId) async {
+    final planRef = FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(exercisePlanId);
+    final planDoc = await planRef.get();
+
+    Map<String, dynamic> plan = planDoc.data()!;
+    List comments = plan['comments'];
+    Map<String, dynamic> comment =
+        comments.firstWhere((comment) => comment['id'] == commentId);
+    List likedBy = comment['likedBy'];
+    likedBy.add(likerId);
+    comment['likedBy'] = likedBy;
+    plan['comment'] = comment;
+
+    await planRef.update(
+      {
+        'comments': comments,
+      },
+    );
+  }
+
+  Future<void> unlikeCommentForExercisePlan(
+      String exercisePlanId, String likerId, String commentId) async {
+    final planRef = FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(exercisePlanId);
+    final planDoc = await planRef.get();
+    Map<String, dynamic> plan = planDoc.data()!;
+
+    List comments = plan['comments'];
+    Map<String, dynamic> comment =
+        comments.firstWhere((comment) => comment['id'] == commentId);
+    List likedBy = comment['likedBy'];
+    likedBy.remove(likerId);
+    comment['likedBy'] = likedBy;
+    plan['comment'] = comment;
+
+    await planRef.update(
+      {
+        'comments': comments,
+      },
+    );
   }
 }
 

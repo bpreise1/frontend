@@ -32,7 +32,7 @@ class CustomUser {
       'username': username,
       'exercise_plans': publishedPlans.map((plan) => plan.toJson()).toList(),
       'progress_pictures': [],
-      'visibilitySettings': visibilitySettings,
+      'visibility_settings': visibilitySettings,
     };
   }
 }
