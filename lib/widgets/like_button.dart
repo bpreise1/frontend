@@ -1,38 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/providers/published_plan_page_provider.dart';
-import 'package:frontend/repository/user_repository.dart';
-
-// class LikeButton extends ConsumerWidget {
-//   const LikeButton({required this.exercisePlan, super.key});
-
-//   final PublishedExercisePlan exercisePlan;
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return LikeButtonAnimation(
-//       isLiked: exercisePlan.likedBy.contains(
-//         userRepository.getCurrentUserId(),
-//       ),
-//       onLikeClicked: () async {
-//         await ref
-//             .read(profilePageProvider.notifier)
-//             .likeExercisePlan(exercisePlan.id);
-
-//         ref.read(publishedPlanPageProvider.notifier).update();
-//       },
-//       onUnlikeClicked: () async {
-//         await ref
-//             .read(profilePageProvider.notifier)
-//             .unlikeExercisePlan(exercisePlan.id);
-
-//         ref.read(publishedPlanPageProvider.notifier).update();
-//       },
-//     );
-//   }
-// }
 
 final _isLoadingNotifier = ValueNotifier(false);
 

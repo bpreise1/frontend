@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/providers/published_plan_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/reply_page.dart';
 import 'package:frontend/widgets/like_button.dart';
@@ -46,16 +45,12 @@ class CommentTile extends ConsumerWidget {
                             .read(profilePageProvider.notifier)
                             .likeCommentForExercisePlan(exercisePlanId,
                                 userRepository.getCurrentUserId(), comment.id);
-
-                        ref.read(publishedPlanPageProvider.notifier).update();
                       },
                       onUnlikeClicked: () async {
                         await ref
                             .read(profilePageProvider.notifier)
                             .unlikeCommentForExercisePlan(exercisePlanId,
                                 userRepository.getCurrentUserId(), comment.id);
-
-                        ref.read(publishedPlanPageProvider.notifier).update();
                       },
                     ),
                     Text(

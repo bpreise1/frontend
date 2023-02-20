@@ -4,7 +4,6 @@ import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/providers/published_plan_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/add_comment_section.dart';
 import 'package:frontend/widgets/comment_tile.dart';
@@ -15,14 +14,13 @@ import 'package:frontend/widgets/like_button.dart';
 import 'package:frontend/widgets/reply_tile.dart';
 
 class PublishedPlanPage extends ConsumerWidget {
-  const PublishedPlanPage({required this.exercisePlan, super.key});
-
-  final PublishedExercisePlan exercisePlan;
+  const PublishedPlanPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(
-        publishedPlanPageProvider); //so other widgets can tell it to update
+    final PublishedExercisePlan exercisePlan = ref
+        .watch(publishedExercisePlanProvider)
+        .exercisePlan as PublishedExercisePlan;
 
     final currentExercises =
         ref.watch(publishedExercisePlanProvider).exercises!;
@@ -108,19 +106,11 @@ class PublishedPlanPage extends ConsumerWidget {
                               await ref
                                   .read(profilePageProvider.notifier)
                                   .likeExercisePlan(exercisePlan.id);
-
-                              ref
-                                  .read(publishedPlanPageProvider.notifier)
-                                  .update();
                             },
                             onUnlikeClicked: () async {
                               await ref
                                   .read(profilePageProvider.notifier)
                                   .unlikeExercisePlan(exercisePlan.id);
-
-                              ref
-                                  .read(publishedPlanPageProvider.notifier)
-                                  .update();
                             },
                           ),
                           Text(
@@ -138,7 +128,7 @@ class PublishedPlanPage extends ConsumerWidget {
                             icon: const Icon(Icons.comment),
                           ),
                           Text(
-                            comments.length.toString(),
+                            exercisePlan.totalComments.toString(),
                           ),
                         ],
                       ),

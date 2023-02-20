@@ -10,11 +10,11 @@ class ExercisePlanState {
     this.description = '',
   }) : _exercisePlan = exercisePlan;
 
-  final InProgressExercisePlan _exercisePlan;
+  final ExercisePlan _exercisePlan;
   final String currentDay;
   final String description;
 
-  InProgressExercisePlan get exercisePlan => _exercisePlan;
+  ExercisePlan get exercisePlan => _exercisePlan;
   Map<String, List<Exercise>> get dayToExercisesMap =>
       exercisePlan.dayToExercisesMap;
   String get planName => exercisePlan.planName;
@@ -308,12 +308,10 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     );
   }
 
-  void setPlan(CompletedExercisePlan exercisePlan) {
+  void setPlan(ExercisePlan exercisePlan) {
     //TODO: change currentDay logic
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
-            planName: exercisePlan.planName,
-            dayToExercisesMap: exercisePlan.dayToExercisesMap),
+        exercisePlan: exercisePlan,
         currentDay: exercisePlan.dayToExercisesMap.keys.first,
         description: state.description);
   }

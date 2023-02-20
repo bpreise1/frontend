@@ -79,10 +79,16 @@ class CompletedExercisePlanRepository
     final completedExercisePlan =
         await getCompletedExercisePlanFromDeviceById(exercisePlanId);
 
-    completedExercisePlan.isInProgress = true;
-    completedExercisePlan.lastUsed = DateTime.now();
+    final CompletedExercisePlan newCompletedExercisePlan =
+        CompletedExercisePlan(
+      id: completedExercisePlan.id,
+      planName: completedExercisePlan.planName,
+      dayToExercisesMap: completedExercisePlan.dayToExercisesMap,
+      isInProgress: true,
+      lastUsed: DateTime.now(),
+    );
 
-    await saveCompletedExercisePlanToDevice(completedExercisePlan);
+    await saveCompletedExercisePlanToDevice(newCompletedExercisePlan);
   }
 
   @override
@@ -91,11 +97,16 @@ class CompletedExercisePlanRepository
     final completedExercisePlan =
         await getCompletedExercisePlanFromDeviceById(exercisePlanId);
 
-    completedExercisePlan.dayToExercisesMap =
-        inProgressExercisePlan.dayToExercisesMap;
-    completedExercisePlan.lastUsed = DateTime.now();
+    final CompletedExercisePlan newCompletedExercisePlan =
+        CompletedExercisePlan(
+      id: completedExercisePlan.id,
+      planName: completedExercisePlan.planName,
+      dayToExercisesMap: inProgressExercisePlan.dayToExercisesMap,
+      isInProgress: completedExercisePlan.isInProgress,
+      lastUsed: DateTime.now(),
+    );
 
-    await saveCompletedExercisePlanToDevice(completedExercisePlan);
+    await saveCompletedExercisePlanToDevice(newCompletedExercisePlan);
   }
 
   @override
@@ -103,10 +114,16 @@ class CompletedExercisePlanRepository
     final completedExercisePlan =
         await getCompletedExercisePlanFromDeviceById(exercisePlanId);
 
-    completedExercisePlan.isInProgress = false;
-    completedExercisePlan.lastUsed = DateTime.now();
+    final CompletedExercisePlan newCompletedExercisePlan =
+        CompletedExercisePlan(
+      id: completedExercisePlan.id,
+      planName: completedExercisePlan.planName,
+      dayToExercisesMap: completedExercisePlan.dayToExercisesMap,
+      isInProgress: false,
+      lastUsed: DateTime.now(),
+    );
 
-    await saveCompletedExercisePlanToDevice(completedExercisePlan);
+    await saveCompletedExercisePlanToDevice(newCompletedExercisePlan);
   }
 }
 

@@ -1,30 +1,30 @@
-import 'dart:convert';
-
 import 'package:frontend/models/comment.dart';
-import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise.dart';
-import 'package:uuid/uuid.dart';
 
-class InProgressExercisePlan {
-  const InProgressExercisePlan(
-      {this.planName = 'My Plan',
-      this.dayToExercisesMap = const {'Day 1': []}});
+abstract class ExercisePlan {
+  const ExercisePlan({required this.planName, required this.dayToExercisesMap});
 
   final String planName;
   final Map<String, List<Exercise>> dayToExercisesMap;
 }
 
-class CompletedExercisePlan {
+class InProgressExercisePlan extends ExercisePlan {
+  const InProgressExercisePlan(
+      {super.planName = 'My Plan',
+      super.dayToExercisesMap = const {'Day 1': []}});
+}
+
+class CompletedExercisePlan extends ExercisePlan {
   CompletedExercisePlan(
-      {required this.planName,
-      required this.dayToExercisesMap,
+      {required this.id,
+      required super.planName,
+      required super.dayToExercisesMap,
+      this.isInProgress = false,
       required this.lastUsed});
 
-  String id = const Uuid().v4();
-  final String planName;
-  Map<String, List<Exercise>> dayToExercisesMap;
-  bool isInProgress = false;
-  DateTime lastUsed;
+  final String id;
+  final bool isInProgress;
+  final DateTime lastUsed;
 
   factory CompletedExercisePlan.fromJson(Map<String, dynamic> json) {
     jsonToExerciseList(List exerciseList) =>
@@ -35,11 +35,14 @@ class CompletedExercisePlan {
         (day, exerciseList) => MapEntry(day, jsonToExerciseList(exerciseList)));
 
     CompletedExercisePlan completedExercisePlan = CompletedExercisePlan(
-        planName: json['planName'],
-        dayToExercisesMap: parsedDayToExercisesMap,
-        lastUsed: DateTime.parse(json['lastUsed']));
-    completedExercisePlan.id = json['id'];
-    completedExercisePlan.isInProgress = json['isInProgress'];
+      id: json['id'],
+      planName: json['planName'],
+      dayToExercisesMap: parsedDayToExercisesMap,
+      isInProgress: json['isInProgress'],
+      lastUsed: DateTime.parse(
+        json['lastUsed'],
+      ),
+    );
     return completedExercisePlan;
   }
 
@@ -58,26 +61,26 @@ class CompletedExercisePlan {
   }
 }
 
-class PublishedExercisePlan {
+class PublishedExercisePlan extends ExercisePlan {
   const PublishedExercisePlan({
     required this.id,
-    required this.planName,
-    required this.dayToExercisesMap,
+    required super.planName,
+    required super.dayToExercisesMap,
     required this.description,
     required this.creatorUserId,
     required this.dateCreated,
     this.likedBy = const [],
     this.comments = const [],
+    this.totalComments = 0,
   });
 
   final String id;
-  final String planName;
-  final Map<String, List<Exercise>> dayToExercisesMap;
   final String description;
   final String creatorUserId;
   final DateTime dateCreated;
   final List<String> likedBy;
   final List<Comment> comments;
+  final int totalComments;
 
   factory PublishedExercisePlan.fromJson(Map<String, dynamic> json) {
     jsonToExerciseList(List exerciseList) =>
@@ -99,6 +102,7 @@ class PublishedExercisePlan {
       dateCreated: DateTime.parse(json['dateCreated']),
       likedBy: likedBy.map((like) => like as String).toList(),
       comments: comments.map((comment) => Comment.fromJson(comment)).toList(),
+      totalComments: json['totalComments'],
     );
   }
 
@@ -116,6 +120,7 @@ class PublishedExercisePlan {
       'dateCreated': dateCreated.toString(),
       'likedBy': likedBy,
       'comments': comments.map((comment) => comment.toJson()).toList(),
+      'totalComments': totalComments,
     };
   }
 }

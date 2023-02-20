@@ -22,8 +22,9 @@ class CreatePlanPage extends ConsumerWidget {
     int selectedStepperIndex = ref.watch(createPlanStepperProvider);
 
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
-    InProgressExercisePlan plan =
-        ref.watch(createExercisePlanProvider).exercisePlan;
+    InProgressExercisePlan plan = ref
+        .watch(createExercisePlanProvider)
+        .exercisePlan as InProgressExercisePlan;
 
     bool isEditingSetsAndReps = ref.watch(setsAndRepsEditorProvider);
     return Scaffold(

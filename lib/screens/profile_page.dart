@@ -4,7 +4,6 @@ import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/providers/published_plan_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/published_plan_page.dart';
 import 'package:frontend/widgets/like_button.dart';
@@ -32,20 +31,17 @@ class ProfilePage extends ConsumerWidget {
               itemBuilder: (context, index) {
                 PublishedExercisePlan plan = user.publishedPlans[index];
                 int likes = plan.likedBy.length;
-                int numComments = plan.comments.length;
 
                 return ListTile(
                   onTap: () async {
-                    ref.read(publishedExercisePlanProvider.notifier).setPlan(
-                        CompletedExercisePlan(
-                            planName: plan.planName,
-                            dayToExercisesMap: plan.dayToExercisesMap,
-                            lastUsed: DateTime.now()));
+                    ref
+                        .read(publishedExercisePlanProvider.notifier)
+                        .setPlan(plan);
 
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          return PublishedPlanPage(exercisePlan: plan);
+                          return const PublishedPlanPage();
                         },
                       ),
                     );
@@ -67,19 +63,11 @@ class ProfilePage extends ConsumerWidget {
                                   await ref
                                       .read(profilePageProvider.notifier)
                                       .likeExercisePlan(plan.id);
-
-                                  ref
-                                      .read(publishedPlanPageProvider.notifier)
-                                      .update();
                                 },
                                 onUnlikeClicked: () async {
                                   await ref
                                       .read(profilePageProvider.notifier)
                                       .unlikeExercisePlan(plan.id);
-
-                                  ref
-                                      .read(publishedPlanPageProvider.notifier)
-                                      .update();
                                 },
                               ),
                               Text(
@@ -96,17 +84,12 @@ class ProfilePage extends ConsumerWidget {
                                 ref
                                     .read(
                                         publishedExercisePlanProvider.notifier)
-                                    .setPlan(CompletedExercisePlan(
-                                        planName: plan.planName,
-                                        dayToExercisesMap:
-                                            plan.dayToExercisesMap,
-                                        lastUsed: DateTime.now()));
+                                    .setPlan(plan);
 
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) {
-                                      return PublishedPlanPage(
-                                          exercisePlan: plan);
+                                      return const PublishedPlanPage();
                                     },
                                   ),
                                 );
@@ -114,7 +97,7 @@ class ProfilePage extends ConsumerWidget {
                               icon: const Icon(Icons.comment),
                             ),
                             Text(
-                              numComments.toString(),
+                              plan.totalComments.toString(),
                             ),
                           ],
                         ),

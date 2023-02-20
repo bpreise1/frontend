@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 
 class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
@@ -31,6 +32,8 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       await userRepository.likePublishedExercisePlan(
           exercisePlanId, currentUser);
 
+      ref.read(publishedExercisePlanProvider.notifier).setPlan(plan);
+
       state = AsyncValue.data(user);
     }
   }
@@ -47,6 +50,8 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       await userRepository.unlikePublishedExercisePlan(
           exercisePlanId, currentUser);
 
+      ref.read(publishedExercisePlanProvider.notifier).setPlan(plan);
+
       state = AsyncValue.data(user);
     }
   }
@@ -55,9 +60,28 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       String exercisePlanId, Comment comment) async {
     if (state.hasValue) {
       final CustomUser user = state.value!;
-      final PublishedExercisePlan plan =
-          user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);
-      plan.comments.add(comment);
+
+      for (int i = 0; i < user.publishedPlans.length; i++) {
+        final plan = user.publishedPlans[i];
+        if (plan.id == exercisePlanId) {
+          user.publishedPlans[i] = PublishedExercisePlan(
+              id: plan.id,
+              planName: plan.planName,
+              dayToExercisesMap: plan.dayToExercisesMap,
+              description: plan.description,
+              creatorUserId: plan.creatorUserId,
+              dateCreated: plan.dateCreated,
+              likedBy: plan.likedBy,
+              comments: [...plan.comments, comment],
+              totalComments: plan.totalComments + 1);
+
+          ref
+              .read(publishedExercisePlanProvider.notifier)
+              .setPlan(user.publishedPlans[i]);
+
+          break;
+        }
+      }
 
       await userRepository.addCommentForExercisePlan(exercisePlanId, comment);
 
@@ -90,6 +114,8 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       await userRepository.likeCommentForExercisePlan(
           exercisePlanId, likerId, commentId);
 
+      ref.read(publishedExercisePlanProvider.notifier).setPlan(plan);
+
       state = AsyncValue.data(user);
     }
   }
@@ -119,6 +145,8 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       await userRepository.unlikeCommentForExercisePlan(
           exercisePlanId, likerId, commentId);
 
+      ref.read(publishedExercisePlanProvider.notifier).setPlan(plan);
+
       state = AsyncValue.data(user);
     }
   }
@@ -127,11 +155,35 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
       String exercisePlanId, String commentId, Comment reply) async {
     if (state.hasValue) {
       final CustomUser user = state.value!;
-      final PublishedExercisePlan plan =
-          user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);
-      final Comment comment =
-          plan.comments.firstWhere((comment) => comment.id == commentId);
-      comment.replies.add(reply);
+
+      outerloop:
+      for (int i = 0; i < user.publishedPlans.length; i++) {
+        final plan = user.publishedPlans[i];
+        if (plan.id == exercisePlanId) {
+          for (final comment in plan.comments) {
+            if (comment.id == commentId) {
+              comment.replies.add(reply);
+
+              user.publishedPlans[i] = PublishedExercisePlan(
+                  id: plan.id,
+                  planName: plan.planName,
+                  dayToExercisesMap: plan.dayToExercisesMap,
+                  description: plan.description,
+                  creatorUserId: plan.creatorUserId,
+                  dateCreated: plan.dateCreated,
+                  likedBy: plan.likedBy,
+                  comments: plan.comments,
+                  totalComments: plan.totalComments + 1);
+
+              ref
+                  .read(publishedExercisePlanProvider.notifier)
+                  .setPlan(user.publishedPlans[i]);
+
+              break outerloop;
+            }
+          }
+        }
+      }
 
       await userRepository.replyToCommentForExercisePlan(
           exercisePlanId, commentId, reply);

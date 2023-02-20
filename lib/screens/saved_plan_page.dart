@@ -93,7 +93,8 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                               .notifier)
                                           .updateCompletedExercisePlanProgressById(
                                               widget.exercisePlan.id,
-                                              inProgressPlan);
+                                              inProgressPlan
+                                                  as InProgressExercisePlan);
                                     })),
                             Consumer(builder: ((context, ref, child) {
                               final userPreferences =
@@ -144,7 +145,8 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                                       .notifier)
                                               .updateCompletedExercisePlanProgressById(
                                                   widget.exercisePlan.id,
-                                                  inProgressPlan);
+                                                  inProgressPlan
+                                                      as InProgressExercisePlan);
                                         }));
                               }, error: (error, stackTrace) {
                                 return Center(child: Text(error.toString()));
@@ -166,7 +168,8 @@ class _SavedPlanPageState extends State<SavedPlanPage> {
                                                       .notifier)
                                               .updateCompletedExercisePlanProgressById(
                                                   widget.exercisePlan.id,
-                                                  inProgressPlan);
+                                                  inProgressPlan
+                                                      as InProgressExercisePlan);
                                         }));
                               });
                             }))

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/providers/published_plan_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -90,8 +89,6 @@ class _AddCommentSectionState extends State<AddCommentSection> {
                               );
 
                       _textController.text = '';
-
-                      ref.read(publishedPlanPageProvider.notifier).update();
                     },
                     error: (error, stackTrace) {
                       throw Exception(

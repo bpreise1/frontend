@@ -101,7 +101,8 @@ class UserRepository implements IUserRepository {
         [
           comment.toJson(),
         ],
-      )
+      ),
+      'totalComments': FieldValue.increment(1),
     });
   }
 
@@ -202,6 +203,7 @@ class UserRepository implements IUserRepository {
     await planRef.update(
       {
         'comments': comments,
+        'totalComments': FieldValue.increment(1),
       },
     );
   }

@@ -91,8 +91,9 @@ class SubmitPlanDialog extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(vertical: 8),
               ),
               Consumer(builder: ((context, ref, child) {
-                InProgressExercisePlan inProgressExerciseplan =
-                    ref.watch(createExercisePlanProvider).exercisePlan;
+                InProgressExercisePlan inProgressExerciseplan = ref
+                    .watch(createExercisePlanProvider)
+                    .exercisePlan as InProgressExercisePlan;
 
                 return OutlinedButton(
                     onPressed: saveIsChecked || publishIsChecked
@@ -103,6 +104,7 @@ class SubmitPlanDialog extends ConsumerWidget {
                             if (saveIsChecked) {
                               final CompletedExercisePlan
                                   completedExercisePlan = CompletedExercisePlan(
+                                      id: const Uuid().v4(),
                                       planName: inProgressExerciseplan.planName,
                                       dayToExercisesMap: inProgressExerciseplan
                                           .dayToExercisesMap,
