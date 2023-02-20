@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/home.dart';
+import 'package:frontend/providers/current_user_provider.dart';
+import 'package:frontend/screens/create_profile_page.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -16,29 +19,68 @@ class AuthGate extends StatelessWidget {
         builder: ((context, snapshot) {
           // User is not signed in
           if (!snapshot.hasData) {
-            return SignInScreen(
-              actions: [
-                AuthStateChangeAction<UserCreated>(
-                  (context, state) {
-                    final user = state.credential.user!;
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .set({
-                      'uid': user.uid,
-                      'username': '',
-                      'exercise_plans': [],
-                      'progress_pictures': [],
-                      'visibility_settings': {},
-                    });
-                  },
-                )
-              ],
+            return Consumer(
+              builder: (context, ref, child) {
+                return SignInScreen(
+                  actions: [
+                    AuthStateChangeAction<UserCreated>(
+                      (context, state) async {
+                        final user = state.credential.user!;
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .set({
+                          'uid': user.uid,
+                          'username': '',
+                          'username_lowercase': '',
+                          'exercise_plans': [],
+                          'progress_pictures': [],
+                          'visibility_settings': {},
+                        });
+                        await ref
+                            .read(currentUserProvider.notifier)
+                            .fetchCurrentUser();
+                      },
+                    ),
+                    AuthStateChangeAction<SignedIn>(
+                      (context, state) async {
+                        await ref
+                            .read(currentUserProvider.notifier)
+                            .fetchCurrentUser();
+                      },
+                    ),
+                  ],
+                );
+              },
             );
           }
 
           // Render application if authenticated
-          return const Home();
+          return Consumer(
+            builder: (context, ref, child) {
+              final currentUser = ref.watch(currentUserProvider);
+
+              return currentUser.when(
+                data: (data) {
+                  if (data.username == '') {
+                    return const CreateProfilePage();
+                  } else {
+                    return const Home();
+                  }
+                },
+                error: (error, stackTrace) {
+                  return const Text('Error logging in');
+                },
+                loading: () {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  );
+                },
+              );
+            },
+          );
         }));
   }
 }

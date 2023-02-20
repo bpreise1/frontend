@@ -23,7 +23,7 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
   Future<void> likeExercisePlan(String exercisePlanId) async {
     final String currentUser = userRepository.getCurrentUserId();
 
-    if (state.hasValue) {
+    if (state.asData != null) {
       final CustomUser user = state.value!;
       final PublishedExercisePlan plan =
           user.publishedPlans.firstWhere((plan) => plan.id == exercisePlanId);

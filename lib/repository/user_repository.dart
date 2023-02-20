@@ -9,6 +9,17 @@ abstract class IUserRepository {
   Future<CustomUser> getUserById(String uid);
   Future<void> publishExercisePlanForCurrentUser(
       PublishedExercisePlan completedExercisePlan);
+  Future<void> likePublishedExercisePlan(String exercisePlanId, String likerId);
+  Future<void> unlikePublishedExercisePlan(
+      String exercisePlanId, String likerId);
+  Future<void> addCommentForExercisePlan(
+      String exercisePlanId, Comment comment);
+  Future<void> likeCommentForExercisePlan(
+      String exercisePlanId, String likerId, String commentId);
+  Future<void> unlikeCommentForExercisePlan(
+      String exercisePlanId, String likerId, String commentId);
+  Future<void> replyToCommentForExercisePlan(
+      String exercisePlanId, String commentId, Comment reply);
 }
 
 class UserRepository implements IUserRepository {
@@ -63,6 +74,7 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  @override
   Future<void> likePublishedExercisePlan(
       String exercisePlanId, String likerId) async {
     await FirebaseFirestore.instance
@@ -77,6 +89,7 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  @override
   Future<void> unlikePublishedExercisePlan(
       String exercisePlanId, String likerId) async {
     await FirebaseFirestore.instance
@@ -91,6 +104,7 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  @override
   Future<void> addCommentForExercisePlan(
       String exercisePlanId, Comment comment) async {
     await FirebaseFirestore.instance
@@ -106,6 +120,7 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  @override
   Future<void> likeCommentForExercisePlan(
       String exercisePlanId, String likerId, String commentId) async {
     final planRef = FirebaseFirestore.instance
@@ -145,6 +160,7 @@ class UserRepository implements IUserRepository {
     );
   }
 
+  @override
   Future<void> unlikeCommentForExercisePlan(
       String exercisePlanId, String likerId, String commentId) async {
     final planRef = FirebaseFirestore.instance
@@ -184,6 +200,7 @@ class UserRepository implements IUserRepository {
     );
   }
 
+  @override
   Future<void> replyToCommentForExercisePlan(
       String exercisePlanId, String commentId, Comment reply) async {
     final planRef = FirebaseFirestore.instance
@@ -206,6 +223,28 @@ class UserRepository implements IUserRepository {
         'totalComments': FieldValue.increment(1),
       },
     );
+  }
+
+  Future<void> setUsernameById(String uid, String username) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).update(
+      {
+        'username': username,
+        'username_lowercase': username.toLowerCase(),
+      },
+    );
+  }
+
+  Future<bool> usernameIsAvailable(String username) async {
+    final users = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username_lowercase', isEqualTo: username.toLowerCase())
+        .limit(1)
+        .get();
+
+    if (users.docs.isNotEmpty) {
+      return false;
+    }
+    return true;
   }
 }
 

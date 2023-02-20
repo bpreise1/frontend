@@ -108,6 +108,8 @@ class ExerciseLineGraph extends ConsumerWidget {
               }
             })),
         error: ((error, stackTrace) => Center(child: Text(error.toString()))),
-        loading: () => const CircularProgressIndicator());
+        loading: () => CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.secondary,
+            ));
   }
 }
