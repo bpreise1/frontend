@@ -7,6 +7,7 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/screens/progress_picture_page.dart';
 import 'package:frontend/screens/published_plan_page.dart';
 import 'package:frontend/widgets/add_image_button.dart';
 import 'package:frontend/widgets/like_button.dart';
@@ -176,11 +177,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 body: ListView(
                   children: [
-                    ProfileAvatar(
-                      radius: 80,
-                      profilePicture: user.profilePicture,
-                      editingEnabled: isCurrentUserProfile,
-                      isProfilePage: true,
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                    ),
+                    Hero(
+                      tag: widget.id,
+                      child: ProfileAvatar(
+                        radius: 80,
+                        profilePicture: user.profilePicture,
+                        editingEnabled: isCurrentUserProfile,
+                        isProfilePage: true,
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
@@ -238,15 +245,34 @@ class _ProfilePageState extends State<ProfilePage> {
                                       );
                                     },
                                     itemBuilder: (context, index) {
+                                      MemoryImage image = MemoryImage(
+                                          user.progressPictures[index].image);
+
                                       return Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Image(
-                                            height: 250,
-                                            image: MemoryImage(
-                                              user.progressPictures[index]
-                                                  .image,
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.of(context)
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) {
+                                                  return ProgressPicturePage(
+                                                    username: user.username,
+                                                    image: image,
+                                                    timeCreated: user
+                                                        .progressPictures[index]
+                                                        .timeCreated,
+                                                  );
+                                                },
+                                              ));
+                                            },
+                                            child: Hero(
+                                              tag: image,
+                                              child: Image(
+                                                height: 250,
+                                                image: image,
+                                              ),
                                             ),
                                           ),
                                           if (user.progressPictures[index]
@@ -277,26 +303,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                     : null,
                                 icon: const Icon(Icons.arrow_back),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: AddImageButton(
-                                  size: 1.25,
-                                  onImagePicked: (image) async {
-                                    ref
-                                        .read(profilePageProvider.notifier)
-                                        .addProgressPictureForCurrentUser(
-                                            image);
+                              if (isCurrentUserProfile)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  child: AddImageButton(
+                                    size: 1.25,
+                                    onImagePicked: (image) async {
+                                      ref
+                                          .read(profilePageProvider.notifier)
+                                          .addProgressPictureForCurrentUser(
+                                              image);
 
-                                    if (_progressPicturesController
-                                        .hasClients) {
-                                      Future.delayed(
-                                          const Duration(milliseconds: 100),
-                                          _scrollRight);
-                                    }
-                                  },
+                                      if (_progressPicturesController
+                                          .hasClients) {
+                                        Future.delayed(
+                                            const Duration(milliseconds: 100),
+                                            _scrollRight);
+                                      }
+                                    },
+                                  ),
                                 ),
-                              ),
                               IconButton(
                                 onPressed: user.progressPictures.isNotEmpty
                                     ? () {
@@ -333,9 +360,15 @@ class _ProfilePageState extends State<ProfilePage> {
               body: Center(
                 child: Column(
                   children: [
-                    ProfileAvatar(
-                      radius: 80,
-                      profilePicture: widget.profilePicture,
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                    ),
+                    Hero(
+                      tag: widget.id,
+                      child: ProfileAvatar(
+                        radius: 80,
+                        profilePicture: widget.profilePicture,
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 32),

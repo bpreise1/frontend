@@ -47,27 +47,31 @@ class Home extends ConsumerWidget {
               return currentUser.when(
                 data: (data) {
                   return InkWell(
-                      onTap: () {
-                        ref
-                            .read(profilePageProvider.notifier)
-                            .fetchUser(userRepository.getCurrentUserId());
+                    onTap: () {
+                      ref
+                          .read(profilePageProvider.notifier)
+                          .fetchUser(userRepository.getCurrentUserId());
 
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ProfilePage(
-                                id: data.id,
-                                username: data.username,
-                                profilePicture: data.profilePicture,
-                              );
-                            },
-                          ),
-                        );
-                      },
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ProfilePage(
+                              id: data.id,
+                              username: data.username,
+                              profilePicture: data.profilePicture,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Hero(
+                      tag: data.id,
                       child: ProfileAvatar(
                         radius: 50,
                         profilePicture: data.profilePicture,
-                      ));
+                      ),
+                    ),
+                  );
                 },
                 error: (error, stackTrace) {
                   return Text(
