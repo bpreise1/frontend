@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/progress_picture.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class IUserRepository {
   String getCurrentUserId();
@@ -65,7 +65,48 @@ class UserRepository implements IUserRepository {
       print(exception);
     }
 
-    List<Uint8List> progressPictures = []; //TODO: implement progress pictures
+    final progressPicturesFolderRef = FirebaseStorage.instance
+        .ref()
+        .child('progress_pictures/${getCurrentUserId()}');
+    final progressPicturesList = await progressPicturesFolderRef.listAll();
+
+    List<ProgressPicture> progressPictures = [];
+    for (final progressPicture in progressPicturesList.items) {
+      try {
+        final progressPictureData = await progressPicture.getData();
+
+        final metaData = await progressPicture.getMetadata();
+        final timeCreated = metaData.timeCreated;
+
+        if (progressPictureData != null) {
+          progressPictures.add(
+            ProgressPicture(
+              image: progressPictureData,
+              timeCreated: timeCreated,
+            ),
+          );
+        }
+      } on PlatformException catch (exception) {
+        print('exception');
+      }
+    }
+    progressPictures.sort(
+      (pic1, pic2) {
+        if (pic1.timeCreated == null && pic2.timeCreated == null) {
+          return 0;
+        }
+
+        if (pic1.timeCreated == null) {
+          return 1;
+        }
+
+        if (pic2.timeCreated == null) {
+          return -1;
+        }
+
+        return pic1.timeCreated!.compareTo(pic2.timeCreated!);
+      },
+    );
 
     return CustomUser.fromJson(jsonData,
         profilePicture: profilePicture, progressPictures: progressPictures);
@@ -271,6 +312,14 @@ class UserRepository implements IUserRepository {
         storageRef.child('profile_pictures/${getCurrentUserId()}.jpg');
 
     await profilePictureRef.putData(image);
+  }
+
+  Future<void> addProgressPictureForCurrentUser(Uint8List image) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final progressPicturesRef = storageRef.child(
+        'progress_pictures/${getCurrentUserId()}/${const Uuid().v4()}.jpg');
+
+    await progressPicturesRef.putData(image);
   }
 }
 

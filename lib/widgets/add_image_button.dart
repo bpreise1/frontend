@@ -26,7 +26,12 @@ class AddImageButton extends StatelessWidget {
           ),
           context: context,
           builder: (context) {
-            return AddPictureModal(onImagePicked: onImagePicked);
+            return AddPictureModal(
+              onImagePicked: (image) {
+                onImagePicked(image);
+                Navigator.pop(context);
+              },
+            );
           },
         );
       },

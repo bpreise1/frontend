@@ -83,15 +83,6 @@ class PublishedPlanPage extends ConsumerWidget {
                         )
                     ],
                   ),
-                if (exercisePlan.description != '')
-                  Column(
-                    children: [
-                      Text(exercisePlan.description),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                      )
-                    ],
-                  ),
                 Row(
                   children: [
                     Expanded(
@@ -145,6 +136,23 @@ class PublishedPlanPage extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+                if (exercisePlan.description != '')
+                  Column(
+                    children: [
+                      Text(exercisePlan.description),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                      )
+                    ],
+                  ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.only(left: 8, bottom: 8),
+                  child: Text(
+                    'Comments',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
                 for (int i = 0; i < comments.length; i++)
                   Column(

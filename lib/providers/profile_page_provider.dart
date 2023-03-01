@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 
@@ -193,12 +194,37 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
     }
   }
 
+  Future<void> addProgressPictureForCurrentUser(Uint8List image) async {
+    state.whenData((user) {
+      userRepository.addProgressPictureForCurrentUser(image);
+
+      List<ProgressPicture> progressPictures = [
+        ...state.value!.progressPictures
+      ];
+      progressPictures.add(
+        ProgressPicture(
+          image: image,
+          timeCreated: DateTime.now(),
+        ),
+      );
+
+      state = AsyncValue.data(CustomUser(
+          id: state.value!.id,
+          username: state.value!.username,
+          publishedPlans: state.value!.publishedPlans,
+          visibilitySettings: state.value!.visibilitySettings,
+          profilePicture: state.value!.profilePicture,
+          progressPictures: progressPictures));
+    });
+  }
+
   void setUsername(String username) {
     state.whenData((user) {
       state = AsyncValue.data(CustomUser(
           id: state.value!.id,
           username: username,
           publishedPlans: state.value!.publishedPlans,
+          profilePicture: state.value!.profilePicture,
           progressPictures: state.value!.progressPictures,
           visibilitySettings: state.value!.visibilitySettings));
     });

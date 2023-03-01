@@ -11,7 +11,8 @@ class AddPictureModal extends StatelessWidget {
     Uint8List? imageData;
 
     try {
-      final image = await ImagePicker().pickImage(source: source);
+      final image = await ImagePicker()
+          .pickImage(source: source, maxHeight: 640, maxWidth: 960);
       if (image != null) {
         imageData = await image.readAsBytes();
       }
