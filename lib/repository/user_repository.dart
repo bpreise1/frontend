@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
@@ -50,7 +54,21 @@ class UserRepository implements IUserRepository {
       }
     }
 
-    return CustomUser.fromJson(jsonData);
+    final profilePictureRef = FirebaseStorage.instance
+        .ref()
+        .child('profile_pictures/${getCurrentUserId()}.jpg');
+
+    Uint8List? profilePicture;
+    try {
+      profilePicture = await profilePictureRef.getData();
+    } on PlatformException catch (exception) {
+      print(exception);
+    }
+
+    List<Uint8List> progressPictures = []; //TODO: implement progress pictures
+
+    return CustomUser.fromJson(jsonData,
+        profilePicture: profilePicture, progressPictures: progressPictures);
   }
 
   @override
@@ -245,6 +263,14 @@ class UserRepository implements IUserRepository {
       return false;
     }
     return true;
+  }
+
+  Future<void> setProfilePictureForCurrentUser(Uint8List image) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final profilePictureRef =
+        storageRef.child('profile_pictures/${getCurrentUserId()}.jpg');
+
+    await profilePictureRef.putData(image);
   }
 }
 

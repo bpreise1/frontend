@@ -34,19 +34,8 @@ class AuthGate extends StatelessWidget {
                           'username': '',
                           'username_lowercase': '',
                           'exercise_plans': [],
-                          'progress_pictures': [],
                           'visibility_settings': {},
                         });
-                        await ref
-                            .read(currentUserProvider.notifier)
-                            .fetchCurrentUser();
-                      },
-                    ),
-                    AuthStateChangeAction<SignedIn>(
-                      (context, state) async {
-                        await ref
-                            .read(currentUserProvider.notifier)
-                            .fetchCurrentUser();
                       },
                     ),
                   ],

@@ -1,37 +1,47 @@
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:frontend/models/exercise_plans.dart';
 
 class CustomUser {
   const CustomUser({
+    required this.id,
     required this.username,
     this.publishedPlans = const [],
-    this.progressPictures = const [],
     this.visibilitySettings = const {},
+    this.profilePicture,
+    this.progressPictures = const [],
   });
 
+  final String id;
   final String username;
   final List<PublishedExercisePlan> publishedPlans;
-  final List<Image> progressPictures;
   final Map<String, dynamic> visibilitySettings;
+  final Uint8List? profilePicture;
+  final List<Uint8List> progressPictures;
 
-  factory CustomUser.fromJson(Map<String, dynamic> json) {
+  factory CustomUser.fromJson(Map<String, dynamic> json,
+      {Uint8List? profilePicture,
+      List<Uint8List> progressPictures = const []}) {
     List plans = json['exercise_plans'];
     List<PublishedExercisePlan> publishedPlans =
         plans.map((plan) => PublishedExercisePlan.fromJson(plan)).toList();
 
     return CustomUser(
+      id: json['uid'],
       username: json['username'],
       publishedPlans: publishedPlans,
-      progressPictures: [],
       visibilitySettings: json['visibility_settings'],
+      profilePicture: profilePicture,
+      progressPictures: progressPictures,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'uid': id,
       'username': username,
       'exercise_plans': publishedPlans.map((plan) => plan.toJson()).toList(),
-      'progress_pictures': [],
       'visibility_settings': visibilitySettings,
     };
   }

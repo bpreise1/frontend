@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
+import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
@@ -11,6 +12,7 @@ import 'package:frontend/screens/create_plan_page.dart';
 import 'package:frontend/screens/profile_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
+import 'package:frontend/widgets/profile_avatar.dart';
 import 'package:frontend/widgets/user_profile_scaffold_button.dart';
 import 'package:frontend/widgets/weight_mode_toggle.dart';
 
@@ -39,20 +41,45 @@ class Home extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
           ),
-          InkWell(
-            child: const CircleAvatar(
-              radius: 50,
-            ),
-            onTap: () {
-              ref
-                  .read(profilePageProvider.notifier)
-                  .fetchUser(userRepository.getCurrentUserId());
+          Consumer(
+            builder: (context, ref, child) {
+              final currentUser = ref.watch(currentUserProvider);
+              return currentUser.when(
+                data: (data) {
+                  return InkWell(
+                      onTap: () {
+                        ref
+                            .read(profilePageProvider.notifier)
+                            .fetchUser(userRepository.getCurrentUserId());
 
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) {
-                  return const ProfilePage();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ProfilePage(
+                                id: data.id,
+                                username: data.username,
+                                profilePicture: data.profilePicture,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: ProfileAvatar(
+                        radius: 50,
+                        profilePicture: data.profilePicture,
+                      ));
                 },
-              ));
+                error: (error, stackTrace) {
+                  return Text(
+                    error.toString(),
+                  );
+                },
+                loading: () {
+                  return const ProfileAvatar(
+                    radius: 50,
+                  );
+                },
+              );
             },
           ),
           const Padding(

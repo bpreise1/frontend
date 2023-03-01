@@ -1,5 +1,3 @@
-import 'package:frontend/models/custom_user.dart';
-
 class Comment {
   const Comment({
     required this.id,

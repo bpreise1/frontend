@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
@@ -9,7 +10,7 @@ import 'package:frontend/repository/user_repository.dart';
 
 class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
   @override
-  FutureOr<CustomUser?> build() {
+  FutureOr<CustomUser?> build() async {
     return null;
   }
 
@@ -190,6 +191,29 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
 
       state = AsyncValue.data(user);
     }
+  }
+
+  void setUsername(String username) {
+    state.whenData((user) {
+      state = AsyncValue.data(CustomUser(
+          id: state.value!.id,
+          username: username,
+          publishedPlans: state.value!.publishedPlans,
+          progressPictures: state.value!.progressPictures,
+          visibilitySettings: state.value!.visibilitySettings));
+    });
+  }
+
+  void setProfilePicture(Uint8List image) {
+    state.whenData((user) {
+      state = AsyncValue.data(CustomUser(
+          id: state.value!.id,
+          username: state.value!.username,
+          publishedPlans: state.value!.publishedPlans,
+          visibilitySettings: state.value!.visibilitySettings,
+          profilePicture: image,
+          progressPictures: state.value!.progressPictures));
+    });
   }
 }
 
