@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
@@ -13,6 +14,7 @@ import 'package:frontend/widgets/add_image_button.dart';
 import 'package:frontend/widgets/like_button.dart';
 import 'package:frontend/widgets/profile_avatar.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage(
@@ -260,9 +262,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   return ProgressPicturePage(
                                                     username: user.username,
                                                     image: image,
-                                                    timeCreated: user
+                                                    dateCreated: user
                                                         .progressPictures[index]
-                                                        .timeCreated,
+                                                        .dateCreated,
                                                   );
                                                 },
                                               ));
@@ -275,18 +277,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ),
                                             ),
                                           ),
-                                          if (user.progressPictures[index]
-                                                  .timeCreated !=
-                                              null)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 4),
-                                              child: Text(
-                                                DateFormat('yMMMd').format(user
-                                                    .progressPictures[index]
-                                                    .timeCreated!),
-                                              ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 4),
+                                            child: Text(
+                                              DateFormat('yMMMd').format(user
+                                                  .progressPictures[index]
+                                                  .dateCreated),
                                             ),
+                                          ),
                                         ],
                                       );
                                     },
@@ -313,7 +312,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ref
                                           .read(profilePageProvider.notifier)
                                           .addProgressPictureForCurrentUser(
-                                              image);
+                                            ProgressPicture(
+                                              id: const Uuid().v4(),
+                                              image: image,
+                                              dateCreated: DateTime.now(),
+                                            ),
+                                          );
 
                                       if (_progressPicturesController
                                           .hasClients) {

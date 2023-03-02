@@ -8,6 +8,7 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:uuid/uuid.dart';
 
 class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
   @override
@@ -194,18 +195,16 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
     }
   }
 
-  Future<void> addProgressPictureForCurrentUser(Uint8List image) async {
+  Future<void> addProgressPictureForCurrentUser(
+      ProgressPicture progressPicture) async {
     state.whenData((user) {
-      userRepository.addProgressPictureForCurrentUser(image);
+      userRepository.addProgressPictureForCurrentUser(progressPicture);
 
       List<ProgressPicture> progressPictures = [
         ...state.value!.progressPictures
       ];
       progressPictures.add(
-        ProgressPicture(
-          image: image,
-          timeCreated: DateTime.now(),
-        ),
+        progressPicture,
       );
 
       state = AsyncValue.data(CustomUser(

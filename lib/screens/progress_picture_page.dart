@@ -5,12 +5,12 @@ class ProgressPicturePage extends StatelessWidget {
   const ProgressPicturePage(
       {required this.username,
       required this.image,
-      this.timeCreated,
+      required this.dateCreated,
       super.key});
 
   final String username;
   final MemoryImage image;
-  final DateTime? timeCreated;
+  final DateTime dateCreated;
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +24,14 @@ class ProgressPicturePage extends StatelessWidget {
               tag: image,
               child: Image(image: image),
             ),
-            if (timeCreated != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Center(
-                  child: Text(
-                    DateFormat('yMMMMd').format(timeCreated!),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Center(
+                child: Text(
+                  DateFormat('yMMMMd').format(dateCreated),
                 ),
               ),
+            ),
           ],
         ));
   }

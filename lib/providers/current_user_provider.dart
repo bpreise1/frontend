@@ -1,28 +1,15 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/user_exception.dart';
+import 'package:frontend/models/user_info.dart';
 import 'package:frontend/repository/user_repository.dart';
 
-class CurrentUserInfoState {
-  CurrentUserInfoState(
-      {required this.id, required this.username, required this.profilePicture});
-
-  final String id;
-  final String username;
-  final Uint8List? profilePicture;
-}
-
-class CurrentUserInfoNotifier extends AsyncNotifier<CurrentUserInfoState> {
+class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {
   @override
-  FutureOr<CurrentUserInfoState> build() async {
-    CustomUser currentUser =
-        await userRepository.getUserById(userRepository.getCurrentUserId());
-    return CurrentUserInfoState(
-        id: currentUser.id,
-        username: currentUser.username,
-        profilePicture: currentUser.profilePicture);
+  FutureOr<CustomUserInfo> build() async {
+    return await userRepository
+        .getUserInfoById(userRepository.getCurrentUserId());
   }
 
   Future<void> setUsernameById(String uid, String username) async {
@@ -36,7 +23,7 @@ class CurrentUserInfoNotifier extends AsyncNotifier<CurrentUserInfoState> {
 
     state.whenData((value) async {
       await userRepository.setUsernameById(uid, username);
-      state = AsyncValue.data(CurrentUserInfoState(
+      state = AsyncValue.data(CustomUserInfo(
           id: state.value!.id,
           username: username,
           profilePicture: state.value!.profilePicture));
@@ -46,7 +33,7 @@ class CurrentUserInfoNotifier extends AsyncNotifier<CurrentUserInfoState> {
   void setProfilePictureForCurrentUser(Uint8List image) {
     state.whenData((value) {
       userRepository.setProfilePictureForCurrentUser(image);
-      state = AsyncValue.data(CurrentUserInfoState(
+      state = AsyncValue.data(CustomUserInfo(
           id: state.value!.id,
           username: state.value!.username,
           profilePicture: image));
@@ -55,5 +42,5 @@ class CurrentUserInfoNotifier extends AsyncNotifier<CurrentUserInfoState> {
 }
 
 final currentUserProvider =
-    AsyncNotifierProvider<CurrentUserInfoNotifier, CurrentUserInfoState>(
+    AsyncNotifierProvider<CurrentUserInfoNotifier, CustomUserInfo>(
         CurrentUserInfoNotifier.new);

@@ -34,6 +34,7 @@ class AuthGate extends StatelessWidget {
                           'username': '',
                           'username_lowercase': '',
                           'exercise_plans': [],
+                          'progress_pictures': [],
                           'visibility_settings': {},
                         });
                       },
