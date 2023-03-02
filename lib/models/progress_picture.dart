@@ -6,6 +6,7 @@ class ProgressPicture {
   const ProgressPicture(
       {required this.id,
       required this.image,
+      required this.creatorUserId,
       required this.dateCreated,
       this.likedBy = const [],
       this.comments = const [],
@@ -13,6 +14,7 @@ class ProgressPicture {
 
   final String id;
   final Uint8List image;
+  final String creatorUserId;
   final DateTime dateCreated;
   final List<String> likedBy;
   final List<Comment> comments;
@@ -26,6 +28,7 @@ class ProgressPicture {
     return ProgressPicture(
       id: json['id'],
       image: progressPicture,
+      creatorUserId: json['creatorUserId'],
       dateCreated: DateTime.parse(json['timeCreated']),
       likedBy: likedBy.map((like) => like as String).toList(),
       comments: comments.map((comment) => Comment.fromJson(comment)).toList(),
@@ -36,6 +39,7 @@ class ProgressPicture {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'creatorUserId': creatorUserId,
       'timeCreated': dateCreated.toString(),
       'likedBy': likedBy,
       'comments': comments.map((comment) => comment.toJson()).toList(),

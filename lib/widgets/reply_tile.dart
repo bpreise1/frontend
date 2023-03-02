@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
-import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/like_button.dart';
 
-class ReplyTile extends ConsumerWidget {
+class ReplyTile extends StatelessWidget {
   const ReplyTile(
-      {required this.comment, required this.exercisePlanId, super.key});
+      {required this.comment,
+      required this.onLikeComment,
+      required this.onUnlikeComment,
+      super.key});
 
   final Comment comment;
-  final String exercisePlanId;
+  final Future<void> Function(Comment likedComment) onLikeComment;
+  final Future<void> Function(Comment unlikedComment) onUnlikeComment;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    int likes = comment.likedBy.length;
-
+  Widget build(BuildContext context) {
     return Column(
       children: [
         const Divider(
@@ -39,24 +39,14 @@ class ReplyTile extends ConsumerWidget {
                           userRepository.getCurrentUserId(),
                         ),
                         onLikeClicked: () async {
-                          await ref
-                              .read(profilePageProvider.notifier)
-                              .likeCommentForExercisePlan(
-                                  exercisePlanId,
-                                  userRepository.getCurrentUserId(),
-                                  comment.id);
+                          await onLikeComment(comment);
                         },
                         onUnlikeClicked: () async {
-                          await ref
-                              .read(profilePageProvider.notifier)
-                              .unlikeCommentForExercisePlan(
-                                  exercisePlanId,
-                                  userRepository.getCurrentUserId(),
-                                  comment.id);
+                          await onUnlikeComment(comment);
                         },
                       ),
                       Text(
-                        likes.toString(),
+                        comment.likedBy.length.toString(),
                       )
                     ],
                   ),

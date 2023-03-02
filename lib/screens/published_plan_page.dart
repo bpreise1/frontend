@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/add_comment_section.dart';
-import 'package:frontend/widgets/comment_tile.dart';
+import 'package:frontend/widgets/comment_section.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 import 'package:frontend/widgets/like_button.dart';
-import 'package:frontend/widgets/reply_tile.dart';
+import 'package:uuid/uuid.dart';
 
 class PublishedPlanPage extends ConsumerWidget {
   const PublishedPlanPage({super.key});
@@ -147,36 +148,73 @@ class PublishedPlanPage extends ConsumerWidget {
                     ],
                   ),
                 const Divider(),
-                const Padding(
-                  padding: EdgeInsets.only(left: 8, bottom: 8),
-                  child: Text(
-                    'Comments',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                CommentSection(
+                  comments: comments,
+                  onReply: (reply, replyingTo) {
+                    ref
+                        .read(profilePageProvider.notifier)
+                        .replyToCommentForExercisePlan(
+                            exercisePlan.id, replyingTo.id, reply);
+                  },
+                  onLikeComment: (likedComment) async {
+                    await ref
+                        .read(profilePageProvider.notifier)
+                        .likeCommentForExercisePlan(
+                          exercisePlan.id,
+                          userRepository.getCurrentUserId(),
+                          likedComment.id,
+                        );
+                  },
+                  onUnlikeComment: (unlikedComment) async {
+                    await ref
+                        .read(profilePageProvider.notifier)
+                        .unlikeCommentForExercisePlan(
+                          exercisePlan.id,
+                          userRepository.getCurrentUserId(),
+                          unlikedComment.id,
+                        );
+                  },
                 ),
-                for (int i = 0; i < comments.length; i++)
-                  Column(
-                    children: [
-                      CommentTile(
-                        comment: comments[i],
-                        exercisePlanId: exercisePlan.id,
-                      ),
-                      for (int j = 0; j < comments[i].replies.length; j++)
-                        Column(
-                          children: [
-                            ReplyTile(
-                              comment: comments[i].replies[j],
-                              exercisePlanId: exercisePlan.id,
-                            ),
-                          ],
-                        )
-                    ],
-                  ),
               ],
             ),
           ),
-          AddCommentSection(
-            exercisePlanId: exercisePlan.id,
+          Consumer(
+            builder: (context, ref, child) {
+              final currentUser = ref.watch(currentUserProvider);
+
+              return currentUser.when(
+                data: (data) {
+                  return AddCommentSection(
+                    hintText: 'Add a comment...',
+                    onSubmitted: (text) {
+                      Comment comment = Comment(
+                        id: const Uuid().v4(),
+                        comment: text,
+                        creatorUserId: userRepository.getCurrentUserId(),
+                        creatorUsername: data.username,
+                        dateCreated: DateTime.now(),
+                        likedBy: [],
+                        replies: [],
+                      );
+
+                      ref
+                          .read(profilePageProvider.notifier)
+                          .addCommentForExercisePlan(exercisePlan.id, comment);
+                    },
+                  );
+                },
+                error: (error, stackTrace) {
+                  return Text(
+                    error.toString(),
+                  );
+                },
+                loading: () {
+                  return CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.secondary,
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

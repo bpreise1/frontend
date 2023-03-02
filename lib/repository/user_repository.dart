@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -337,6 +339,54 @@ class UserRepository implements IUserRepository {
             progressPicture.toJson(),
           ],
         ),
+      },
+    );
+  }
+
+  Future<void> likeProgressPictureForUser(
+      String pictureId, String uid, String likerId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        List likedBy = progressPictureJson['likedBy'];
+        likedBy.add(likerId);
+        progressPictureJson['likedBy'] = likedBy;
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> unlikeProgressPictureForUser(
+      String pictureId, String uid, String likerId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        List likedBy = progressPictureJson['likedBy'];
+        likedBy.remove(likerId);
+        progressPictureJson['likedBy'] = likedBy;
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
       },
     );
   }

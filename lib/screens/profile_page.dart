@@ -247,8 +247,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       );
                                     },
                                     itemBuilder: (context, index) {
-                                      MemoryImage image = MemoryImage(
-                                          user.progressPictures[index].image);
+                                      ProgressPicture progressPicture =
+                                          user.progressPictures[index];
 
                                       return Column(
                                         mainAxisAlignment:
@@ -261,19 +261,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 builder: (context) {
                                                   return ProgressPicturePage(
                                                     username: user.username,
-                                                    image: image,
-                                                    dateCreated: user
-                                                        .progressPictures[index]
-                                                        .dateCreated,
+                                                    progressPicture:
+                                                        progressPicture,
                                                   );
                                                 },
                                               ));
                                             },
                                             child: Hero(
-                                              tag: image,
+                                              tag: progressPicture,
                                               child: Image(
                                                 height: 250,
-                                                image: image,
+                                                image: MemoryImage(
+                                                    progressPicture.image),
                                               ),
                                             ),
                                           ),
@@ -315,6 +314,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ProgressPicture(
                                               id: const Uuid().v4(),
                                               image: image,
+                                              creatorUserId: userRepository
+                                                  .getCurrentUserId(),
                                               dateCreated: DateTime.now(),
                                             ),
                                           );

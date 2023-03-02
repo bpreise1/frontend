@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
-import 'package:frontend/providers/profile_page_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/reply_page.dart';
 import 'package:frontend/widgets/like_button.dart';
 
-class CommentTile extends ConsumerWidget {
+class CommentTile extends StatelessWidget {
   const CommentTile(
       {required this.comment,
-      required this.exercisePlanId,
-      this.repliesEnabled = true,
+      required this.onLikeComment,
+      required this.onUnlikeComment,
+      this.onReply,
       super.key});
 
   final Comment comment;
-  final String exercisePlanId;
-  final bool repliesEnabled;
+  final void Function(Comment comment, Comment replyTo)? onReply;
+  final Future<void> Function(Comment likedComment) onLikeComment;
+  final Future<void> Function(Comment unlikedComment) onUnlikeComment;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    int likes = comment.likedBy.length;
-    List<Comment> replies = comment.replies;
-
+  Widget build(BuildContext context) {
     return Column(
       children: [
         const Divider(
@@ -41,20 +38,14 @@ class CommentTile extends ConsumerWidget {
                         userRepository.getCurrentUserId(),
                       ),
                       onLikeClicked: () async {
-                        await ref
-                            .read(profilePageProvider.notifier)
-                            .likeCommentForExercisePlan(exercisePlanId,
-                                userRepository.getCurrentUserId(), comment.id);
+                        await onLikeComment(comment);
                       },
                       onUnlikeClicked: () async {
-                        await ref
-                            .read(profilePageProvider.notifier)
-                            .unlikeCommentForExercisePlan(exercisePlanId,
-                                userRepository.getCurrentUserId(), comment.id);
+                        await onUnlikeComment(comment);
                       },
                     ),
                     Text(
-                      likes.toString(),
+                      comment.likedBy.length.toString(),
                     )
                   ],
                 ),
@@ -65,15 +56,16 @@ class CommentTile extends ConsumerWidget {
                   children: [
                     IconButton(
                       disabledColor: Theme.of(context).iconTheme.color,
-                      onPressed: repliesEnabled
+                      onPressed: onReply != null
                           ? () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
                                     return ReplyPage(
-                                      comment: comment,
-                                      exercisePlanId: exercisePlanId,
-                                    );
+                                        comment: comment,
+                                        onReply: onReply!,
+                                        onLikeComment: onLikeComment,
+                                        onUnlikeComment: onUnlikeComment);
                                   },
                                 ),
                               );
@@ -82,7 +74,7 @@ class CommentTile extends ConsumerWidget {
                       icon: const Icon(Icons.comment),
                     ),
                     Text(
-                      replies.length.toString(),
+                      comment.replies.length.toString(),
                     )
                   ],
                 ),

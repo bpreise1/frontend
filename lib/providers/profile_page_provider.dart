@@ -8,7 +8,6 @@ import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
-import 'package:uuid/uuid.dart';
 
 class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
   @override
@@ -217,15 +216,86 @@ class ProfilePageNotifier extends AsyncNotifier<CustomUser?> {
     });
   }
 
-  void setUsername(String username) {
-    state.whenData((user) {
-      state = AsyncValue.data(CustomUser(
-          id: state.value!.id,
-          username: username,
-          publishedPlans: state.value!.publishedPlans,
-          profilePicture: state.value!.profilePicture,
-          progressPictures: state.value!.progressPictures,
-          visibilitySettings: state.value!.visibilitySettings));
+  Future<void> likeProgessPictureForUser(
+      String pictureId, String userId) async {
+    state.whenData((user) async {
+      final String currentUser = userRepository.getCurrentUserId();
+
+      await userRepository.likeProgressPictureForUser(
+          pictureId, userId, currentUser);
+
+      final List<ProgressPicture> newProgressPictures = [];
+      for (final progressPicture in user!.progressPictures) {
+        if (progressPicture.id == pictureId) {
+          newProgressPictures.add(
+            ProgressPicture(
+              id: progressPicture.id,
+              image: progressPicture.image,
+              creatorUserId: progressPicture.creatorUserId,
+              dateCreated: progressPicture.dateCreated,
+              likedBy: [...progressPicture.likedBy, currentUser],
+              comments: progressPicture.comments,
+              totalComments: progressPicture.totalComments,
+            ),
+          );
+        } else {
+          newProgressPictures.add(progressPicture);
+        }
+      }
+
+      CustomUser newUser = CustomUser(
+        id: user.id,
+        username: user.username,
+        publishedPlans: user.publishedPlans,
+        visibilitySettings: user.visibilitySettings,
+        profilePicture: user.profilePicture,
+        progressPictures: newProgressPictures,
+      );
+
+      state = AsyncValue.data(newUser);
+    });
+  }
+
+  Future<void> unlikeProgessPictureForUser(
+      String pictureId, String userId) async {
+    state.whenData((user) async {
+      final String currentUser = userRepository.getCurrentUserId();
+
+      await userRepository.unlikeProgressPictureForUser(
+          pictureId, userId, currentUser);
+
+      final List<ProgressPicture> newProgressPictures = [];
+      for (final progressPicture in user!.progressPictures) {
+        if (progressPicture.id == pictureId) {
+          List<String> newLikedBy = [...progressPicture.likedBy];
+          newLikedBy.remove(currentUser);
+
+          newProgressPictures.add(
+            ProgressPicture(
+              id: progressPicture.id,
+              image: progressPicture.image,
+              creatorUserId: progressPicture.creatorUserId,
+              dateCreated: progressPicture.dateCreated,
+              likedBy: newLikedBy,
+              comments: progressPicture.comments,
+              totalComments: progressPicture.totalComments,
+            ),
+          );
+        } else {
+          newProgressPictures.add(progressPicture);
+        }
+      }
+
+      CustomUser newUser = CustomUser(
+        id: user.id,
+        username: user.username,
+        publishedPlans: user.publishedPlans,
+        visibilitySettings: user.visibilitySettings,
+        profilePicture: user.profilePicture,
+        progressPictures: newProgressPictures,
+      );
+
+      state = AsyncValue.data(newUser);
     });
   }
 
