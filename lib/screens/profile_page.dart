@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/custom_user.dart';
@@ -8,6 +7,7 @@ import 'package:frontend/providers/progress_picture_provider.dart';
 import 'package:frontend/providers/user_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/progress_picture_page.dart';
+import 'package:frontend/utils/mem_equals.dart';
 import 'package:frontend/widgets/add_image_button.dart';
 import 'package:frontend/widgets/profile_avatar.dart';
 import 'package:frontend/widgets/published_plan_tile.dart';
@@ -56,11 +56,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Consumer(
       builder: (context, ref, child) {
-        final user = ref.watch(
+        final asyncUser = ref.watch(
           userNotifierProvider(widget.id),
         );
 
-        return user.when(
+        return asyncUser.when(
           data: (data) {
             final CustomUser user = data;
 
@@ -77,7 +77,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     tag: widget.id,
                     child: ProfileAvatar(
                       radius: 80,
-                      profilePicture: user.profilePicture,
+                      profilePicture:
+                          memEquals(widget.profilePicture, user.profilePicture)
+                              ? widget.profilePicture
+                              : user.profilePicture,
                       editingEnabled: isCurrentUserProfile,
                       isProfilePage: true,
                     ),

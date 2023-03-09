@@ -33,7 +33,7 @@ class _AddCommentSectionState extends State<AddCommentSection> {
           top: BorderSide(width: 2, color: Theme.of(context).dividerColor),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24, top: 12),
       width: MediaQuery.of(context).size.width,
       child: Row(
         children: [
