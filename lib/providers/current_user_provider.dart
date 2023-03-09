@@ -23,6 +23,7 @@ class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {
 
     state.whenData((value) async {
       await userRepository.setUsernameById(uid, username);
+
       state = AsyncValue.data(CustomUserInfo(
           id: state.value!.id,
           username: username,
@@ -33,6 +34,7 @@ class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {
   void setProfilePictureForCurrentUser(Uint8List image) {
     state.whenData((value) {
       userRepository.setProfilePictureForCurrentUser(image);
+
       state = AsyncValue.data(CustomUserInfo(
           id: state.value!.id,
           username: state.value!.username,

@@ -3,7 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/current_user_provider.dart';
-import 'package:frontend/providers/profile_page_provider.dart';
+import 'package:frontend/providers/user_provider.dart';
+import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/add_image_button.dart';
 
 class ProfileAvatar extends StatelessWidget {
@@ -45,7 +46,11 @@ class ProfileAvatar extends StatelessWidget {
 
                         if (isProfilePage) {
                           ref
-                              .read(profilePageProvider.notifier)
+                              .read(
+                                userNotifierProvider(
+                                  userRepository.getCurrentUserId(),
+                                ).notifier,
+                              )
                               .setProfilePicture(image);
                         }
                       },

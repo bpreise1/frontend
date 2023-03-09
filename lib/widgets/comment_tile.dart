@@ -3,16 +3,23 @@ import 'package:frontend/models/comment.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/reply_page.dart';
 import 'package:frontend/widgets/like_button.dart';
+import 'package:frontend/widgets/comment_section.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile(
       {required this.comment,
+      required this.type,
+      required this.contentCreatorId,
+      required this.contentId,
       required this.onLikeComment,
       required this.onUnlikeComment,
       this.onReply,
       super.key});
 
   final Comment comment;
+  final ContentType type;
+  final String contentCreatorId;
+  final String contentId;
   final void Function(Comment comment, Comment replyTo)? onReply;
   final Future<void> Function(Comment likedComment) onLikeComment;
   final Future<void> Function(Comment unlikedComment) onUnlikeComment;
@@ -62,7 +69,10 @@ class CommentTile extends StatelessWidget {
                                 MaterialPageRoute(
                                   builder: (context) {
                                     return ReplyPage(
-                                        comment: comment,
+                                        commentId: comment.id,
+                                        type: type,
+                                        contentCreatorId: contentCreatorId,
+                                        contentId: contentId,
                                         onReply: onReply!,
                                         onLikeComment: onLikeComment,
                                         onUnlikeComment: onUnlikeComment);

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -83,7 +81,7 @@ class UserRepository implements IUserRepository {
           ),
         );
       } on PlatformException catch (exception) {
-        print('exception');
+        print(exception);
       }
     }
     progressPictures.sort(
@@ -380,6 +378,147 @@ class UserRepository implements IUserRepository {
         List likedBy = progressPictureJson['likedBy'];
         likedBy.remove(likerId);
         progressPictureJson['likedBy'] = likedBy;
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> addCommentToProgressPictureForUser(
+      String pictureId, String uid, Comment comment) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        List comments = progressPictureJson['comments'];
+        comments.add(
+          comment.toJson(),
+        );
+        progressPictureJson['comments'] = comments;
+        progressPictureJson['totalComments'] += 1;
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> likeProgressPictureCommentForUser(
+      String pictureId, String uid, String likerId, String commentId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        outerloop:
+        for (final Map<String, dynamic> commentJson
+            in progressPictureJson['comments'] as List) {
+          if (commentJson['id'] == commentId) {
+            List likedBy = commentJson['likedBy'];
+            likedBy.add(likerId);
+            commentJson['likedBy'] = likedBy;
+            break outerloop;
+          }
+
+          for (final Map<String, dynamic> repliesJson
+              in commentJson['replies'] as List) {
+            if (repliesJson['id'] == commentId) {
+              List likedBy = repliesJson['likedBy'];
+              likedBy.add(likerId);
+              repliesJson['likedBy'] = likedBy;
+              break outerloop;
+            }
+          }
+        }
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> unlikeProgressPictureCommentForUser(
+      String pictureId, String uid, String likerId, String commentId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        outerloop:
+        for (final Map<String, dynamic> commentJson
+            in progressPictureJson['comments'] as List) {
+          if (commentJson['id'] == commentId) {
+            List likedBy = commentJson['likedBy'];
+            likedBy.remove(likerId);
+            commentJson['likedBy'] = likedBy;
+            break outerloop;
+          }
+
+          for (final Map<String, dynamic> repliesJson
+              in commentJson['replies']) {
+            if (repliesJson['id'] == commentId) {
+              List likedBy = repliesJson['likedBy'];
+              likedBy.remove(likerId);
+              repliesJson['likedBy'] = likedBy;
+              break outerloop;
+            }
+          }
+        }
+      }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> replyToProgressPictureCommentForUser(
+      String pictureId, String uid, String commentId, Comment comment) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (progressPictureJson['id'] == pictureId) {
+        for (final Map<String, dynamic> commentJson
+            in progressPictureJson['comments'] as List) {
+          if (commentJson['id'] == commentId) {
+            List replies = commentJson['replies'];
+            replies.add(
+              comment.toJson(),
+            );
+            commentJson['replies'] = replies;
+            progressPictureJson['totalComments'] += 1;
+          }
+        }
       }
       newProgressPictures.add(progressPictureJson);
     }

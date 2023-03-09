@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/comment.dart';
+import 'package:frontend/providers/current_user_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class AddCommentSection extends StatefulWidget {
   const AddCommentSection(
       {required this.hintText, required this.onSubmitted, super.key});
 
   final String hintText;
-  final void Function(String text) onSubmitted;
+  final void Function(Comment comment) onSubmitted;
 
   @override
   State<AddCommentSection> createState() => _AddCommentSectionState();
@@ -42,16 +46,45 @@ class _AddCommentSectionState extends State<AddCommentSection> {
               ),
             ),
           ),
-          TextButton(
-            onPressed: () {
-              widget.onSubmitted(_textController.text);
-              _textController.text = '';
+          Consumer(
+            builder: (context, ref, child) {
+              final currentUser = ref.watch(currentUserProvider);
+
+              return currentUser.when(
+                data: (data) {
+                  return TextButton(
+                    onPressed: () {
+                      widget.onSubmitted(
+                        Comment(
+                            id: const Uuid().v4(),
+                            comment: _textController.text,
+                            creatorUserId: data.id,
+                            creatorUsername: data.username,
+                            dateCreated: DateTime.now(),
+                            likedBy: [],
+                            replies: []),
+                      );
+                      _textController.text = '';
+                    },
+                    child: Text(
+                      'Post',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground),
+                    ),
+                  );
+                },
+                error: (error, stackTrace) {
+                  return Text(
+                    error.toString(),
+                  );
+                },
+                loading: () {
+                  return CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.secondary,
+                  );
+                },
+              );
             },
-            child: Text(
-              'Post',
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
-            ),
           ),
         ],
       ),

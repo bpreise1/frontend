@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
 import 'package:frontend/providers/current_user_provider.dart';
-import 'package:frontend/providers/profile_page_provider.dart';
-import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
 import 'package:frontend/screens/create_plan_page.dart';
@@ -47,12 +45,8 @@ class Home extends ConsumerWidget {
               return currentUser.when(
                 data: (data) {
                   return InkWell(
-                    onTap: () {
-                      ref
-                          .read(profilePageProvider.notifier)
-                          .fetchUser(userRepository.getCurrentUserId());
-
-                      Navigator.of(context).push(
+                    onTap: () async {
+                      await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) {
                             return ProfilePage(
