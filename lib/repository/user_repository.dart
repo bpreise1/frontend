@@ -6,7 +6,7 @@ import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/custom_user.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/progress_picture.dart';
-import 'package:frontend/models/user_info.dart';
+import 'package:frontend/models/custom_user_info.dart';
 
 abstract class IUserRepository {
   String getCurrentUserId();
@@ -90,8 +90,31 @@ class UserRepository implements IUserRepository {
       },
     );
 
+    final List<CustomUserInfo> followRequests = [];
+    for (final Map<String, dynamic> followRequestJson
+        in jsonData['follow_requests']) {
+      final followerProfilePictureRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/${followRequestJson['uid']}.jpg');
+
+      try {
+        followRequests.add(
+          CustomUserInfo.fromJson(
+            followRequestJson,
+            await followerProfilePictureRef.getData(),
+          ),
+        );
+      } on PlatformException catch (exception) {
+        print(exception);
+      }
+    }
+
+    print(followRequests.length);
+
     return CustomUser.fromJson(jsonData,
-        profilePicture: profilePicture, progressPictures: progressPictures);
+        profilePicture: profilePicture,
+        progressPictures: progressPictures,
+        followRequests: followRequests);
   }
 
   @override
@@ -552,6 +575,86 @@ class UserRepository implements IUserRepository {
         'followers': FieldValue.arrayRemove(
           [
             followerId,
+          ],
+        ),
+      },
+    );
+  }
+
+  Future<void> requestFollowForUser(
+      String uid, CustomUserInfo followerUserInfo) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'follow_requests': FieldValue.arrayUnion(
+          [
+            followerUserInfo.toJson(),
+          ],
+        ),
+      },
+    );
+  }
+
+  Future<void> unrequestFollowForUser(
+      String uid, CustomUserInfo followerUserInfo) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'follow_requests': FieldValue.arrayRemove(
+          [
+            followerUserInfo.toJson(),
+          ],
+        ),
+      },
+    );
+  }
+
+  Future<void> setProfileStatusForUser(String uid,
+      {required bool isPublic}) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+
+    final userJson = userDoc.data()!;
+    final Map<String, dynamic> visibilitySettings =
+        userJson['visibility_settings'];
+    visibilitySettings['public_profile'] = isPublic;
+
+    userDocRef.update(
+      {
+        'visibility_settings': visibilitySettings,
+      },
+    );
+  }
+
+  Future<void> acceptFollowRequestForUser(
+      String uid, CustomUserInfo followerInfo) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'follow_requests': FieldValue.arrayRemove(
+          [
+            followerInfo.toJson(),
+          ],
+        ),
+        'followers': FieldValue.arrayUnion(
+          [followerInfo.id],
+        ),
+      },
+    );
+  }
+
+  Future<void> rejectFollowRequestForUser(
+      String uid, CustomUserInfo followerInfo) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'follow_requests': FieldValue.arrayRemove(
+          [
+            followerInfo.toJson(),
           ],
         ),
       },

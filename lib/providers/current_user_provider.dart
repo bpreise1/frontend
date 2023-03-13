@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/user_exception.dart';
-import 'package:frontend/models/user_info.dart';
+import 'package:frontend/models/custom_user_info.dart';
 import 'package:frontend/repository/user_repository.dart';
 
 class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {

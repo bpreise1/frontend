@@ -6,6 +6,7 @@ import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/progress_picture_provider.dart';
 import 'package:frontend/providers/user_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/screens/follow_requests_page.dart';
 import 'package:frontend/screens/progress_picture_page.dart';
 import 'package:frontend/widgets/add_image_button.dart';
 import 'package:frontend/widgets/follow_button.dart';
@@ -77,6 +78,41 @@ class _ProfilePageState extends State<ProfilePage> {
             return Scaffold(
               appBar: AppBar(
                 title: Text(user.username),
+                actions: [
+                  if (isCurrentUserProfile)
+                    TextButton(
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                          (_) {
+                            if (user.followRequests.isEmpty) {
+                              return Theme.of(context).colorScheme.onBackground;
+                            }
+                            return Theme.of(context).colorScheme.secondary;
+                          },
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return FollowRequestsPage(
+                                uid: widget.id,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            user.followRequests.length.toString(),
+                          ),
+                          const Icon(Icons.person_add_alt_1),
+                        ],
+                      ),
+                    ),
+                ],
               ),
               body: RefreshIndicator(
                 onRefresh: () async {
@@ -109,29 +145,24 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: EdgeInsets.symmetric(horizontal: 8),
                           ),
                           FollowButton(
-                            isFollowing: user.followers.contains(
-                              userRepository.getCurrentUserId(),
-                            ),
-                            onFollow: () {
-                              ref
-                                  .read(
-                                    userNotifierProvider(widget.id).notifier,
-                                  )
-                                  .addFollower(
-                                    userRepository.getCurrentUserId(),
-                                  );
-                            },
-                            onUnfollow: () {
-                              ref
-                                  .read(
-                                    userNotifierProvider(widget.id).notifier,
-                                  )
-                                  .removeFollower(
-                                    userRepository.getCurrentUserId(),
-                                  );
-                            },
+                            user: user,
                           ),
-                          const VisibilitySettingsDropdown(),
+                          VisibilitySettingsDropdown(
+                              isPublic: user.visibilitySettings.isPublicProfile,
+                              onPublicSelected: () {
+                                ref
+                                    .read(
+                                      userNotifierProvider(widget.id).notifier,
+                                    )
+                                    .setProfilePublic();
+                              },
+                              onPrivateSelected: () {
+                                ref
+                                    .read(
+                                      userNotifierProvider(widget.id).notifier,
+                                    )
+                                    .setProfilePrivate();
+                              }),
                         ],
                       ),
                     ),
@@ -150,6 +181,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 8),
+                          ),
+                          const Divider(
+                            height: .5,
                           ),
                           for (final publishedPlan in user.publishedPlans)
                             PublishedPlanTile(

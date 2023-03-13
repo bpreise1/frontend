@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/home.dart';
+import 'package:frontend/models/visibility_settings.dart';
 import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/screens/create_profile_page.dart';
 
@@ -35,7 +36,10 @@ class AuthGate extends StatelessWidget {
                           'username_lowercase': '',
                           'exercise_plans': [],
                           'progress_pictures': [],
-                          'visibility_settings': {},
+                          'visibility_settings':
+                              const VisibilitySettings().toJson(),
+                          'followers': [],
+                          'follow_requests': [],
                         });
                       },
                     ),

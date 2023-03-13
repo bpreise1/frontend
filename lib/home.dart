@@ -7,7 +7,6 @@ import 'package:frontend/providers/current_user_provider.dart';
 import 'package:frontend/screens/encyclopedia_page.dart';
 import 'package:frontend/screens/home_page.dart';
 import 'package:frontend/screens/create_plan_page.dart';
-import 'package:frontend/screens/notification_page.dart';
 import 'package:frontend/screens/profile_page.dart';
 import 'package:frontend/screens/saved_plans_page.dart';
 import 'package:frontend/screens/search_page.dart';
@@ -33,21 +32,7 @@ class Home extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fitkick'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const NotificationPage();
-                  },
-                ),
-              );
-            },
-            icon: const Icon(Icons.notifications),
-          ),
-          const UserProfileScaffoldWidget()
-        ],
+        actions: const [UserProfileScaffoldWidget()],
       ),
       endDrawer: Drawer(
         child: ListView(children: [

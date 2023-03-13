@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class VisibilitySettingsDropdown extends StatefulWidget {
-  const VisibilitySettingsDropdown({super.key});
+  const VisibilitySettingsDropdown(
+      {required this.isPublic,
+      required this.onPublicSelected,
+      required this.onPrivateSelected,
+      super.key});
+
+  final bool isPublic;
+  final void Function() onPublicSelected;
+  final void Function() onPrivateSelected;
 
   @override
   State<VisibilitySettingsDropdown> createState() =>
@@ -10,10 +18,10 @@ class VisibilitySettingsDropdown extends StatefulWidget {
 
 class _VisibilitySettingsDropdownState
     extends State<VisibilitySettingsDropdown> {
-  String _dropdownValue = 'public';
-
   @override
   Widget build(BuildContext context) {
+    String dropdownValue = widget.isPublic ? 'public' : 'private';
+
     return Material(
       elevation: 2,
       child: DecoratedBox(
@@ -25,7 +33,7 @@ class _VisibilitySettingsDropdownState
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: DropdownButtonHideUnderline(
             child: DropdownButton(
-              value: _dropdownValue,
+              value: dropdownValue,
               items: const [
                 DropdownMenuItem(
                   value: 'public',
@@ -39,9 +47,11 @@ class _VisibilitySettingsDropdownState
                 ),
               ],
               onChanged: (value) {
-                setState(() {
-                  _dropdownValue = value!;
-                });
+                if (value == 'public') {
+                  widget.onPublicSelected();
+                } else {
+                  widget.onPrivateSelected();
+                }
               },
             ),
           ),
