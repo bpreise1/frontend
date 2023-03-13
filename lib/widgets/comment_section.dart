@@ -128,6 +128,12 @@ class CommentSection extends ConsumerWidget {
                 .unlikeComment(likedComment.id);
           };
 
+    final List<Widget> commentTiles = _getCommentTiles(
+        comments: comments,
+        onReply: onReply,
+        onLikeComment: onLikeComment,
+        onUnlikeComment: onUnlikeComment);
+
     return Column(
       children: [
         const Padding(
@@ -140,11 +146,7 @@ class CommentSection extends ConsumerWidget {
             ),
           ),
         ),
-        ..._getCommentTiles(
-            comments: comments,
-            onReply: onReply,
-            onLikeComment: onLikeComment,
-            onUnlikeComment: onUnlikeComment),
+        ...commentTiles,
       ],
     );
   }

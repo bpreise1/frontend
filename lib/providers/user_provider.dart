@@ -15,7 +15,7 @@ class UserNotifier extends _$UserNotifier {
     return userRepository.getUserById(uid);
   }
 
-  Future<void> fetchUser(String uid) async {
+  Future<void> fetchUser() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () => userRepository.getUserById(uid),
@@ -33,6 +33,7 @@ class UserNotifier extends _$UserNotifier {
             visibilitySettings: user.visibilitySettings,
             profilePicture: user.profilePicture,
             progressPictures: user.progressPictures,
+            followers: user.followers,
           ),
         );
       },
@@ -44,13 +45,13 @@ class UserNotifier extends _$UserNotifier {
       (user) {
         state = AsyncValue.data(
           CustomUser(
-            id: user.id,
-            username: user.username,
-            publishedPlans: user.publishedPlans,
-            visibilitySettings: user.visibilitySettings,
-            profilePicture: picture,
-            progressPictures: user.progressPictures,
-          ),
+              id: user.id,
+              username: user.username,
+              publishedPlans: user.publishedPlans,
+              visibilitySettings: user.visibilitySettings,
+              profilePicture: picture,
+              progressPictures: user.progressPictures,
+              followers: user.followers),
         );
       },
     );
@@ -68,8 +69,52 @@ class UserNotifier extends _$UserNotifier {
           visibilitySettings: user.visibilitySettings,
           profilePicture: user.profilePicture,
           progressPictures: [...user.progressPictures, picture],
+          followers: user.followers,
         ),
       );
     });
+  }
+
+  Future<void> addFollower(String followerId) async {
+    state.whenData(
+      (user) {
+        userRepository.addFollowerForUser(uid, followerId);
+
+        state = AsyncValue.data(
+          CustomUser(
+            id: user.id,
+            username: user.username,
+            publishedPlans: user.publishedPlans,
+            visibilitySettings: user.visibilitySettings,
+            profilePicture: user.profilePicture,
+            progressPictures: user.progressPictures,
+            followers: [...user.followers, followerId],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> removeFollower(String followerId) async {
+    state.whenData(
+      (user) {
+        userRepository.removeFollowerForUser(uid, followerId);
+
+        List<String> newFollowers = [...user.followers];
+        newFollowers.remove(followerId);
+
+        state = AsyncValue.data(
+          CustomUser(
+            id: user.id,
+            username: user.username,
+            publishedPlans: user.publishedPlans,
+            visibilitySettings: user.visibilitySettings,
+            profilePicture: user.profilePicture,
+            progressPictures: user.progressPictures,
+            followers: newFollowers,
+          ),
+        );
+      },
+    );
   }
 }

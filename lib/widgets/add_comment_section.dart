@@ -52,25 +52,44 @@ class _AddCommentSectionState extends State<AddCommentSection> {
 
               return currentUser.when(
                 data: (data) {
-                  return TextButton(
-                    onPressed: () {
-                      widget.onSubmitted(
-                        Comment(
-                            id: const Uuid().v4(),
-                            comment: _textController.text,
-                            creatorUserId: data.id,
-                            creatorUsername: data.username,
-                            dateCreated: DateTime.now(),
-                            likedBy: [],
-                            replies: []),
+                  return ValueListenableBuilder(
+                    valueListenable: _textController,
+                    builder: (context, value, child) {
+                      return ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (states) {
+                              if (states.contains(MaterialState.disabled)) {
+                                return Theme.of(context).disabledColor;
+                              }
+                              return Theme.of(context).colorScheme.secondary;
+                            },
+                          ),
+                        ),
+                        onPressed: value.text.isNotEmpty
+                            ? () {
+                                widget.onSubmitted(
+                                  Comment(
+                                      id: const Uuid().v4(),
+                                      comment: value.text,
+                                      creatorUserId: data.id,
+                                      creatorUsername: data.username,
+                                      dateCreated: DateTime.now(),
+                                      likedBy: [],
+                                      replies: []),
+                                );
+                                _textController.text = '';
+                              }
+                            : null,
+                        child: Text(
+                          'Post',
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
+                        ),
                       );
-                      _textController.text = '';
                     },
-                    child: Text(
-                      'Post',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground),
-                    ),
                   );
                 },
                 error: (error, stackTrace) {

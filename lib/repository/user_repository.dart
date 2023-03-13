@@ -529,6 +529,34 @@ class UserRepository implements IUserRepository {
       },
     );
   }
+
+  Future<void> addFollowerForUser(String uid, String followerId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'followers': FieldValue.arrayUnion(
+          [
+            followerId,
+          ],
+        ),
+      },
+    );
+  }
+
+  Future<void> removeFollowerForUser(String uid, String followerId) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    userDocRef.update(
+      {
+        'followers': FieldValue.arrayRemove(
+          [
+            followerId,
+          ],
+        ),
+      },
+    );
+  }
 }
 
 final UserRepository userRepository = UserRepository();
