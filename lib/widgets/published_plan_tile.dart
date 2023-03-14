@@ -90,6 +90,7 @@ class PublishedPlanTile extends ConsumerWidget {
                               return PublishedPlanPage(
                                 planCreatorId: planCreatorId,
                                 planId: planId,
+                                autofocusCommentSection: true,
                               );
                             },
                           ),

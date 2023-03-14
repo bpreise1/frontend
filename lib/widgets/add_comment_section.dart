@@ -6,9 +6,13 @@ import 'package:uuid/uuid.dart';
 
 class AddCommentSection extends StatefulWidget {
   const AddCommentSection(
-      {required this.hintText, required this.onSubmitted, super.key});
+      {required this.hintText,
+      this.autofocus = false,
+      required this.onSubmitted,
+      super.key});
 
   final String hintText;
+  final bool autofocus;
   final void Function(Comment comment) onSubmitted;
 
   @override
@@ -17,10 +21,12 @@ class AddCommentSection extends StatefulWidget {
 
 class _AddCommentSectionState extends State<AddCommentSection> {
   final _textController = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void dispose() {
     _textController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -40,6 +46,8 @@ class _AddCommentSectionState extends State<AddCommentSection> {
           const Divider(),
           Expanded(
             child: TextField(
+              focusNode: _focusNode,
+              autofocus: widget.autofocus,
               controller: _textController,
               decoration: InputDecoration.collapsed(
                 hintText: widget.hintText,
@@ -79,7 +87,8 @@ class _AddCommentSectionState extends State<AddCommentSection> {
                                       likedBy: [],
                                       replies: []),
                                 );
-                                _textController.text = '';
+                                _textController.clear();
+                                _focusNode.unfocus();
                               }
                             : null,
                         child: Text(

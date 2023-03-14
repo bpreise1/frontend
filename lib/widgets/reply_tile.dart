@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/utils/time_ago.dart';
 import 'package:frontend/widgets/like_button.dart';
 
 class ReplyTile extends StatelessWidget {
@@ -26,8 +27,21 @@ class ReplyTile extends StatelessWidget {
               border: Border.symmetric(horizontal: BorderSide())),
           child: ListTile(
             tileColor: Theme.of(context).colorScheme.surface,
-            contentPadding: const EdgeInsets.only(left: 32, top: 4, bottom: 4),
-            title: Text(comment.comment),
+            contentPadding:
+                const EdgeInsets.only(left: 32, top: 4, bottom: 4, right: 8),
+            title: Row(
+              children: [
+                Text(comment.comment),
+                const Spacer(),
+                Text(
+                  timeAgo(comment.dateCreated),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+              ],
+            ),
             subtitle: Row(
               children: [
                 Expanded(
@@ -35,6 +49,7 @@ class ReplyTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       LikeButton(
+                        key: Key(comment.id),
                         isLiked: comment.likedBy.contains(
                           userRepository.getCurrentUserId(),
                         ),

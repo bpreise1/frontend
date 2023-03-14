@@ -79,7 +79,8 @@ class ProgressPicturePage extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            disabledColor: Theme.of(context).iconTheme.color,
+                            onPressed: null,
                             icon: const Icon(Icons.comment),
                           ),
                           Text(

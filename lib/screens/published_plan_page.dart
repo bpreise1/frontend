@@ -12,10 +12,14 @@ import 'package:frontend/widgets/comment_section.dart';
 
 class PublishedPlanPage extends StatelessWidget {
   const PublishedPlanPage(
-      {required this.planCreatorId, required this.planId, super.key});
+      {required this.planCreatorId,
+      required this.planId,
+      this.autofocusCommentSection = false,
+      super.key});
 
   final String planCreatorId;
   final String planId;
+  final bool autofocusCommentSection;
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +150,9 @@ class PublishedPlanPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    disabledColor:
+                                        Theme.of(context).iconTheme.color,
+                                    onPressed: null,
                                     icon: const Icon(Icons.comment),
                                   ),
                                   Text(
@@ -203,6 +209,7 @@ class PublishedPlanPage extends StatelessWidget {
                       )
                       .addComment(comment);
                 },
+                autofocus: autofocusCommentSection,
               );
             },
           ),

@@ -73,6 +73,7 @@ class ReplyPage extends ConsumerWidget {
             onSubmitted: (reply) {
               onReply(reply, comment);
             },
+            autofocus: true,
           ),
         ],
       ),
