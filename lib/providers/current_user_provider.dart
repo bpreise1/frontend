@@ -8,13 +8,20 @@ import 'package:frontend/repository/user_repository.dart';
 class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {
   @override
   FutureOr<CustomUserInfo> build() async {
+    print('building for user ${userRepository.getCurrentUserId()}');
+
     return await userRepository
         .getUserInfoById(userRepository.getCurrentUserId());
   }
 
   Future<void> setUsernameById(String uid, String username) async {
-    if (username == '') {
+    if (RegExp(r'^\s*$').hasMatch(username)) {
       throw const UserException(message: 'Username must not be empty');
+    }
+
+    if (username.startsWith(' ')) {
+      throw const UserException(
+          message: 'Username must not begin with a space');
     }
 
     if (!(await userRepository.usernameIsAvailable(username))) {

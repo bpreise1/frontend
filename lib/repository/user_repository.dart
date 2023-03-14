@@ -109,8 +109,6 @@ class UserRepository implements IUserRepository {
       }
     }
 
-    print(followRequests.length);
-
     return CustomUser.fromJson(jsonData,
         profilePicture: profilePicture,
         progressPictures: progressPictures,
@@ -659,6 +657,54 @@ class UserRepository implements IUserRepository {
         ),
       },
     );
+  }
+
+  Future<void> setExercisePlanVisibilityForUser(
+      String uid, bool isVisible) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+
+    final userJson = userDoc.data()!;
+    final Map<String, dynamic> visibilitySettings =
+        userJson['visibility_settings'];
+    visibilitySettings['show_exercise_plans'] = isVisible;
+
+    userDocRef.update(
+      {
+        'visibility_settings': visibilitySettings,
+      },
+    );
+  }
+
+  Future<void> setProgressPictureVisibilityForUser(
+      String uid, bool isVisible) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+
+    final userJson = userDoc.data()!;
+    final Map<String, dynamic> visibilitySettings =
+        userJson['visibility_settings'];
+    visibilitySettings['show_progress_pictures'] = isVisible;
+
+    userDocRef.update(
+      {
+        'visibility_settings': visibilitySettings,
+      },
+    );
+  }
+
+  Future<Uint8List?> getProfilePictureById(String uid) async {
+    final profilePictureRef =
+        FirebaseStorage.instance.ref().child('profile_pictures/$uid.jpg');
+
+    Uint8List? profilePicture;
+    try {
+      profilePicture = await profilePictureRef.getData();
+    } on PlatformException catch (exception) {
+      print(exception);
+    }
+
+    return profilePicture;
   }
 }
 

@@ -196,8 +196,12 @@ class UserNotifier extends _$UserNotifier {
               id: user.id,
               username: user.username,
               publishedPlans: user.publishedPlans,
-              visibilitySettings:
-                  const VisibilitySettings(isPublicProfile: true),
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: true,
+                showExercisePlans: user.visibilitySettings.showExercisePlans,
+                showProgressPictures:
+                    user.visibilitySettings.showProgressPictures,
+              ),
               profilePicture: user.profilePicture,
               progressPictures: user.progressPictures,
               followers: user.followers,
@@ -217,8 +221,110 @@ class UserNotifier extends _$UserNotifier {
               id: user.id,
               username: user.username,
               publishedPlans: user.publishedPlans,
-              visibilitySettings:
-                  const VisibilitySettings(isPublicProfile: false),
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: false,
+                showExercisePlans: user.visibilitySettings.showExercisePlans,
+                showProgressPictures:
+                    user.visibilitySettings.showProgressPictures,
+              ),
+              profilePicture: user.profilePicture,
+              progressPictures: user.progressPictures,
+              followers: user.followers,
+              followRequests: user.followRequests),
+        );
+      },
+    );
+  }
+
+  Future<void> showExercisePlans() async {
+    state.whenData(
+      (user) {
+        userRepository.setExercisePlanVisibilityForUser(uid, true);
+
+        state = AsyncValue.data(
+          CustomUser(
+              id: user.id,
+              username: user.username,
+              publishedPlans: user.publishedPlans,
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: user.visibilitySettings.isPublicProfile,
+                showExercisePlans: true,
+                showProgressPictures:
+                    user.visibilitySettings.showProgressPictures,
+              ),
+              profilePicture: user.profilePicture,
+              progressPictures: user.progressPictures,
+              followers: user.followers,
+              followRequests: user.followRequests),
+        );
+      },
+    );
+  }
+
+  Future<void> hideExercisePlans() async {
+    state.whenData(
+      (user) {
+        userRepository.setExercisePlanVisibilityForUser(uid, false);
+
+        state = AsyncValue.data(
+          CustomUser(
+              id: user.id,
+              username: user.username,
+              publishedPlans: user.publishedPlans,
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: user.visibilitySettings.isPublicProfile,
+                showExercisePlans: false,
+                showProgressPictures:
+                    user.visibilitySettings.showProgressPictures,
+              ),
+              profilePicture: user.profilePicture,
+              progressPictures: user.progressPictures,
+              followers: user.followers,
+              followRequests: user.followRequests),
+        );
+      },
+    );
+  }
+
+  Future<void> showProgressPictures() async {
+    state.whenData(
+      (user) {
+        userRepository.setProgressPictureVisibilityForUser(uid, true);
+
+        state = AsyncValue.data(
+          CustomUser(
+              id: user.id,
+              username: user.username,
+              publishedPlans: user.publishedPlans,
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: user.visibilitySettings.isPublicProfile,
+                showExercisePlans: user.visibilitySettings.showExercisePlans,
+                showProgressPictures: true,
+              ),
+              profilePicture: user.profilePicture,
+              progressPictures: user.progressPictures,
+              followers: user.followers,
+              followRequests: user.followRequests),
+        );
+      },
+    );
+  }
+
+  Future<void> hideProgressPictures() async {
+    state.whenData(
+      (user) {
+        userRepository.setProgressPictureVisibilityForUser(uid, false);
+
+        state = AsyncValue.data(
+          CustomUser(
+              id: user.id,
+              username: user.username,
+              publishedPlans: user.publishedPlans,
+              visibilitySettings: VisibilitySettings(
+                isPublicProfile: user.visibilitySettings.isPublicProfile,
+                showExercisePlans: user.visibilitySettings.showExercisePlans,
+                showProgressPictures: false,
+              ),
               profilePicture: user.profilePicture,
               progressPictures: user.progressPictures,
               followers: user.followers,

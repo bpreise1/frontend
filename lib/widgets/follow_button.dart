@@ -19,9 +19,6 @@ class FollowButton extends ConsumerWidget {
     );
     final bool isPublic = user.visibilitySettings.isPublicProfile;
 
-    print(isPublic);
-    print(isRequested);
-
     return ElevatedButton(
       style: ButtonStyle(
         minimumSize: MaterialStateProperty.resolveWith<Size>(

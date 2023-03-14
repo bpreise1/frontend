@@ -43,6 +43,11 @@ class AuthGate extends StatelessWidget {
                         });
                       },
                     ),
+                    AuthStateChangeAction<SignedIn>(
+                      (context, state) async {
+                        ref.invalidate(currentUserProvider);
+                      },
+                    )
                   ],
                 );
               },
