@@ -82,6 +82,64 @@ class PublishedExercisePlanNotifier extends _$PublishedExercisePlanNotifier {
     );
   }
 
+  Future<void> deleteComment(Comment comment) async {
+    int commentsRemoved = 1;
+
+    for (final reply in comment.replies) {
+      await userRepository.deleteCommentForExercisePlan(planId, reply);
+      commentsRemoved++;
+    }
+    await userRepository.deleteCommentForExercisePlan(planId, comment);
+
+    final List<Comment> newComments = [];
+
+    bool isFound = false;
+    for (final oldComment in state.comments) {
+      if (!isFound) {
+        if (oldComment.id == comment.id) {
+          isFound = true;
+          continue;
+        }
+
+        List<Comment> newReplies = [];
+
+        for (final reply in oldComment.replies) {
+          if (reply.id == comment.id) {
+            isFound = true;
+          } else {
+            newReplies.add(reply);
+          }
+        }
+
+        newComments.add(
+          Comment(
+            id: oldComment.id,
+            comment: oldComment.comment,
+            creatorUserId: oldComment.creatorUserId,
+            creatorUsername: oldComment.creatorUsername,
+            dateCreated: oldComment.dateCreated,
+            likedBy: oldComment.likedBy,
+            replies: newReplies,
+          ),
+        );
+      } else {
+        newComments.add(oldComment);
+      }
+    }
+
+    state = PublishedExercisePlan(
+      id: state.id,
+      planName: state.planName,
+      dayToExercisesMap: state.dayToExercisesMap,
+      description: state.description,
+      creatorUserId: state.creatorUserId,
+      dateCreated: state.dateCreated,
+      likedBy: state.likedBy,
+      comments: newComments,
+      totalComments: state.totalComments - commentsRemoved,
+    );
+  }
+
   Future<void> replyToComment(String commentId, Comment reply) async {
     await userRepository.replyToCommentForExercisePlan(
         planId, commentId, reply);

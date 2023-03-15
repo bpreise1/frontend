@@ -205,6 +205,45 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  Future<void> deleteCommentForExercisePlan(
+      String exercisePlanId, Comment comment) async {
+    final planRef = FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(exercisePlanId);
+    final planDoc = await planRef.get();
+
+    Map<String, dynamic> plan = planDoc.data()!;
+    List comments = plan['comments'];
+    int commentsRemoved = 0;
+
+    outerloop:
+    for (final Map<String, dynamic> oldComment in comments) {
+      if (oldComment['id'] == comment.id) {
+        commentsRemoved = 1 + (oldComment['replies'] as List).length;
+        comments.remove(oldComment);
+        plan['comments'] = comments;
+        break outerloop;
+      }
+
+      List replies = oldComment['replies'];
+      for (final Map<String, dynamic> reply in oldComment['replies']) {
+        if (reply['id'] == comment.id) {
+          commentsRemoved = 1;
+          replies.remove(reply);
+          oldComment['replies'] = replies;
+          break outerloop;
+        }
+      }
+    }
+
+    await planRef.update(
+      {
+        'comments': comments,
+        'totalComments': (plan['totalComments'] as int) - commentsRemoved,
+      },
+    );
+  }
+
   @override
   Future<void> likeCommentForExercisePlan(
       String exercisePlanId, String likerId, String commentId) async {
@@ -235,8 +274,6 @@ class UserRepository implements IUserRepository {
         }
       }
     }
-
-    plan['comment'] = newComment;
 
     await planRef.update(
       {
@@ -276,8 +313,6 @@ class UserRepository implements IUserRepository {
       }
     }
 
-    plan['comment'] = newComment;
-
     await planRef.update(
       {
         'comments': comments,
@@ -300,7 +335,6 @@ class UserRepository implements IUserRepository {
     List replies = comment['replies'];
     replies.add(reply.toJson());
     comment['replies'] = replies;
-    plan['comment'] = comment;
 
     await planRef.update(
       {
@@ -427,6 +461,61 @@ class UserRepository implements IUserRepository {
         progressPictureJson['comments'] = comments;
         progressPictureJson['totalComments'] += 1;
       }
+      newProgressPictures.add(progressPictureJson);
+    }
+
+    userDocRef.update(
+      {
+        'progress_pictures': newProgressPictures,
+      },
+    );
+  }
+
+  Future<void> deleteCommentFromProgressPictureForUser(
+      String pictureId, String uid, Comment comment) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final userDoc = await userDocRef.get();
+    final user = userDoc.data()!;
+
+    List<Map<String, dynamic>> newProgressPictures = [];
+
+    bool isFound = false;
+    for (final Map<String, dynamic> progressPictureJson
+        in user['progress_pictures'] as List) {
+      if (!isFound) {
+        int commentsRemoved = 0;
+
+        if (progressPictureJson['id'] == pictureId) {
+          List<Map<String, dynamic>> newComments = [];
+
+          for (final Map<String, dynamic> oldComment
+              in progressPictureJson['comments']) {
+            if (oldComment['id'] == comment.id) {
+              commentsRemoved = 1 + (oldComment['replies'] as List).length;
+              isFound = true;
+              continue;
+            }
+
+            List<Map<String, dynamic>> newReplies = [];
+            for (final Map<String, dynamic> reply in oldComment['replies']) {
+              if (reply['id'] == comment.id) {
+                commentsRemoved = 1;
+                isFound = true;
+              } else {
+                newReplies.add(reply);
+              }
+            }
+
+            oldComment['replies'] = newReplies;
+            newComments.add(oldComment);
+          }
+
+          progressPictureJson['comments'] = newComments;
+          progressPictureJson['totalComments'] =
+              (progressPictureJson['totalComments'] as int) - commentsRemoved;
+        }
+      }
+
       newProgressPictures.add(progressPictureJson);
     }
 

@@ -80,6 +80,64 @@ class ProgressPictureNotifier extends _$ProgressPictureNotifier {
     );
   }
 
+  Future<void> deleteComment(Comment comment) async {
+    int commentsRemoved = 1;
+
+    for (final reply in comment.replies) {
+      await userRepository.deleteCommentFromProgressPictureForUser(
+          pictureId, uid, reply);
+      commentsRemoved++;
+    }
+    await userRepository.deleteCommentFromProgressPictureForUser(
+        pictureId, uid, comment);
+
+    final List<Comment> newComments = [];
+
+    bool isFound = false;
+    for (final oldComment in state.comments) {
+      if (!isFound) {
+        if (oldComment.id == comment.id) {
+          isFound = true;
+          continue;
+        }
+
+        List<Comment> newReplies = [];
+
+        for (final reply in oldComment.replies) {
+          if (reply.id == comment.id) {
+            isFound = true;
+          } else {
+            newReplies.add(reply);
+          }
+        }
+
+        newComments.add(
+          Comment(
+            id: oldComment.id,
+            comment: oldComment.comment,
+            creatorUserId: oldComment.creatorUserId,
+            creatorUsername: oldComment.creatorUsername,
+            dateCreated: oldComment.dateCreated,
+            likedBy: oldComment.likedBy,
+            replies: newReplies,
+          ),
+        );
+      } else {
+        newComments.add(oldComment);
+      }
+    }
+
+    state = ProgressPicture(
+      id: state.id,
+      image: state.image,
+      creatorUserId: state.creatorUserId,
+      dateCreated: state.dateCreated,
+      likedBy: state.likedBy,
+      comments: newComments,
+      totalComments: state.totalComments - commentsRemoved,
+    );
+  }
+
   Future<void> replyToComment(String commentId, Comment reply) async {
     await userRepository.replyToProgressPictureCommentForUser(
         pictureId, uid, commentId, reply);

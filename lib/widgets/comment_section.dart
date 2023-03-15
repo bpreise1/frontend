@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/providers/progress_picture_provider.dart';
 import 'package:frontend/providers/published_exercise_plan_provider.dart';
+import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/comment_tile.dart';
 import 'package:frontend/widgets/reply_tile.dart';
 
@@ -34,11 +35,13 @@ class CommentSection extends StatefulWidget {
 class _CommentSectionState extends State<CommentSection> {
   SortByOptions _sortBy = SortByOptions.mostLiked;
 
-  List<Widget> _getCommentTiles(
-      {required List<Comment> comments,
-      required void Function(Comment comment, Comment replyTo) onReply,
-      required Future<void> Function(Comment likedComment) onLikeComment,
-      required Future<void> Function(Comment unlikedComment) onUnlikeComment}) {
+  List<Widget> _getCommentTiles({
+    required List<Comment> comments,
+    required void Function(Comment comment, Comment replyTo) onReply,
+    required Future<void> Function(Comment likedComment) onLikeComment,
+    required Future<void> Function(Comment unlikedComment) onUnlikeComment,
+    required Future<void> Function(Comment unlikedComment) onDelete,
+  }) {
     List<Widget> tiles = [];
 
     int sortByMostRecent(Comment comment1, Comment comment2) {
@@ -51,7 +54,7 @@ class _CommentSectionState extends State<CommentSection> {
       } else if (comment1.likedBy.length > comment2.likedBy.length) {
         return -1;
       }
-      return sortByMostRecent(comment1, comment2);
+      return 0;
     }
 
     comments.sort(_sortBy == SortByOptions.mostLiked
@@ -61,6 +64,7 @@ class _CommentSectionState extends State<CommentSection> {
     for (final comment in comments) {
       tiles.add(
         CommentTile(
+          key: UniqueKey(),
           comment: comment,
           type: widget.type,
           contentCreatorId: widget.contentCreatorId,
@@ -68,14 +72,26 @@ class _CommentSectionState extends State<CommentSection> {
           onReply: onReply,
           onLikeComment: onLikeComment,
           onUnlikeComment: onUnlikeComment,
+          onDelete: comment.creatorUserId ==
+                      userRepository.getCurrentUserId() ||
+                  widget.contentCreatorId == userRepository.getCurrentUserId()
+              ? onDelete
+              : null,
         ),
       );
       for (final reply in comment.replies) {
         tiles.add(
           ReplyTile(
-              comment: reply,
-              onLikeComment: onLikeComment,
-              onUnlikeComment: onUnlikeComment),
+            key: UniqueKey(),
+            comment: reply,
+            onLikeComment: onLikeComment,
+            onUnlikeComment: onUnlikeComment,
+            onDelete: comment.creatorUserId ==
+                        userRepository.getCurrentUserId() ||
+                    widget.contentCreatorId == userRepository.getCurrentUserId()
+                ? onDelete
+                : null,
+          ),
         );
       }
     }
@@ -163,11 +179,34 @@ class _CommentSectionState extends State<CommentSection> {
                         .unlikeComment(likedComment.id);
                   };
 
+        Future<void> Function(Comment comment) onDelete =
+            widget.type == ContentType.exercisePlan
+                ? (comment) async {
+                    await ref
+                        .read(
+                          publishedExercisePlanNotifierProvider(
+                                  widget.contentCreatorId, widget.contentId)
+                              .notifier,
+                        )
+                        .deleteComment(comment);
+                  }
+                : (comment) async {
+                    await ref
+                        .read(
+                          progressPictureNotifierProvider(
+                                  widget.contentCreatorId, widget.contentId)
+                              .notifier,
+                        )
+                        .deleteComment(comment);
+                  };
+
         final List<Widget> commentTiles = _getCommentTiles(
-            comments: comments,
-            onReply: onReply,
-            onLikeComment: onLikeComment,
-            onUnlikeComment: onUnlikeComment);
+          comments: comments,
+          onReply: onReply,
+          onLikeComment: onLikeComment,
+          onUnlikeComment: onUnlikeComment,
+          onDelete: onDelete,
+        );
 
         return Column(
           children: [

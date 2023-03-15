@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/comment.dart';
+import 'package:frontend/providers/user_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/screens/profile_page.dart';
 import 'package:frontend/screens/reply_page.dart';
 import 'package:frontend/utils/time_ago.dart';
 import 'package:frontend/widgets/like_button.dart';
 import 'package:frontend/widgets/comment_section.dart';
+import 'package:frontend/widgets/slidable_comment_tile.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile(
@@ -14,6 +18,7 @@ class CommentTile extends StatelessWidget {
       required this.contentId,
       required this.onLikeComment,
       required this.onUnlikeComment,
+      this.onDelete,
       this.onReply,
       super.key});
 
@@ -24,6 +29,7 @@ class CommentTile extends StatelessWidget {
   final void Function(Comment comment, Comment replyTo)? onReply;
   final Future<void> Function(Comment likedComment) onLikeComment;
   final Future<void> Function(Comment unlikedComment) onUnlikeComment;
+  final Future<void> Function(Comment comment)? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -32,80 +38,144 @@ class CommentTile extends StatelessWidget {
         const Divider(
           height: .5,
         ),
-        ListTile(
-          contentPadding:
-              const EdgeInsets.only(left: 16, top: 4, bottom: 4, right: 8),
-          title: Row(
-            children: [
-              Text(comment.comment),
-              const Spacer(),
-              Text(
-                timeAgo(comment.dateCreated),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Theme.of(context).hintColor,
-                ),
-              ),
-            ],
-          ),
-          subtitle: Row(
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LikeButton(
-                      key: Key(comment.id),
-                      isLiked: comment.likedBy.contains(
-                        userRepository.getCurrentUserId(),
+        SlidableCommentTile(
+          key: UniqueKey(),
+          comment: comment,
+          onDelete: onDelete,
+          child: ListTile(
+            isThreeLine: true,
+            contentPadding:
+                const EdgeInsets.only(left: 16, top: 4, bottom: 4, right: 8),
+            title: Row(
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    return TextButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.resolveWith(
+                            (_) => EdgeInsets.zero),
                       ),
-                      onLikeClicked: () async {
-                        await onLikeComment(comment);
+                      onPressed: () async {
+                        final commenterProfilePicture = !ref.exists(
+                          userNotifierProvider(comment.creatorUserId),
+                        )
+                            ? await userRepository
+                                .getProfilePictureById(comment.creatorUserId)
+                            : null;
+
+                        if (context.mounted) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ProfilePage(
+                                    id: comment.creatorUserId,
+                                    username: comment.creatorUsername,
+                                    profilePicture: commenterProfilePicture);
+                              },
+                            ),
+                          );
+                        }
                       },
-                      onUnlikeClicked: () async {
-                        await onUnlikeComment(comment);
-                      },
-                    ),
-                    Text(
-                      comment.likedBy.length.toString(),
-                    )
-                  ],
+                      child: Text(
+                        comment.creatorUsername,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                const Spacer(),
+                Text(
+                  timeAgo(comment.dateCreated),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+              ],
+            ),
+            subtitle: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 8,
+                    bottom: 2,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      comment.comment,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
                   children: [
-                    IconButton(
-                      disabledColor: Theme.of(context).iconTheme.color,
-                      onPressed: onReply != null
-                          ? () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ReplyPage(
-                                        commentId: comment.id,
-                                        type: type,
-                                        contentCreatorId: contentCreatorId,
-                                        contentId: contentId,
-                                        onReply: onReply!,
-                                        onLikeComment: onLikeComment,
-                                        onUnlikeComment: onUnlikeComment);
-                                  },
-                                ),
-                              );
-                            }
-                          : null,
-                      icon: const Icon(Icons.comment),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          LikeButton(
+                            key: UniqueKey(),
+                            isLiked: comment.likedBy.contains(
+                              userRepository.getCurrentUserId(),
+                            ),
+                            onLikeClicked: () async {
+                              await onLikeComment(comment);
+                            },
+                            onUnlikeClicked: () async {
+                              await onUnlikeComment(comment);
+                            },
+                          ),
+                          Text(
+                            comment.likedBy.length.toString(),
+                          )
+                        ],
+                      ),
                     ),
-                    Text(
-                      comment.replies.length.toString(),
-                    )
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            disabledColor: Theme.of(context).iconTheme.color,
+                            onPressed: onReply != null
+                                ? () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return ReplyPage(
+                                              commentId: comment.id,
+                                              type: type,
+                                              contentCreatorId:
+                                                  contentCreatorId,
+                                              contentId: contentId,
+                                              onReply: onReply!,
+                                              onLikeComment: onLikeComment,
+                                              onUnlikeComment: onUnlikeComment);
+                                        },
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            icon: const Icon(Icons.comment),
+                          ),
+                          Text(
+                            comment.replies.length.toString(),
+                          )
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
                   ],
                 ),
-              ),
-              const Spacer(),
-            ],
+              ],
+            ),
           ),
         ),
         const Divider(
