@@ -14,6 +14,7 @@ import 'package:frontend/widgets/privacy_toggle_button.dart';
 import 'package:frontend/widgets/profile_avatar.dart';
 import 'package:frontend/widgets/published_plan_tile.dart';
 import 'package:frontend/widgets/visibility_settings_dropdown.dart';
+import 'package:frontend/widgets/yes_no_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -267,8 +268,21 @@ class _ProfilePageState extends State<ProfilePage> {
                             else
                               for (final publishedPlan in user.publishedPlans)
                                 PublishedPlanTile(
-                                    planCreatorId: publishedPlan.creatorUserId,
-                                    planId: publishedPlan.id),
+                                  planCreatorId: publishedPlan.creatorUserId,
+                                  planId: publishedPlan.id,
+                                  planName: publishedPlan.planName,
+                                  onDelete: isCurrentUserProfile
+                                      ? () {
+                                          ref
+                                              .read(
+                                                userNotifierProvider(widget.id)
+                                                    .notifier,
+                                              )
+                                              .deleteExercisePlan(
+                                                  publishedPlan.id);
+                                        }
+                                      : null,
+                                ),
                           ],
                         ),
                       ),
@@ -359,6 +373,41 @@ class _ProfilePageState extends State<ProfilePage> {
                                               MainAxisAlignment.center,
                                           children: [
                                             InkWell(
+                                              onLongPress: isCurrentUserProfile
+                                                  ? () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return YesNoDialog(
+                                                            title:
+                                                                const ListTile(
+                                                              title: Text(
+                                                                  'Would you like to delete this progress picture?'),
+                                                              subtitle: Text(
+                                                                  'This cannot be undone'),
+                                                            ),
+                                                            onNoPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            onYesPressed: () {
+                                                              ref
+                                                                  .read(
+                                                                    UserNotifierProvider(
+                                                                            widget.id)
+                                                                        .notifier,
+                                                                  )
+                                                                  .deleteProgressPicture(
+                                                                      progressPicture);
+
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          );
+                                                        },
+                                                      );
+                                                    }
+                                                  : null,
                                               onTap: () {
                                                 Navigator.of(context)
                                                     .push(MaterialPageRoute(

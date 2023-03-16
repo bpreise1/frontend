@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:frontend/models/custom_user_info.dart';
+import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/models/visibility_settings.dart';
 import 'package:frontend/providers/current_user_provider.dart';
@@ -63,9 +64,61 @@ class UserNotifier extends _$UserNotifier {
     );
   }
 
+  Future<void> deleteExercisePlan(String exercisePlanId) async {
+    state.whenData(
+      (user) {
+        userRepository.deleteExercisePlanForCurrentUser(exercisePlanId);
+
+        final List<PublishedExercisePlan> newExercisePlans = [
+          ...user.publishedPlans
+        ];
+        newExercisePlans.removeWhere((plan) => plan.id == exercisePlanId);
+
+        state = AsyncValue.data(
+          CustomUser(
+            id: user.id,
+            username: user.username,
+            publishedPlans: newExercisePlans,
+            visibilitySettings: user.visibilitySettings,
+            profilePicture: user.profilePicture,
+            progressPictures: user.progressPictures,
+            followers: user.followers,
+            followRequests: user.followRequests,
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> addProgressPicture(ProgressPicture picture) async {
+    state.whenData(
+      (user) {
+        userRepository.addProgressPictureForCurrentUser(picture);
+
+        state = AsyncValue.data(
+          CustomUser(
+            id: user.id,
+            username: user.username,
+            publishedPlans: user.publishedPlans,
+            visibilitySettings: user.visibilitySettings,
+            profilePicture: user.profilePicture,
+            progressPictures: [...user.progressPictures, picture],
+            followers: user.followers,
+            followRequests: user.followRequests,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> deleteProgressPicture(ProgressPicture picture) async {
     state.whenData((user) {
-      userRepository.addProgressPictureForCurrentUser(picture);
+      userRepository.deleteProgressPictureForCurrentUser(picture);
+
+      final List<ProgressPicture> newProgressPictures = [
+        ...user.progressPictures
+      ];
+      newProgressPictures.removeWhere((pic) => pic.id == picture.id);
 
       state = AsyncValue.data(
         CustomUser(
@@ -74,7 +127,7 @@ class UserNotifier extends _$UserNotifier {
           publishedPlans: user.publishedPlans,
           visibilitySettings: user.visibilitySettings,
           profilePicture: user.profilePicture,
-          progressPictures: [...user.progressPictures, picture],
+          progressPictures: newProgressPictures,
           followers: user.followers,
           followRequests: user.followRequests,
         ),

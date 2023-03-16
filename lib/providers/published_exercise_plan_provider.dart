@@ -10,7 +10,7 @@ part 'published_exercise_plan_provider.g.dart';
 class PublishedExercisePlanNotifier extends _$PublishedExercisePlanNotifier {
   @override
   PublishedExercisePlan build(String uid, String planId) {
-    final user = ref.watch(
+    final user = ref.read(
       userNotifierProvider(uid),
     );
 

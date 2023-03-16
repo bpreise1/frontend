@@ -10,7 +10,7 @@ part 'progress_picture_provider.g.dart';
 class ProgressPictureNotifier extends _$ProgressPictureNotifier {
   @override
   ProgressPicture build(String uid, String pictureId) {
-    final user = ref.watch(
+    final user = ref.read(
       userNotifierProvider(uid),
     );
 

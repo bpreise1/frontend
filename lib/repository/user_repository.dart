@@ -159,6 +159,26 @@ class UserRepository implements IUserRepository {
     });
   }
 
+  Future<void> deleteExercisePlanForCurrentUser(
+      String publishedExercisePlanId) async {
+    final publishedPlanRef = FirebaseFirestore.instance
+        .collection('exercise_plans')
+        .doc(publishedExercisePlanId);
+
+    await publishedPlanRef.delete();
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(getCurrentUserId())
+        .update({
+      'exercise_plans': FieldValue.arrayRemove(
+        [
+          publishedPlanRef,
+        ],
+      )
+    });
+  }
+
   @override
   Future<void> likePublishedExercisePlan(
       String exercisePlanId, String likerId) async {
@@ -388,6 +408,28 @@ class UserRepository implements IUserRepository {
         .update(
       {
         'progress_pictures': FieldValue.arrayUnion(
+          [
+            progressPicture.toJson(),
+          ],
+        ),
+      },
+    );
+  }
+
+  Future<void> deleteProgressPictureForCurrentUser(
+      ProgressPicture progressPicture) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final progressPicturesRef = storageRef.child(
+        'progress_pictures/${getCurrentUserId()}/${progressPicture.id}.jpg');
+
+    await progressPicturesRef.delete();
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(getCurrentUserId())
+        .update(
+      {
+        'progress_pictures': FieldValue.arrayRemove(
           [
             progressPicture.toJson(),
           ],

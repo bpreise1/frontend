@@ -86,7 +86,7 @@ class _CommentSectionState extends State<CommentSection> {
             comment: reply,
             onLikeComment: onLikeComment,
             onUnlikeComment: onUnlikeComment,
-            onDelete: comment.creatorUserId ==
+            onDelete: reply.creatorUserId ==
                         userRepository.getCurrentUserId() ||
                     widget.contentCreatorId == userRepository.getCurrentUserId()
                 ? onDelete
@@ -201,7 +201,7 @@ class _CommentSectionState extends State<CommentSection> {
                   };
 
         final List<Widget> commentTiles = _getCommentTiles(
-          comments: comments,
+          comments: [...comments],
           onReply: onReply,
           onLikeComment: onLikeComment,
           onUnlikeComment: onUnlikeComment,
