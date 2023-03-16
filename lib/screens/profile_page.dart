@@ -266,7 +266,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               )
                             else
-                              for (final publishedPlan in user.publishedPlans)
+                              for (final publishedPlan
+                                  in user.publishedPlans.reversed)
                                 PublishedPlanTile(
                                   planCreatorId: publishedPlan.creatorUserId,
                                   planId: publishedPlan.id,
