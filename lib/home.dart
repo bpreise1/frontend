@@ -44,8 +44,6 @@ class Home extends ConsumerWidget {
               final currentUser = ref.watch(currentUserProvider);
               return currentUser.when(
                 data: (data) {
-                  print(data.username);
-
                   return InkWell(
                     onTap: () async {
                       await Navigator.of(context).push(

@@ -104,8 +104,13 @@ class UserRepository implements IUserRepository {
             await followerProfilePictureRef.getData(),
           ),
         );
-      } on PlatformException catch (exception) {
-        print(exception);
+      } on PlatformException catch (_) {
+        followRequests.add(
+          CustomUserInfo.fromJson(
+            followRequestJson,
+            null,
+          ),
+        );
       }
     }
 
