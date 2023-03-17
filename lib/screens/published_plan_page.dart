@@ -5,6 +5,7 @@ import 'package:frontend/providers/published_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/add_comment_section.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
+import 'package:frontend/widgets/download_plan_button.dart';
 import 'package:frontend/widgets/exercise_list_item.dart';
 import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 import 'package:frontend/widgets/like_button.dart';
@@ -165,9 +166,8 @@ class PublishedPlanPage extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.send),
+                                  DownloadPlanButton(
+                                    plan: plan,
                                   ),
                                 ],
                               ),
