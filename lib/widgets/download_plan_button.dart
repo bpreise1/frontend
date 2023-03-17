@@ -29,6 +29,7 @@ class DownloadPlanButton extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+                duration: const Duration(seconds: 1),
                 content: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
