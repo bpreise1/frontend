@@ -2,10 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/custom_user.dart';
+import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/progress_picture.dart';
 import 'package:frontend/providers/progress_picture_provider.dart';
+import 'package:frontend/providers/published_exercise_plan_provider.dart';
 import 'package:frontend/providers/user_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/screens/all_published_plans_page.dart';
 import 'package:frontend/screens/follow_requests_page.dart';
 import 'package:frontend/screens/progress_picture_page.dart';
 import 'package:frontend/widgets/add_image_button.dart';
@@ -266,24 +269,73 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               )
                             else
-                              for (final publishedPlan
-                                  in user.publishedPlans.reversed)
-                                PublishedPlanTile(
-                                  planCreatorId: publishedPlan.creatorUserId,
-                                  planId: publishedPlan.id,
-                                  planName: publishedPlan.planName,
-                                  onDelete: isCurrentUserProfile
-                                      ? () {
-                                          ref
-                                              .read(
-                                                userNotifierProvider(widget.id)
-                                                    .notifier,
-                                              )
-                                              .deleteExercisePlan(
-                                                  publishedPlan.id);
-                                        }
-                                      : null,
-                                ),
+                              Builder(
+                                builder: (context) {
+                                  final List<PublishedExercisePlan>
+                                      publishedPlans = [];
+                                  for (final plan in user.publishedPlans) {
+                                    publishedPlans.add(
+                                      ref.watch(
+                                        publishedExercisePlanNotifierProvider(
+                                            widget.id, plan.id),
+                                      ),
+                                    );
+                                  }
+
+                                  publishedPlans.sort(
+                                    (plan1, plan2) {
+                                      if (plan1.likedBy.length <
+                                          plan2.likedBy.length) {
+                                        return 1;
+                                      } else if (plan1.likedBy.length >
+                                          plan2.likedBy.length) {
+                                        return -1;
+                                      }
+                                      return 0;
+                                    },
+                                  );
+
+                                  return Column(
+                                    children: [
+                                      for (int i = 0;
+                                          i < publishedPlans.length && i < 3;
+                                          i++)
+                                        PublishedPlanTile(
+                                          planCreatorId:
+                                              publishedPlans[i].creatorUserId,
+                                          planId: publishedPlans[i].id,
+                                          planName: publishedPlans[i].planName,
+                                          onDelete: isCurrentUserProfile
+                                              ? () {
+                                                  ref
+                                                      .read(
+                                                        userNotifierProvider(
+                                                                widget.id)
+                                                            .notifier,
+                                                      )
+                                                      .deleteExercisePlan(
+                                                          publishedPlans[i].id);
+                                                }
+                                              : null,
+                                        ),
+                                      if (user.publishedPlans.length > 3)
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) {
+                                                  return AllPublishedPlansPage(
+                                                      uid: widget.id);
+                                                },
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('Show all'),
+                                        )
+                                    ],
+                                  );
+                                },
+                              ),
                           ],
                         ),
                       ),

@@ -8,8 +8,6 @@ import 'package:frontend/repository/user_repository.dart';
 class CurrentUserInfoNotifier extends AsyncNotifier<CustomUserInfo> {
   @override
   FutureOr<CustomUserInfo> build() async {
-    print('building for user ${userRepository.getCurrentUserId()}');
-
     return await userRepository
         .getUserInfoById(userRepository.getCurrentUserId());
   }

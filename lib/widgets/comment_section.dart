@@ -6,15 +6,11 @@ import 'package:frontend/providers/published_exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/comment_tile.dart';
 import 'package:frontend/widgets/reply_tile.dart';
+import 'package:frontend/widgets/sort_dropdown.dart';
 
 enum ContentType {
   exercisePlan,
   progressPicture,
-}
-
-enum SortByOptions {
-  mostLiked,
-  mostRecent,
 }
 
 class CommentSection extends StatefulWidget {
@@ -221,25 +217,18 @@ class _CommentSectionState extends State<CommentSection> {
                       style: TextStyle(fontSize: 16),
                     ),
                     const Spacer(),
-                    const Text('Sort by:'),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                    ),
-                    DropdownButton(
+                    SortDropdown(
                       value: _sortBy,
-                      items: const [
-                        DropdownMenuItem(
-                          value: SortByOptions.mostLiked,
-                          child: Text('Most liked'),
-                        ),
-                        DropdownMenuItem(
-                          value: SortByOptions.mostRecent,
-                          child: Text('Most recent'),
-                        )
-                      ],
-                      onChanged: (value) {
+                      onMostLikedSelected: () {
+                        setState(
+                          () {
+                            _sortBy = SortByOptions.mostLiked;
+                          },
+                        );
+                      },
+                      onMostRecentSelected: () {
                         setState(() {
-                          _sortBy = value!;
+                          _sortBy = SortByOptions.mostRecent;
                         });
                       },
                     ),

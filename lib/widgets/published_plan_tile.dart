@@ -24,7 +24,7 @@ class PublishedPlanTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resizeDuration = Duration(milliseconds: 150);
+    const resizeDuration = Duration(milliseconds: 150);
 
     return Consumer(
       builder: (context, ref, child) {
