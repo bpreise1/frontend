@@ -24,18 +24,37 @@ class ExercisePlanState {
 
 class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
   ExercisePlanNotifier()
-      : super(const ExercisePlanState(exercisePlan: InProgressExercisePlan()));
+      : super(
+          const ExercisePlanState(
+            exercisePlan: ExercisePlan(
+              planName: "My Plan",
+              dayToExercisesMap: {
+                'Day 1': [],
+              },
+            ),
+          ),
+        );
 
   void changePlanName(String name) {
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
-            planName: name, dayToExercisesMap: state.dayToExercisesMap),
-        currentDay: state.currentDay,
-        description: state.description);
+      exercisePlan: ExercisePlan(
+        planName: name,
+        dayToExercisesMap: state.dayToExercisesMap,
+      ),
+      currentDay: state.currentDay,
+      description: state.description,
+    );
   }
 
   void resetPlan() {
-    state = const ExercisePlanState(exercisePlan: InProgressExercisePlan());
+    state = const ExercisePlanState(
+      exercisePlan: ExercisePlan(
+        planName: "My Plan",
+        dayToExercisesMap: {
+          'Day 1': [],
+        },
+      ),
+    );
   }
 
   void addExercise(Exercise exercise) {
@@ -51,7 +70,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-      exercisePlan: InProgressExercisePlan(
+      exercisePlan: ExercisePlan(
           planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
       currentDay: state.currentDay,
       description: state.description,
@@ -71,7 +90,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: state.currentDay,
         description: state.description);
@@ -93,7 +112,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: state.currentDay,
         description: state.description);
@@ -112,7 +131,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     newDayToExercisesMap[day] = [];
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: day,
         description: state.description);
@@ -138,7 +157,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: name,
         description: state.description);
@@ -167,7 +186,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     }
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: newDay,
         description: state.description);
@@ -201,7 +220,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         weights: newWeights);
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: state.currentDay,
         description: state.description);
@@ -225,7 +244,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         weights: exerciseToReplace.weights);
 
     state = ExercisePlanState(
-      exercisePlan: InProgressExercisePlan(
+      exercisePlan: ExercisePlan(
           planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
       currentDay: state.currentDay,
       description: state.description,
@@ -250,7 +269,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         weights: exerciseToReplace.weights);
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: state.currentDay,
         description: state.description);
@@ -274,13 +293,13 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
         weights: newWeights);
 
     state = ExercisePlanState(
-        exercisePlan: InProgressExercisePlan(
+        exercisePlan: ExercisePlan(
             planName: state.planName, dayToExercisesMap: newDayToExercisesMap),
         currentDay: state.currentDay,
         description: state.description);
   }
 
-  void editPlan(CompletedExercisePlan exercisePlan) {
+  void editPlan(SavedExercisePlan exercisePlan) {
     final Map<String, List<Exercise>> newDayToExercisesMap = {};
     exercisePlan.dayToExercisesMap.forEach((day, exercises) {
       final newExerciseList = exercises.map((exercise) {
@@ -301,7 +320,7 @@ class ExercisePlanNotifier extends StateNotifier<ExercisePlanState> {
     });
 
     state = ExercisePlanState(
-      exercisePlan: InProgressExercisePlan(
+      exercisePlan: ExercisePlan(
           planName: '${exercisePlan.planName} (Copy)',
           dayToExercisesMap: newDayToExercisesMap),
       currentDay: exercisePlan.dayToExercisesMap.keys.first,

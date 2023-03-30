@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/screens/new_saved_plan_page.dart';
 import 'package:frontend/screens/saved_plan_page.dart';
 
 class PlanListItem extends ConsumerWidget {
@@ -11,7 +12,7 @@ class PlanListItem extends ConsumerWidget {
       this.onTapEnabled = true,
       super.key});
 
-  final CompletedExercisePlan exercisePlan;
+  final SavedExercisePlan exercisePlan;
   final List<Widget> children;
   final bool onTapEnabled;
 
@@ -21,18 +22,16 @@ class PlanListItem extends ConsumerWidget {
         child: InkWell(
       onTap: onTapEnabled
           ? () {
-              ref
-                  .read(savedExercisePlanProvider.notifier)
-                  .setPlan(exercisePlan);
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: ((context) =>
-                      SavedPlanPage(exercisePlan: exercisePlan))));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: ((context) => NewSavedPlanPage(
+                        exercisePlanId: exercisePlan.id,
+                      )),
+                ),
+              );
             }
           : null,
       child: Card(
-        color: exercisePlan.isInProgress
-            ? Theme.of(context).colorScheme.secondary
-            : Theme.of(context).cardColor,
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Row(

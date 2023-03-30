@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/completed_exercise_plan_provider.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/saved_exercise_list_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 
 import 'package:frontend/providers/published_exercise_plan_provider.dart';
-import 'package:frontend/repository/completed_exercise_plan_repository.dart';
+import 'package:frontend/repository/saved_exercise_plan_repository.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/screens/published_plan_page.dart';
 import 'package:frontend/widgets/download_plan_button.dart';

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
+import 'package:frontend/models/week.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
-import 'package:frontend/providers/completed_exercise_plan_provider.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/saved_exercise_list_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/repository/user_repository.dart';
 import 'package:frontend/widgets/edit_text.dart';
 import 'package:uuid/uuid.dart';
@@ -91,9 +92,8 @@ class SubmitPlanDialog extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(vertical: 8),
               ),
               Consumer(builder: ((context, ref, child) {
-                InProgressExercisePlan inProgressExerciseplan = ref
-                    .watch(createExercisePlanProvider)
-                    .exercisePlan as InProgressExercisePlan;
+                ExercisePlan inProgressExerciseplan =
+                    ref.watch(createExercisePlanProvider).exercisePlan;
 
                 return OutlinedButton(
                     onPressed: saveIsChecked || publishIsChecked
@@ -102,16 +102,20 @@ class SubmitPlanDialog extends ConsumerWidget {
                                 'Either save or publish must be selected');
 
                             if (saveIsChecked) {
-                              final CompletedExercisePlan
-                                  completedExercisePlan = CompletedExercisePlan(
-                                      id: const Uuid().v4(),
-                                      planName: inProgressExerciseplan.planName,
-                                      dayToExercisesMap: inProgressExerciseplan
-                                          .dayToExercisesMap,
-                                      lastUsed: DateTime.now());
+                              final SavedExercisePlan completedExercisePlan =
+                                  SavedExercisePlan(
+                                id: const Uuid().v4(),
+                                planName: inProgressExerciseplan.planName,
+                                dayToExercisesMap:
+                                    inProgressExerciseplan.dayToExercisesMap,
+                                lastUsed: DateTime.now(),
+                                weeks: const [
+                                  Week(workouts: []),
+                                ],
+                              );
 
                               await ref
-                                  .read(completedExercisePlansProvider.notifier)
+                                  .read(savedExerciseListProvider.notifier)
                                   .saveCompletedExercisePlanToDevice(
                                       completedExercisePlan);
                             }

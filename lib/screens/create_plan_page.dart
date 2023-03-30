@@ -5,7 +5,7 @@ import 'package:frontend/models/exercise.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/models/user_exception.dart';
 import 'package:frontend/providers/create_plan_stepper_provider.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/providers/sets_and_reps_editor_provider.dart';
 import 'package:frontend/widgets/day_select_dropdown.dart';
 import 'package:frontend/widgets/draggable_exercise_list.dart';
@@ -22,9 +22,7 @@ class CreatePlanPage extends ConsumerWidget {
     int selectedStepperIndex = ref.watch(createPlanStepperProvider);
 
     List<Exercise>? exercises = ref.watch(createExercisePlanProvider).exercises;
-    InProgressExercisePlan plan = ref
-        .watch(createExercisePlanProvider)
-        .exercisePlan as InProgressExercisePlan;
+    ExercisePlan plan = ref.watch(createExercisePlanProvider).exercisePlan;
 
     bool isEditingSetsAndReps = ref.watch(setsAndRepsEditorProvider);
     return Scaffold(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/user_exception.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/widgets/yes_no_dialog.dart';
 
 class DaySelectDropdown extends StatefulWidget {

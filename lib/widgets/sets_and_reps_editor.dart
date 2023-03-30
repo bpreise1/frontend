@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/providers/sets_and_reps_editor_provider.dart';
 import 'package:frontend/utils/reps_input_formatter.dart';
 
@@ -30,6 +30,7 @@ class SetsAndRepsEditing extends ConsumerWidget {
   const SetsAndRepsEditing({required this.exerciseIndex, super.key});
 
   final int exerciseIndex;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String currentDay = ref.watch(createExercisePlanProvider).currentDay;
@@ -44,10 +45,11 @@ class SetsAndRepsEditing extends ConsumerWidget {
             children: [
               const Spacer(),
               IconButton(
-                  onPressed: (() {
-                    Navigator.pop(context);
-                  }),
-                  icon: const Icon(Icons.done)),
+                onPressed: (() {
+                  Navigator.pop(context);
+                }),
+                icon: const Icon(Icons.done),
+              ),
             ],
           ),
         ),

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
 import 'package:frontend/providers/bottom_navigation_bar_provider.dart';
-import 'package:frontend/providers/completed_exercise_plan_provider.dart';
+import 'package:frontend/providers/saved_exercise_list_provider.dart';
 import 'package:frontend/providers/create_plan_stepper_provider.dart';
-import 'package:frontend/providers/in_progress_exercise_plan_provider.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
 import 'package:frontend/screens/plan_metrics_page.dart';
 import 'package:frontend/widgets/plan_list_item.dart';
 import 'package:frontend/widgets/yes_no_dialog.dart';
@@ -14,11 +14,11 @@ class PlanList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final completedExercisePlans = ref.watch(completedExercisePlansProvider);
+    final completedExercisePlans = ref.watch(savedExerciseListProvider);
 
     return completedExercisePlans.when(data: (data) {
-      final List<CompletedExercisePlan> allPlans = data.exercisePlans;
-      List<CompletedExercisePlan> plans = data.exercisePlans;
+      final List<SavedExercisePlan> allPlans = data;
+      List<SavedExercisePlan> plans = data;
 
       return plans.isEmpty
           ? Center(
@@ -150,10 +150,10 @@ class PlanList extends ConsumerWidget {
                                       },
                                       onYesPressed: () {
                                         ref
-                                            .read(completedExercisePlansProvider
+                                            .read(savedExerciseListProvider
                                                 .notifier)
                                             .removeCompletedExercisePlanFromDevice(
-                                                plan);
+                                                plan.id);
                                         Navigator.pop(context);
                                       },
                                     );

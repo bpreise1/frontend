@@ -1,32 +1,27 @@
 import 'package:frontend/models/comment.dart';
 import 'package:frontend/models/exercise.dart';
+import 'package:frontend/models/week.dart';
 
-abstract class ExercisePlan {
+class ExercisePlan {
   const ExercisePlan({required this.planName, required this.dayToExercisesMap});
 
   final String planName;
   final Map<String, List<Exercise>> dayToExercisesMap;
 }
 
-class InProgressExercisePlan extends ExercisePlan {
-  const InProgressExercisePlan(
-      {super.planName = 'My Plan',
-      super.dayToExercisesMap = const {'Day 1': []}});
-}
-
-class CompletedExercisePlan extends ExercisePlan {
-  CompletedExercisePlan(
+class SavedExercisePlan extends ExercisePlan {
+  SavedExercisePlan(
       {required this.id,
       required super.planName,
       required super.dayToExercisesMap,
-      this.isInProgress = false,
+      required this.weeks,
       required this.lastUsed});
 
   final String id;
-  final bool isInProgress;
   final DateTime lastUsed;
+  List<Week> weeks;
 
-  factory CompletedExercisePlan.fromJson(Map<String, dynamic> json) {
+  factory SavedExercisePlan.fromJson(Map<String, dynamic> json) {
     jsonToExerciseList(List exerciseList) =>
         exerciseList.map((exercise) => Exercise.fromJson(exercise)).toList();
 
@@ -34,15 +29,20 @@ class CompletedExercisePlan extends ExercisePlan {
     Map<String, List<Exercise>> parsedDayToExercisesMap = plan.map(
         (day, exerciseList) => MapEntry(day, jsonToExerciseList(exerciseList)));
 
-    CompletedExercisePlan completedExercisePlan = CompletedExercisePlan(
-      id: json['id'],
-      planName: json['planName'],
-      dayToExercisesMap: parsedDayToExercisesMap,
-      isInProgress: json['isInProgress'],
-      lastUsed: DateTime.parse(
-        json['lastUsed'],
-      ),
-    );
+    List weeks = json['weeks'];
+
+    SavedExercisePlan completedExercisePlan = SavedExercisePlan(
+        id: json['id'],
+        planName: json['planName'],
+        dayToExercisesMap: parsedDayToExercisesMap,
+        lastUsed: DateTime.parse(
+          json['lastUsed'],
+        ),
+        weeks: weeks
+            .map(
+              (week) => Week.fromJson(week),
+            )
+            .toList());
     return completedExercisePlan;
   }
 
@@ -53,10 +53,17 @@ class CompletedExercisePlan extends ExercisePlan {
       'id': id,
       'planName': planName,
       'lastUsed': lastUsed.toString(),
-      'isInProgress': isInProgress,
       'plan': dayToExercisesMap.map<String, List<Map<String, dynamic>>>(
-          (day, exerciseList) =>
-              MapEntry(day, exerciseListToJson(exerciseList))),
+        (day, exerciseList) => MapEntry(
+          day,
+          exerciseListToJson(exerciseList),
+        ),
+      ),
+      'weeks': weeks
+          .map(
+            (week) => week.toJson(),
+          )
+          .toList(),
     };
   }
 }

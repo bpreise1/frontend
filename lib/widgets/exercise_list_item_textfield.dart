@@ -8,6 +8,7 @@ class ExerciseListItemTextfield extends StatefulWidget {
       this.helperText,
       this.hintText,
       this.disabled = false,
+      this.submitOnUnfocus = false,
       this.inputFormatters,
       super.key});
 
@@ -16,6 +17,7 @@ class ExerciseListItemTextfield extends StatefulWidget {
   final void Function(String text) onSubmitted;
   final String? hintText;
   final bool disabled;
+  final bool submitOnUnfocus;
   final List<TextInputFormatter>? inputFormatters;
 
   @override
@@ -35,9 +37,13 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
 
   void _handleFocusChange() {
     if (!_focusNode.hasFocus) {
-      setState(() {
-        _textController.text = widget.text;
-      });
+      if (widget.submitOnUnfocus) {
+        widget.onSubmitted(_textController.text);
+      } else {
+        setState(() {
+          _textController.text = widget.text;
+        });
+      }
     }
   }
 
@@ -55,10 +61,13 @@ class _ExerciseListItemTextfieldState extends State<ExerciseListItemTextfield> {
         child: Container(
             alignment: Alignment.center,
             child: TextField(
+              key: UniqueKey(),
               controller: _textController..text = widget.text,
               focusNode: _focusNode,
               readOnly: widget.disabled,
-              onSubmitted: widget.onSubmitted,
+              onSubmitted: (text) {
+                widget.onSubmitted(_textController.text);
+              },
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 helperText: widget.helperText,

@@ -11,12 +11,14 @@ import 'package:frontend/repository/user_preferences_repository.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseUIAuth.configureProviders([
-    EmailAuthProvider(),
-    GoogleProvider(
-        clientId:
-            '1067187549080-sp094097p0l7rsslbsabaj6ld0uqv1be.apps.googleusercontent.com'),
-  ]);
+  FirebaseUIAuth.configureProviders(
+    [
+      EmailAuthProvider(),
+      GoogleProvider(
+          clientId:
+              '1067187549080-sp094097p0l7rsslbsabaj6ld0uqv1be.apps.googleusercontent.com'),
+    ],
+  );
 
   try {
     await userPreferencesRepository.getUserPreferences();
