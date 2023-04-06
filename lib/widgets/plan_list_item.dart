@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/exercise_plans.dart';
-import 'package:frontend/providers/exercise_plan_provider.dart';
-import 'package:frontend/screens/new_saved_plan_page.dart';
 import 'package:frontend/screens/saved_plan_page.dart';
 
 class PlanListItem extends ConsumerWidget {
@@ -24,7 +22,7 @@ class PlanListItem extends ConsumerWidget {
           ? () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: ((context) => NewSavedPlanPage(
+                  builder: ((context) => SavedPlanPage(
                         exercisePlanId: exercisePlan.id,
                       )),
                 ),
@@ -33,7 +31,7 @@ class PlanListItem extends ConsumerWidget {
           : null,
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(8),
           child: Row(
             children: [
               Text(

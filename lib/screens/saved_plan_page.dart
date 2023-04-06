@@ -1,238 +1,140 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:frontend/models/exercise.dart';
-// import 'package:frontend/models/exercise_plans.dart';
-// import 'package:frontend/models/user_exception.dart';
-// import 'package:frontend/models/user_preferences.dart';
-// import 'package:frontend/models/workout.dart';
-// import 'package:frontend/providers/exercise_plan_provider.dart';
-// import 'package:frontend/providers/user_preferences_provider.dart';
-// import 'package:frontend/repository/workout_repository.dart';
-// import 'package:frontend/utils/convert_weight.dart';
-// import 'package:frontend/widgets/day_select_dropdown.dart';
-// import 'package:frontend/widgets/exercise_list_item.dart';
-// import 'package:frontend/widgets/exercise_list_item_textfield.dart';
 
-// class SavedPlanPage extends StatefulWidget {
-//   const SavedPlanPage({required this.exercisePlan, super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/models/user_exception.dart';
+import 'package:frontend/providers/exercise_plan_provider.dart';
+import 'package:frontend/providers/saved_exercise_plan_provider.dart';
+import 'package:frontend/screens/view_plan_page.dart';
+import 'package:frontend/screens/week_page.dart';
+import 'package:frontend/utils/validate_saved_plan.dart';
+import 'package:frontend/widgets/yes_no_dialog.dart';
 
-//   final SavedExercisePlan exercisePlan;
+class SavedPlanPage extends ConsumerWidget {
+  const SavedPlanPage({required this.exercisePlanId, super.key});
 
-//   @override
-//   State<SavedPlanPage> createState() => _SavedPlanPageState();
-// }
+  final String exercisePlanId;
 
-// class _SavedPlanPageState extends State<SavedPlanPage> {
-//   bool _isInProgress = false;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final plan = ref.watch(
+      savedExercisePlanNotifierProvider(exercisePlanId),
+    );
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _isInProgress = widget.exercisePlan.isInProgress;
-//   }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(plan.planName),
+      ),
+      body: ListView.builder(
+        itemCount: plan.weeks.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return WeekPage(
+                        exercisePlanId: exercisePlanId, weekNumber: index + 1);
+                  },
+                ),
+              );
+            },
+            child: Card(
+              color: index == plan.weeks.length - 1
+                  ? Theme.of(context).colorScheme.secondary
+                  : Theme.of(context).cardColor,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text('Week ${index + 1}'),
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'viewEntirePlan',
+            onPressed: () {
+              ref.read(savedExercisePlanProvider.notifier).setPlan(plan);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer(builder: ((context, ref, child) {
-//       final currentDay = ref.watch(savedExercisePlanProvider).currentDay;
-//       final inProgressPlan = ref.watch(savedExercisePlanProvider).exercisePlan;
-//       final planName = ref.watch(savedExercisePlanProvider).planName;
-//       final planExercises = ref.watch(savedExercisePlanProvider).exercises!;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const ViewPlanPage();
+                  },
+                ),
+              );
+            },
+            child: const Icon(Icons.visibility),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+          ),
+          FloatingActionButton(
+            heroTag: 'addWeek',
+            onPressed: () async {
+              bool? canAddWeek;
 
-//       return Scaffold(
-//         appBar: AppBar(
-//             title: Text(
-//               planName,
-//             ),
-//             backgroundColor: _isInProgress
-//                 ? Theme.of(context).colorScheme.secondary
-//                 : Theme.of(context).appBarTheme.backgroundColor),
-//         body: Column(children: [
-//           DaySelectDropdown(
-//               provider: savedExercisePlanProvider, disabled: _isInProgress),
-//           Expanded(
-//               child: ListView(children: [
-//             for (int index = 0; index < planExercises.length; index++)
-//               ExpansionTile(
-//                   key: PageStorageKey<String>('${currentDay}_$index'),
-//                   initiallyExpanded: true,
-//                   title: ExerciseListItem(
-//                     exercise: planExercises[index],
-//                   ),
-//                   children: [
-//                     for (int set = 0;
-//                         set < int.parse(planExercises[index].sets);
-//                         set++)
-//                       ListTile(
-//                           key: PageStorageKey<String>(
-//                               '${currentDay}_{$index}_$set'),
-//                           title: Row(children: [
-//                             Text('Set ${set + 1}'),
-//                             Expanded(
-//                               child: ExerciseListItemTextfield(
-//                                 text: planExercises[index].reps[set],
-//                                 helperText: 'Reps',
-//                                 hintText:
-//                                     'Goal: ${planExercises[index].goalReps[set]}',
-//                                 disabled: !_isInProgress,
-//                                 inputFormatters: [
-//                                   FilteringTextInputFormatter.allow(
-//                                     RegExp(r'\d'),
-//                                   )
-//                                 ],
-//                                 onSubmitted: (text) async {
-//                                   ref
-//                                       .read(savedExercisePlanProvider.notifier)
-//                                       .updateRepsForSet(
-//                                           currentDay, index, set, text);
-//                                   await ref
-//                                       .read(completedExercisePlansProvider
-//                                           .notifier)
-//                                       .updateCompletedExercisePlanProgressById(
-//                                           widget.exercisePlan.id,
-//                                           inProgressPlan);
-//                                 },
-//                               ),
-//                             ),
-//                             Consumer(builder: ((context, ref, child) {
-//                               final userPreferences =
-//                                   ref.watch(userPreferencesProvider);
+              if (plan.weeks.isEmpty) {
+                canAddWeek = true;
+              } else if (plan.weeks.last.workouts.isEmpty) {
+                UserException(
+                        message: 'Week ${plan.weeks.length} must not be empty.')
+                    .displayException(context);
+              } else if (plan.weeks.last.workouts.last.dateCompleted != null) {
+                canAddWeek = true;
+              } else {
+                final lastWorkout = plan.weeks.last.workouts.last;
 
-//                               return userPreferences.when(data: (data) {
-//                                 return Expanded(
-//                                   child: ExerciseListItemTextfield(
-//                                     text: data.weightMode == WeightMode.pounds
-//                                         ? planExercises[index].weights[set]
-//                                         : planExercises[index].weights[set] ==
-//                                                 ''
-//                                             ? ''
-//                                             : convertWeightToKilograms(
-//                                                     double.parse(
-//                                                         planExercises[index]
-//                                                             .weights[set]))
-//                                                 .toStringAsFixed(2),
-//                                     helperText:
-//                                         'Weight ${data.weightMode == WeightMode.pounds ? '(Pounds)' : '(Kilograms)'}',
-//                                     disabled: !_isInProgress,
-//                                     inputFormatters: [
-//                                       FilteringTextInputFormatter.allow(
-//                                         RegExp(r'\d'),
-//                                       )
-//                                     ],
-//                                     onSubmitted: (text) async {
-//                                       String submittedWeight =
-//                                           data.weightMode == WeightMode.pounds
-//                                               ? text
-//                                               : text == ''
-//                                                   ? ''
-//                                                   : convertWeightToPounds(
-//                                                           double.parse(text))
-//                                                       .toStringAsFixed(2);
+                canAddWeek = await showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return YesNoDialog(
+                      title: ListTile(
+                        title: Text(
+                            'You must complete "${lastWorkout.day}" for Week ${plan.weeks.length} before beginning a new week.'),
+                        subtitle: Text(
+                            'Would you like to complete "${lastWorkout.day}"?'),
+                      ),
+                      onNoPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      onYesPressed: () async {
+                        UserException? exception = validateWorkout(lastWorkout);
 
-//                                       ref
-//                                           .read(savedExercisePlanProvider
-//                                               .notifier)
-//                                           .updateWeightForSet(currentDay, index,
-//                                               set, submittedWeight);
-//                                       await ref
-//                                           .read(completedExercisePlansProvider
-//                                               .notifier)
-//                                           .updateCompletedExercisePlanProgressById(
-//                                               widget.exercisePlan.id,
-//                                               inProgressPlan);
-//                                     },
-//                                   ),
-//                                 );
-//                               }, error: (error, stackTrace) {
-//                                 return Center(child: Text(error.toString()));
-//                               }, loading: () {
-//                                 return Expanded(
-//                                   child: ExerciseListItemTextfield(
-//                                     text: planExercises[index].weights[set],
-//                                     helperText: 'Weight',
-//                                     disabled: !_isInProgress,
-//                                     onSubmitted: (text) async {
-//                                       ref
-//                                           .read(savedExercisePlanProvider
-//                                               .notifier)
-//                                           .updateWeightForSet(
-//                                               currentDay, index, set, text);
-//                                       await ref
-//                                           .read(completedExercisePlansProvider
-//                                               .notifier)
-//                                           .updateCompletedExercisePlanProgressById(
-//                                               widget.exercisePlan.id,
-//                                               inProgressPlan);
-//                                     },
-//                                   ),
-//                                 );
-//                               });
-//                             }))
-//                           ]))
-//                   ])
-//           ]))
-//         ]),
-//         floatingActionButton: FloatingActionButton(
-//             child: _isInProgress
-//                 ? const Icon(Icons.done)
-//                 : const Icon(Icons.play_arrow_rounded),
-//             onPressed: () async {
-//               if (_isInProgress) {
-//                 UserException? exception;
+                        if (exception != null) {
+                          exception.displayException(context);
+                          Navigator.pop(context, false);
+                        } else {
+                          await ref
+                              .read(SavedExercisePlanNotifierProvider(
+                                      exercisePlanId)
+                                  .notifier)
+                              .completeWorkout(
+                                  lastWorkout.id, plan.weeks.length - 1);
 
-//                 outerloop:
-//                 for (var entry
-//                     in widget.exercisePlan.dayToExercisesMap.entries) {
-//                   if (entry.value.isEmpty) {
-//                     exception = UserException(
-//                         message: 'Day "${entry.key}" must not be empty');
-//                     break outerloop;
-//                   }
+                          if (context.mounted) {
+                            Navigator.pop(context, true);
+                          }
+                        }
+                      },
+                    );
+                  },
+                );
+              }
 
-//                   for (Exercise exercise in entry.value) {
-//                     for (int i = 0; i < int.parse(exercise.sets); i++) {
-//                       if (exercise.reps[i] == '' && exercise.weights[i] != '') {
-//                         exception = UserException(
-//                             message:
-//                                 'Set ${i + 1} of "${exercise.name} has empty reps but non-empty weight');
-//                         break outerloop;
-//                       } else if (exercise.reps[i] != '' &&
-//                           exercise.weights[i] == '') {
-//                         exception = UserException(
-//                             message:
-//                                 'Set ${i + 1} of "${exercise.name} has empty weight but non-empty reps');
-//                         break outerloop;
-//                       }
-//                     }
-//                   }
-//                 }
-
-//                 if (exception != null) {
-//                   exception.displayException(context);
-//                 } else {
-//                   setState(() {
-//                     _isInProgress = false;
-//                   });
-
-//                   await ref
-//                       .read(completedExercisePlansProvider.notifier)
-//                       .endCompletedExercisePlanById(widget.exercisePlan.id);
-//                   await workoutRepository.saveWorkoutForExercisePlanById(
-//                       Workout(day: currentDay, exercises: planExercises),
-//                       widget.exercisePlan.id);
-//                 }
-//               } else {
-//                 setState(() {
-//                   _isInProgress = true;
-//                 });
-
-//                 await ref
-//                     .read(completedExercisePlansProvider.notifier)
-//                     .beginCompletedExercisePlanById(widget.exercisePlan.id);
-//               }
-//             }),
-//       );
-//     }));
-//   }
-// }
+              if (canAddWeek == true) {
+                ref
+                    .read(savedExercisePlanNotifierProvider(exercisePlanId)
+                        .notifier)
+                    .addWeek();
+              }
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+}

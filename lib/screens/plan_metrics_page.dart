@@ -34,58 +34,64 @@ class PlanMetricsPage extends StatelessWidget {
     return splitExercises;
   }
 
+  List<Workout> _getWorkoutsForExercisePlanByDay(String day) {
+    List<Workout> workouts = [];
+
+    for (final week in exercisePlan.weeks) {
+      for (final workout in week.workouts) {
+        if (workout.dateCompleted != null && workout.day == day) {
+          workouts.add(workout);
+        }
+      }
+    }
+
+    return workouts;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(exercisePlan.planName)),
-      body: Column(children: [
-        DaySelectDropdown(provider: savedExercisePlanProvider),
-        Consumer(builder: ((context, ref, child) {
-          final String currentDay =
-              ref.watch(savedExercisePlanProvider).currentDay;
+      body: Column(
+        children: [
+          DaySelectDropdown(provider: savedExercisePlanProvider),
+          Consumer(
+            builder: ((context, ref, child) {
+              final String currentDay =
+                  ref.watch(savedExercisePlanProvider).currentDay;
+              final workouts = _getWorkoutsForExercisePlanByDay(currentDay);
 
-          return FutureBuilder(
-              future: workoutRepository.getWorkoutsForExercisePlanByDay(
-                  currentDay, exercisePlan.id),
-              builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (!snapshot.hasError) {
-                    return snapshot.data!.isEmpty
-                        ? const Flexible(
-                            child: Center(
-                              child: Text(
-                                'Complete a workout to begin tracking metrics',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            ),
-                          )
-                        : Expanded(
-                            child: ListView(
-                                children:
-                                    _splitWorkoutListIntoDateTimeExercises(
-                                            snapshot.data!)
-                                        .map(
-                                          (exercises) => ExpansionTile(
-                                            initiallyExpanded: true,
-                                            title: ExerciseListItem(
-                                                exercise:
-                                                    exercises.first.exercise),
-                                            children: [
-                                              ExerciseLineGraph(
-                                                  exercises: exercises)
-                                            ],
-                                          ),
-                                        )
-                                        .toList()),
-                          );
-                  }
-                  return Center(child: Text(snapshot.error.toString()));
-                }
-                return Container();
-              }));
-        })),
-      ]),
+              return workouts.isEmpty
+                  ? const Flexible(
+                      child: Center(
+                        child: Text(
+                          'Complete a workout to begin tracking metrics',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView(
+                        children:
+                            _splitWorkoutListIntoDateTimeExercises(workouts)
+                                .map(
+                                  (exercises) => ExpansionTile(
+                                    initiallyExpanded: true,
+                                    title: ExerciseListItem(
+                                        exercise: exercises.first.exercise),
+                                    children: [
+                                      ExerciseLineGraph(exercises: exercises)
+                                    ],
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    );
+            }),
+          ),
+        ],
+      ),
     );
   }
 }

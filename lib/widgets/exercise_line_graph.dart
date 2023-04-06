@@ -75,17 +75,19 @@ class ExerciseLineGraph extends ConsumerWidget {
                         'Volume ${preferences.weightMode == WeightMode.pounds ? '(Pounds)' : '(Kilograms)'}')),
             series: <ChartSeries>[
               FastLineSeries<DateTimeExercise, DateTime>(
-                  name: 'Volume',
-                  enableTooltip: true,
-                  markerSettings: const MarkerSettings(isVisible: true),
-                  dataSource: exercises,
-                  xValueMapper: (DateTimeExercise data, _) => data.dateTime,
-                  yValueMapper: (DateTimeExercise data, _) =>
-                      preferences.weightMode == WeightMode.pounds
-                          ? data.getVolume()
-                          : double.parse(
-                              convertWeightToKilograms(data.getVolume())
-                                  .toStringAsFixed(2))),
+                name: 'Volume',
+                enableTooltip: true,
+                markerSettings: const MarkerSettings(isVisible: true),
+                dataSource: exercises,
+                xValueMapper: (DateTimeExercise data, _) => data.dateTime,
+                yValueMapper: (DateTimeExercise data, _) =>
+                    preferences.weightMode == WeightMode.pounds
+                        ? data.getVolume()
+                        : double.parse(
+                            convertWeightToKilograms(data.getVolume())
+                                .toStringAsFixed(2),
+                          ),
+              ),
             ],
             tooltipBehavior: TooltipBehavior(enable: true),
             onTooltipRender: (tooltipArgs) {
@@ -93,7 +95,12 @@ class ExerciseLineGraph extends ConsumerWidget {
 
               if (index != null) {
                 DateTimeExercise exercise = exercises[index];
-                String newText = 'Volume: ${exercise.getVolume()}\n';
+                String newText =
+                    'Volume: ${preferences.weightMode == WeightMode.pounds ? exercise.getVolume() : double.parse(
+                        convertWeightToKilograms(
+                          exercise.getVolume(),
+                        ).toStringAsFixed(2),
+                      )}\n';
                 for (int set = 0; set < int.parse(exercise.sets); set++) {
                   if (exercise.reps[set] == '' || exercise.weights[set] == '') {
                     newText += "\nSet ${set + 1}: _";
